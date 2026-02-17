@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindset Tracker - CSI Revenue Signals Accelerator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS Custom Properties ===== */
+        :root {
+            --navy: #0B2340;
+            --lime: #BFD731;
+            --teal: #008AB0;
+            --dark-gray: #464646;
+            --off-white: #FAF9F6;
+            --white: #ffffff;
+            --amber: #F59E0B;
+            --bg: var(--off-white);
+            --card-bg: var(--white);
+            --text: var(--dark-gray);
+            --heading: var(--navy);
+            --shadow: rgba(11, 35, 64, 0.12);
+            --shadow-strong: rgba(11, 35, 64, 0.25);
+            --toast-bg: var(--navy);
+            --toast-text: var(--white);
+            --cell-bg: var(--white);
+            --cell-border: var(--navy);
+            --cell-text: var(--navy);
+            --input-bg: var(--white);
+            --input-border: #d1d5db;
+            --footer-bg: rgba(11, 35, 64, 0.06);
+            --footer-text: var(--dark-gray);
+            --overlay-bg: rgba(11, 35, 64, 0.92);
+            --toggle-bg: #d1d5db;
+            --toggle-active: var(--teal);
+
+            --level-toxic: #EF4444;
+            --level-talker: #F59E0B;
+            --level-action: #008AB0;
+            --level-driver: #BFD731;
+            --track-leadership: #F59E0B;
+            --track-product: #008AB0;
+            --track-rnd: #BFD731;
+            --track-general: #9CA3AF;
+
+            --star-color: transparent;
+            --sky-gradient: linear-gradient(180deg, transparent 0%, rgba(11, 35, 64, 0.02) 60%, rgba(11, 35, 64, 0.06) 100%);
+            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='mfar' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.12'/%3E%3C/linearGradient%3E%3ClinearGradient id='mmid' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.18'/%3E%3C/linearGradient%3E%3ClinearGradient id='mnear' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.18'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.25'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,400 L0,180 L80,200 L160,120 L240,170 L320,80 L400,150 L480,60 L560,140 L640,90 L720,160 L800,50 L880,130 L960,70 L1040,140 L1120,100 L1200,160 L1280,110 L1360,150 L1440,120 L1440,400Z' fill='url(%23mfar)'/%3E%3Cpath d='M0,400 L0,240 L100,220 L200,180 L280,230 L380,160 L460,210 L540,150 L640,200 L720,170 L820,220 L920,160 L1000,200 L1100,180 L1200,220 L1300,190 L1440,210 L1440,400Z' fill='url(%23mmid)'/%3E%3Cpath d='M0,400 L0,300 L120,280 L240,300 L360,270 L480,290 L600,260 L720,285 L840,265 L960,290 L1080,275 L1200,295 L1320,280 L1440,290 L1440,400Z' fill='url(%23mnear)'/%3E%3Cpath d='M475,58 L480,60 L485,64' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M795,48 L800,50 L805,55' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M315,78 L320,80 L325,85' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M955,68 L960,70 L965,75' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M635,88 L640,90 L645,95' fill='none' stroke='white' stroke-width='2.5' opacity='0.2'/%3E%3Cpath d='M1115,98 L1120,100 L1125,105' fill='none' stroke='white' stroke-width='2' opacity='0.2'/%3E%3C/svg%3E");
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1729;
+            --card-bg: #1a2744;
+            --text: #d1d5db;
+            --heading: var(--off-white);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-strong: rgba(0, 0, 0, 0.5);
+            --toast-bg: var(--lime);
+            --toast-text: var(--navy);
+            --cell-bg: #1e2d4a;
+            --cell-border: #2a3f66;
+            --cell-text: var(--off-white);
+            --input-bg: #1e2d4a;
+            --input-border: #2a3f66;
+            --footer-bg: rgba(255, 255, 255, 0.05);
+            --footer-text: #9ca3af;
+            --overlay-bg: rgba(15, 23, 41, 0.95);
+            --toggle-bg: #374151;
+
+            --star-color: rgba(255, 255, 255, 0.5);
+            --sky-gradient: linear-gradient(180deg, transparent 0%, transparent 40%, rgba(15, 25, 50, 0.2) 65%, rgba(20, 35, 65, 0.4) 85%, rgba(15, 23, 41, 0.6) 100%);
+            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='mfar' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%231a3050' stop-opacity='0.5'/%3E%3Cstop offset='100%25' stop-color='%23122040' stop-opacity='0.7'/%3E%3C/linearGradient%3E%3ClinearGradient id='mmid' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23142838' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%230e1c2e' stop-opacity='0.85'/%3E%3C/linearGradient%3E%3ClinearGradient id='mnear' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f1e30' stop-opacity='0.85'/%3E%3Cstop offset='100%25' stop-color='%230a1420' stop-opacity='0.95'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,400 L0,180 L80,200 L160,120 L240,170 L320,80 L400,150 L480,60 L560,140 L640,90 L720,160 L800,50 L880,130 L960,70 L1040,140 L1120,100 L1200,160 L1280,110 L1360,150 L1440,120 L1440,400Z' fill='url(%23mfar)'/%3E%3Cpath d='M0,400 L0,240 L100,220 L200,180 L280,230 L380,160 L460,210 L540,150 L640,200 L720,170 L820,220 L920,160 L1000,200 L1100,180 L1200,220 L1300,190 L1440,210 L1440,400Z' fill='url(%23mmid)'/%3E%3Cpath d='M0,400 L0,300 L120,280 L240,300 L360,270 L480,290 L600,260 L720,285 L840,265 L960,290 L1080,275 L1200,295 L1320,280 L1440,290 L1440,400Z' fill='url(%23mnear)'/%3E%3Cpath d='M475,58 L480,60 L485,64' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M795,48 L800,50 L805,55' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M315,78 L320,80 L325,85' fill='none' stroke='%23E8F0FF' stroke-width='1.5' opacity='0.3'/%3E%3Cpath d='M955,68 L960,70 L965,75' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M635,88 L640,90 L645,95' fill='none' stroke='%23E8F0FF' stroke-width='2.5' opacity='0.3'/%3E%3Cpath d='M1115,98 L1120,100 L1125,105' fill='none' stroke='%23E8F0FF' stroke-width='1.5' opacity='0.25'/%3E%3C/svg%3E");
+        }
+
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        /* Denver mountain range - dramatic layered background */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100vh;
+            background:
+                /* Stars in sky (dark mode enhanced) */
+                radial-gradient(1px 1px at 10% 15%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 25% 8%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 40% 20%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 55% 12%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 70% 5%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 85% 18%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 15% 25%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 62% 22%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1px 1px at 92% 10%, var(--star-color) 50%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 48% 3%, var(--star-color) 50%, transparent 100%),
+                /* Sky gradient */
+                var(--sky-gradient);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 45vh;
+            background: var(--mountain-scene);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .logo-area { margin-bottom: 12px; }
+        .logo-area img { height: 40px; width: auto; transition: filter 0.3s; }
+        [data-theme="dark"] .logo-area img { filter: brightness(0) invert(1); }
+
+        .logo-subtitle {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Denver mountain header decoration */
+        .mountain-header {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 8px;
+            display: block;
+        }
+
+        .mountain-header svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 2px 8px rgba(11, 35, 64, 0.15));
+        }
+
+        [data-theme="dark"] .mountain-header svg {
+            filter: drop-shadow(0 2px 12px rgba(191, 215, 49, 0.2));
+        }
+
+        [data-theme="dark"] .mountain-header .mtn-far {
+            fill: #8ba4c4;
+            opacity: 0.2;
+        }
+
+        [data-theme="dark"] .mountain-header .mtn-mid {
+            fill: #6b8ab0;
+            opacity: 0.3;
+        }
+
+        [data-theme="dark"] .mountain-header .mtn-near {
+            fill: #4a6e96;
+            opacity: 0.35;
+        }
+
+        [data-theme="dark"] .mountain-header svg path[fill="white"] {
+            opacity: 0.85;
+        }
+
+        .title {
+            font-weight: 900;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            color: var(--heading);
+            line-height: 1.1;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .user-info {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--teal);
+        }
+
+        /* ===== Dark Mode Toggle ===== */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--cell-border);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--teal); color: var(--teal); }
+
+        .btn-signout {
+            background: none;
+            border: 2px solid var(--level-toxic);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--level-toxic);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-signout:hover { background: var(--level-toxic); color: var(--white); }
+
+        /* ===== Day Selector ===== */
+        .day-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .day-pill {
+            width: 40px;
+            height: 32px;
+            border-radius: 16px;
+            border: 2px solid var(--cell-border);
+            background: var(--cell-bg);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--cell-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .day-pill:hover { transform: scale(1.08); }
+        .day-pill.active {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: var(--white);
+        }
+
+        /* ===== Track Filter ===== */
+        .track-filter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .track-btn {
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            background: var(--cell-bg);
+            color: var(--text);
+        }
+        .track-btn:hover { transform: scale(1.05); }
+        .track-btn.active { color: var(--navy); font-weight: 800; }
+        .track-btn[data-track="all"].active { background: var(--off-white); border-color: var(--navy); color: var(--navy); }
+        .track-btn[data-track="leadership"].active { background: var(--track-leadership); border-color: var(--track-leadership); }
+        .track-btn[data-track="product"].active { background: var(--track-product); border-color: var(--track-product); color: var(--white); }
+        .track-btn[data-track="rnd"].active { background: var(--track-rnd); border-color: var(--track-rnd); }
+        [data-theme="dark"] .track-btn[data-track="all"].active { background: var(--cell-bg); border-color: var(--off-white); color: var(--off-white); }
+
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            box-shadow: 0 1px 4px var(--shadow);
+        }
+
+        .stat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* ===== Cards ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: background 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-weight: 800;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: var(--heading);
+        }
+
+        /* ===== Participant Cards Grid ===== */
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .participant-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 8px var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .participant-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px var(--shadow-strong); }
+        .participant-card[data-level="toxic"] { border-left-color: var(--level-toxic); }
+        .participant-card[data-level="talker"] { border-left-color: var(--level-talker); }
+        .participant-card[data-level="action"] { border-left-color: var(--level-action); }
+        .participant-card[data-level="driver"] { border-left-color: var(--level-driver); }
+
+        .participant-info { flex: 1; min-width: 0; }
+        .participant-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--heading);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .participant-meta {
+            font-size: 0.68rem;
+            color: var(--text);
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .track-badge {
+            display: inline-block;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .level-pill.toxic { background: var(--level-toxic); color: var(--white); }
+        .level-pill.talker { background: var(--level-talker); color: var(--navy); }
+        .level-pill.action { background: var(--level-action); color: var(--white); }
+        .level-pill.driver { background: var(--level-driver); color: var(--navy); }
+        .level-pill.none { background: var(--cell-bg); color: var(--text); border: 1px solid var(--cell-border); }
+
+        .movement-arrow {
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+        .movement-arrow.up { color: var(--level-driver); }
+        .movement-arrow.down { color: var(--level-toxic); }
+        .movement-arrow.same { color: var(--text); opacity: 0.4; }
+
+        .rater-count {
+            font-size: 0.6rem;
+            color: var(--text);
+            opacity: 0.5;
+            font-weight: 600;
+        }
+
+        /* ===== VBU Group ===== */
+        .vbu-group { margin-bottom: 16px; }
+        .vbu-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-left: 2px;
+        }
+
+        /* ===== Assessment View ===== */
+        .level-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .level-btn {
+            min-height: 64px;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        .level-btn:hover { transform: scale(1.03); }
+        .level-btn:active { transform: scale(0.97); }
+        .level-btn .level-num { font-size: 0.6rem; font-weight: 600; opacity: 0.7; }
+
+        .level-btn.toxic { background: rgba(239,68,68,0.15); color: var(--level-toxic); border-color: rgba(239,68,68,0.3); }
+        .level-btn.toxic.selected { background: var(--level-toxic); color: var(--white); border-color: var(--level-toxic); }
+        .level-btn.talker { background: rgba(245,158,11,0.15); color: var(--level-talker); border-color: rgba(245,158,11,0.3); }
+        .level-btn.talker.selected { background: var(--level-talker); color: var(--navy); border-color: var(--level-talker); }
+        .level-btn.action { background: rgba(0,138,176,0.15); color: var(--level-action); border-color: rgba(0,138,176,0.3); }
+        .level-btn.action.selected { background: var(--level-action); color: var(--white); border-color: var(--level-action); }
+        .level-btn.driver { background: rgba(191,215,49,0.15); color: #6b8a10; border-color: rgba(191,215,49,0.3); }
+        .level-btn.driver.selected { background: var(--level-driver); color: var(--navy); border-color: var(--level-driver); }
+        [data-theme="dark"] .level-btn.driver { color: var(--level-driver); }
+
+        .other-ratings {
+            margin-top: 16px;
+        }
+
+        .other-ratings h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .rating-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--cell-border);
+            font-size: 0.8rem;
+        }
+
+        .rating-row:last-child { border-bottom: none; }
+
+        /* ===== Journey View ===== */
+        .journey-timeline {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .journey-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .journey-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            border: 3px solid var(--cell-border);
+            background: var(--cell-bg);
+            color: var(--cell-text);
+            position: relative;
+            z-index: 2;
+        }
+        .journey-circle.toxic { background: var(--level-toxic); border-color: var(--level-toxic); color: var(--white); }
+        .journey-circle.talker { background: var(--level-talker); border-color: var(--level-talker); color: var(--navy); }
+        .journey-circle.action { background: var(--level-action); border-color: var(--level-action); color: var(--white); }
+        .journey-circle.driver { background: var(--level-driver); border-color: var(--level-driver); color: var(--navy); }
+
+        .journey-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text);
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .journey-connector {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: var(--cell-border);
+            z-index: 1;
+        }
+
+        .journey-day:last-child .journey-connector { display: none; }
+
+        /* ===== Form Elements ===== */
+        .form-group { margin-bottom: 12px; }
+        .form-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--teal);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn:hover { transform: scale(1.03); }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-primary { background: var(--teal); color: var(--white); }
+        .btn-lime { background: var(--lime); color: var(--navy); }
+        .btn-danger { background: var(--level-toxic); color: var(--white); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--cell-border);
+            color: var(--text);
+        }
+        .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+        .btn-sm { padding: 6px 12px; font-size: 0.72rem; }
+
+        /* ===== Table ===== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--cell-border);
+        }
+
+        .data-table th {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .data-table tr:hover td { background: rgba(0,138,176,0.05); }
+
+        /* ===== View Management ===== */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* ===== Top Nav ===== */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 6px 8px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--text);
+            opacity: 0.5;
+            background: none;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-family: 'Barlow', sans-serif;
+        }
+        .nav-item:hover { opacity: 0.8; background: rgba(0,138,176,0.06); }
+        .nav-item.active { opacity: 1; color: var(--teal); border-color: var(--teal); background: rgba(0,138,176,0.08); }
+        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            box-shadow: 0 4px 16px var(--shadow-strong);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 200;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* ===== Login View ===== */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px var(--shadow);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-title {
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--heading);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 0.82rem;
+            color: var(--text);
+            opacity: 0.7;
+            margin-bottom: 24px;
+        }
+
+        .btn-signin {
+            background: var(--teal);
+            color: var(--white);
+            font-family: 'Barlow', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-signin:hover { transform: scale(1.03); background: #007a9c; }
+
+        /* ===== Participant Select (Assessment) ===== */
+        .participant-select-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid var(--cell-border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .participant-select-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--cell-border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--heading);
+        }
+        .participant-select-item:last-child { border-bottom: none; }
+        .participant-select-item:hover { background: rgba(0,138,176,0.08); }
+        .participant-select-item.selected { background: rgba(0,138,176,0.15); color: var(--teal); }
+
+        /* ===== Admin View ===== */
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .file-input-hidden { display: none; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 600px) {
+            .participants-grid { grid-template-columns: 1fr; }
+            .level-buttons { grid-template-columns: 1fr 1fr; }
+            .login-card { padding: 28px 20px; }
+            .data-table { font-size: 0.68rem; }
+            .data-table th, .data-table td { padding: 6px; }
+        }
+
+        /* ===== Empty State ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text);
+            opacity: 0.5;
+        }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+        .empty-state p { font-size: 0.85rem; font-weight: 600; }
+
+        /* ===== Back Button ===== */
+        .back-btn {
+            background: none;
+            border: none;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--teal);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 12px;
+            padding: 4px 0;
+        }
+        .back-btn:hover { text-decoration: underline; }
+
+        /* ===== Search ===== */
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--teal); }
+
+        .search-wrapper {
+            position: relative;
+        }
+        .search-wrapper svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--text);
+            opacity: 0.4;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--cell-border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header class="header" id="appHeader" style="display:none;">
+            <div class="logo-area">
+                <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="logoImg">
+                <div class="logo-subtitle">CSI Revenue Signals Accelerator</div>
+            </div>
+            <!-- Denver mountain skyline -->
+            <div class="mountain-header">
+                <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Far range -->
+                    <path class="mtn-far" d="M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z" fill="var(--navy)" opacity="0.07"/>
+                    <!-- Mid range -->
+                    <path class="mtn-mid" d="M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z" fill="var(--navy)" opacity="0.12"/>
+                    <!-- Near foothills -->
+                    <path class="mtn-near" d="M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z" fill="var(--navy)" opacity="0.18"/>
+                    <!-- Snow caps on tallest peaks -->
+                    <path d="M205,14 L210,12 L216,17 L210,15Z" fill="white" opacity="0.6"/>
+                    <path d="M207,16 L210,12 L220,20 L212,18Z" fill="white" opacity="0.25"/>
+                    <path d="M415,12 L420,10 L426,16 L420,13Z" fill="white" opacity="0.6"/>
+                    <path d="M417,14 L420,10 L428,18 L422,16Z" fill="white" opacity="0.25"/>
+                    <path d="M145,20 L150,18 L156,24 L150,21Z" fill="white" opacity="0.55"/>
+                    <path d="M147,22 L150,18 L158,26 L152,23Z" fill="white" opacity="0.2"/>
+                    <path d="M335,17 L340,15 L346,21 L340,18Z" fill="white" opacity="0.55"/>
+                    <path d="M337,19 L340,15 L348,23 L342,20Z" fill="white" opacity="0.2"/>
+                    <path d="M75,30 L80,28 L86,34 L80,31Z" fill="white" opacity="0.5"/>
+                    <path d="M77,32 L80,28 L88,36 L82,33Z" fill="white" opacity="0.18"/>
+                    <path d="M495,20 L500,18 L506,24 L500,21Z" fill="white" opacity="0.5"/>
+                </svg>
+            </div>
+            <div class="title">Mindset Tracker</div>
+            <div class="header-controls">
+                <span class="user-info" id="userDisplay"></span>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark</button>
+                <button class="btn-signout" onclick="signOut()">Sign Out</button>
+            </div>
+        </header>
+
+        <!-- ===== LOGIN VIEW ===== -->
+        <div class="view active" id="viewLogin">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="logo-area" style="margin-bottom:16px;">
+                        <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris">
+                    </div>
+                    <!-- Denver mountain skyline -->
+                    <div class="mountain-header">
+                        <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path class="mtn-far" d="M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z" fill="var(--navy)" opacity="0.07"/>
+                            <path class="mtn-mid" d="M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z" fill="var(--navy)" opacity="0.12"/>
+                            <path class="mtn-near" d="M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z" fill="var(--navy)" opacity="0.18"/>
+                            <path d="M205,14 L210,12 L216,17 L210,15Z" fill="white" opacity="0.6"/>
+                            <path d="M415,12 L420,10 L426,16 L420,13Z" fill="white" opacity="0.6"/>
+                            <path d="M145,20 L150,18 L156,24 L150,21Z" fill="white" opacity="0.55"/>
+                            <path d="M335,17 L340,15 L346,21 L340,18Z" fill="white" opacity="0.55"/>
+                        </svg>
+                    </div>
+                    <div class="login-title">Mindset Tracker</div>
+                    <div class="login-subtitle">CSI Revenue Signals Product Accelerator<br>Facilitator Assessment Tool</div>
+                    <button class="btn-signin" onclick="signIn()">Sign In</button>
+                    <div style="margin-top:16px;font-size:0.68rem;color:var(--text);opacity:0.5;">Facilitators only</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOP NAV ===== -->
+        <nav class="top-nav" id="topNav" style="display:none;">
+            <button class="nav-item active" data-view="dashboard" onclick="showView('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Board
+            </button>
+            <button class="nav-item" data-view="assessment" onclick="showView('assessment')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Assess
+            </button>
+            <button class="nav-item" data-view="journey" onclick="showView('journey')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Journey
+            </button>
+            <button class="nav-item" data-view="admin" onclick="showView('admin')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                Admin
+            </button>
+            <button class="nav-item" data-view="auditLog" onclick="showView('auditLog')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Log
+            </button>
+        </nav>
+
+        <!-- ===== DASHBOARD VIEW ===== -->
+        <div class="view" id="viewDashboard">
+            <div class="day-selector" id="daySelector"></div>
+            <div class="track-filter" id="trackFilter"></div>
+            <div class="stats-bar" id="statsBar"></div>
+            <div id="dashboardContent"></div>
+        </div>
+
+        <!-- ===== ASSESSMENT VIEW ===== -->
+        <div class="view" id="viewAssessment">
+            <button class="back-btn" onclick="showView('dashboard')">&#8592; Back to Dashboard</button>
+            <div id="assessmentContent"></div>
+        </div>
+
+        <!-- ===== JOURNEY VIEW ===== -->
+        <div class="view" id="viewJourney">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Participant Journey</div>
+                </div>
+                <div class="search-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="journeySearch" placeholder="Search participants..." oninput="filterJourneyList()">
+                </div>
+                <div id="journeyParticipantList" class="participant-select-list"></div>
+            </div>
+            <div id="journeyDetail" style="display:none;"></div>
+        </div>
+
+        <!-- ===== ADMIN VIEW ===== -->
+        <div class="view" id="viewAdmin">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Participant Management</div>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-primary btn-sm" onclick="showAddParticipant()">+ Add</button>
+                    <button class="btn btn-outline btn-sm" onclick="downloadTemplate()">CSV Template</button>
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('csvFileInput').click()">Import CSV</button>
+                    <button class="btn btn-outline btn-sm" onclick="exportAssessments()">Export Data</button>
+                    <input type="file" id="csvFileInput" class="file-input-hidden" accept=".csv" onchange="importCSV(event)">
+                </div>
+                <!-- VBU Management -->
+                <div class="card" id="vbuManagement" style="margin-bottom:12px;">
+                    <div class="card-header">
+                        <div class="card-title" style="font-size:0.85rem;">VBU / Companies</div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="vbuChips"></div>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" class="form-input" id="newVbuInput" placeholder="Add VBU name..." style="flex:1;" onkeydown="if(event.key==='Enter')addVbuEntity()">
+                        <button class="btn btn-primary btn-sm" onclick="addVbuEntity()">Add</button>
+                    </div>
+                </div>
+
+                <div id="addParticipantForm" style="display:none;" class="card" style="margin-bottom:12px;">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" id="addName" placeholder="Full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="addEmail" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">VBU / Company</label>
+                        <select class="form-select" id="addVbu">
+                            <option value="">Select VBU...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Track</label>
+                        <select class="form-select" id="addTrack">
+                            <option value="product">Product</option>
+                            <option value="rnd">R&D</option>
+                            <option value="leadership">Leadership</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px;">
+                        <button class="btn btn-lime btn-sm" onclick="saveParticipant()">Save</button>
+                        <button class="btn btn-outline btn-sm" onclick="hideAddParticipant()">Cancel</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table" id="adminTable">
+                        <thead>
+                            <tr><th>Name</th><th>Email</th><th>VBU</th><th>Track</th><th></th></tr>
+                        </thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AUDIT LOG VIEW ===== -->
+        <div class="view" id="viewAuditLog">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Audit Log</div>
+                </div>
+                <div class="search-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="auditSearch" placeholder="Filter by participant..." oninput="filterAuditLog()">
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Time</th><th>Participant</th><th>Day</th><th>Assessor</th><th>Action</th><th>From</th><th>To</th></tr>
+                        </thead>
+                        <tbody id="auditTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- nav moved to inside container -->
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+    /* ==========================================================================
+       MINDSET TRACKER — CSI Revenue Signals Product Accelerator
+       Facilitator assessment tool: Toxic > Talker > Action > Driver
+       ========================================================================== */
+
+    // ===== CONFIG =====
+    const CONFIG = {
+        API_BASE: 'https://vxm4x8vt1b.execute-api.us-east-1.amazonaws.com',
+        COGNITO_DOMAIN: 'https://mindset-tracker-csi.auth.us-east-1.amazoncognito.com',
+        COGNITO_CLIENT_ID: '6hudm6vbdj4oc5n8ol6237al34',
+        COGNITO_REDIRECT_URI: window.location.origin + window.location.pathname,
+    };
+
+    const LEVELS = ['toxic', 'talker', 'action', 'driver'];
+    const LEVEL_LABELS = { toxic: 'Toxic', talker: 'Talker', action: 'Action', driver: 'Driver' };
+    const LEVEL_VALUES = { toxic: 1, talker: 2, action: 3, driver: 4 };
+    const TRACK_LABELS = { product: 'Product', rnd: 'R&D', leadership: 'Leadership' };
+    const TRACK_COLORS = { product: 'var(--track-product)', rnd: 'var(--track-rnd)', leadership: 'var(--track-leadership)' };
+    const DAYS = ['D1', 'D2', 'D3', 'D4'];
+
+    // ===== STATE =====
+    let currentUser = null;
+    let idToken = null;
+    let participants = [];
+    let currentDay = 'D1';
+    let currentTrack = 'all';
+    let consensusData = [];
+    let allAuditEntries = [];
+    let isDarkMode = false;
+    let selectedAssessmentParticipant = null;
+    let selectedJourneyParticipant = null;
+
+    // ===== AUTH =====
+    function signIn() {
+        if (!CONFIG.COGNITO_DOMAIN || !CONFIG.COGNITO_CLIENT_ID) {
+            // Dev mode: fake login
+            currentUser = { email: 'dev@test.com', name: 'Dev User' };
+            idToken = 'dev-token';
+            sessionStorage.setItem('idToken', idToken);
+            sessionStorage.setItem('userEmail', currentUser.email);
+            sessionStorage.setItem('userName', currentUser.name);
+            onAuthenticated();
+            return;
+        }
+        const url = `${CONFIG.COGNITO_DOMAIN}/login?response_type=token&client_id=${CONFIG.COGNITO_CLIENT_ID}&redirect_uri=${encodeURIComponent(CONFIG.COGNITO_REDIRECT_URI)}&scope=openid+email+profile`;
+        window.location.href = url;
+    }
+
+    function signOut() {
+        sessionStorage.clear();
+        currentUser = null;
+        idToken = null;
+        document.getElementById('appHeader').style.display = 'none';
+        document.getElementById('topNav').style.display = 'none';
+        showView('login');
+    }
+
+    function checkAuth() {
+        // Check for callback hash
+        if (window.location.hash) {
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const token = params.get('id_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    // Check expiry
+                    if (payload.exp && payload.exp * 1000 > Date.now()) {
+                        idToken = token;
+                        currentUser = {
+                            email: payload.email || payload['cognito:username'] || 'unknown',
+                            name: payload.name || payload.email || 'User',
+                        };
+                        sessionStorage.setItem('idToken', token);
+                        sessionStorage.setItem('userEmail', currentUser.email);
+                        sessionStorage.setItem('userName', currentUser.name);
+                        sessionStorage.setItem('tokenExp', payload.exp);
+                        // Clean URL
+                        history.replaceState(null, '', window.location.pathname);
+                        onAuthenticated();
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Token parse error:', e);
+                }
+            }
+        }
+
+        // Check session storage
+        const storedToken = sessionStorage.getItem('idToken');
+        const storedExp = sessionStorage.getItem('tokenExp');
+        if (storedToken) {
+            if (storedExp && parseInt(storedExp) * 1000 < Date.now()) {
+                sessionStorage.clear();
+                return;
+            }
+            idToken = storedToken;
+            currentUser = {
+                email: sessionStorage.getItem('userEmail') || 'unknown',
+                name: sessionStorage.getItem('userName') || 'User',
+            };
+            onAuthenticated();
+        }
+    }
+
+    function onAuthenticated() {
+        document.getElementById('appHeader').style.display = '';
+        document.getElementById('topNav').style.display = '';
+        document.getElementById('userDisplay').textContent = currentUser.name;
+        showView('dashboard');
+        loadParticipants();
+    }
+
+    // ===== API =====
+    async function api(method, path, body) {
+        if (!CONFIG.API_BASE) {
+            console.warn('API_BASE not configured, using mock data');
+            return mockApi(method, path, body);
+        }
+
+        const opts = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`,
+            },
+        };
+        if (body) opts.body = JSON.stringify(body);
+
+        const resp = await fetch(CONFIG.API_BASE + path, opts);
+        if (resp.status === 401) {
+            showToast('Session expired. Please sign in again.');
+            signOut();
+            throw new Error('Unauthorized');
+        }
+        if (!resp.ok) {
+            const errBody = await resp.json().catch(() => ({}));
+            throw new Error(errBody.error || `API error ${resp.status}`);
+        }
+        return resp.json();
+    }
+
+    // ===== MOCK API (for local dev without backend) =====
+    let mockParticipants = [
+        { userId: 'alice@acme.com', name: 'Alice Johnson', email: 'alice@acme.com', vbu: 'Acme Corp', track: 'product' },
+        { userId: 'bob@acme.com', name: 'Bob Smith', email: 'bob@acme.com', vbu: 'Acme Corp', track: 'rnd' },
+        { userId: 'carol@beta.com', name: 'Carol Williams', email: 'carol@beta.com', vbu: 'Beta Inc', track: 'leadership' },
+        { userId: 'david@beta.com', name: 'David Brown', email: 'david@beta.com', vbu: 'Beta Inc', track: 'product' },
+        { userId: 'eve@gamma.com', name: 'Eve Davis', email: 'eve@gamma.com', vbu: 'Gamma Ltd', track: 'rnd' },
+        { userId: 'frank@gamma.com', name: 'Frank Miller', email: 'frank@gamma.com', vbu: 'Gamma Ltd', track: 'product' },
+    ];
+    let mockAssessments = {};
+    let mockAuditLog = [];
+    let mockNotes = {};
+
+    function mockApi(method, path, body) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                // GET /participants
+                if (method === 'GET' && path === '/participants') {
+                    resolve({ participants: mockParticipants });
+                    return;
+                }
+                // POST /participants
+                if (method === 'POST' && path === '/participants') {
+                    mockParticipants.push({ userId: body.email, ...body });
+                    resolve({ success: true });
+                    return;
+                }
+                // DELETE /participants/xxx
+                if (method === 'DELETE' && path.startsWith('/participants/')) {
+                    const email = decodeURIComponent(path.split('/participants/')[1]);
+                    mockParticipants = mockParticipants.filter(p => p.userId !== email);
+                    resolve({ success: true });
+                    return;
+                }
+                // POST /participants/import
+                if (method === 'POST' && path === '/participants/import') {
+                    for (const p of body.participants) {
+                        if (!mockParticipants.find(x => x.userId === p.email)) {
+                            mockParticipants.push({ userId: p.email, ...p });
+                        }
+                    }
+                    resolve({ success: true, imported: body.participants.length });
+                    return;
+                }
+                // GET /assessments
+                if (method === 'GET' && path.startsWith('/assessments')) {
+                    const params = new URLSearchParams(path.split('?')[1] || '');
+                    const pid = params.get('participantId');
+                    const day = params.get('day');
+                    const key = `${pid}#${day}`;
+                    const all = Object.values(mockAssessments).flat();
+                    const filtered = all.filter(a =>
+                        (!pid || a.participantId === pid) && (!day || a.day === day)
+                    );
+                    resolve({ assessments: filtered });
+                    return;
+                }
+                // POST /assessments
+                if (method === 'POST' && path === '/assessments') {
+                    const key = `${body.participantId}#${body.day}#${currentUser.email}`;
+                    const existing = mockAssessments[key];
+                    const prevLevel = existing ? existing.level : null;
+                    mockAssessments[key] = {
+                        participantId: body.participantId,
+                        day: body.day,
+                        dayAssessor: `${body.day}#${currentUser.email}`,
+                        level: body.level,
+                        assessorId: currentUser.email,
+                        assessorName: currentUser.name,
+                        timestamp: new Date().toISOString(),
+                    };
+                    mockAuditLog.unshift({
+                        participantId: body.participantId,
+                        timestamp: new Date().toISOString(),
+                        action: prevLevel ? 'update' : 'create',
+                        assessorId: currentUser.email,
+                        assessorName: currentUser.name,
+                        day: body.day,
+                        previousLevel: prevLevel,
+                        newLevel: body.level,
+                    });
+                    resolve({ success: true });
+                    return;
+                }
+                // GET /consensus
+                if (method === 'GET' && path.startsWith('/consensus')) {
+                    const params = new URLSearchParams(path.split('?')[1] || '');
+                    const day = params.get('day');
+                    const prevDay = day === 'D1' ? null : `D${parseInt(day.slice(1)) - 1}`;
+                    const allAssess = Object.values(mockAssessments);
+
+                    const consensus = mockParticipants.map(p => {
+                        const dayAssess = allAssess.filter(a => a.participantId === p.userId && a.day === day);
+                        const prevAssess = prevDay ? allAssess.filter(a => a.participantId === p.userId && a.day === prevDay) : [];
+
+                        function calc(arr) {
+                            if (arr.length === 0) return null;
+                            const sum = arr.reduce((s, a) => s + (LEVEL_VALUES[a.level] || 0), 0);
+                            const mean = Math.round(sum / arr.length * 100) / 100;
+                            let label;
+                            if (mean < 1.5) label = 'toxic';
+                            else if (mean < 2.5) label = 'talker';
+                            else if (mean < 3.5) label = 'action';
+                            else label = 'driver';
+                            return { mean, label, count: arr.length };
+                        }
+
+                        const current = calc(dayAssess);
+                        const prev = calc(prevAssess);
+                        let movement = 'none';
+                        if (current && prev) {
+                            if (current.mean > prev.mean) movement = 'up';
+                            else if (current.mean < prev.mean) movement = 'down';
+                            else movement = 'same';
+                        }
+
+                        return { ...p, consensus: current, movement, assessments: dayAssess };
+                    });
+
+                    resolve({ consensus, day });
+                    return;
+                }
+                // GET /audit-log
+                if (method === 'GET' && path.startsWith('/audit-log')) {
+                    resolve({ entries: mockAuditLog });
+                    return;
+                }
+                // GET /notes/xxx
+                if (method === 'GET' && path.startsWith('/notes/')) {
+                    const pid = decodeURIComponent(path.split('/notes/')[1]);
+                    resolve({ notes: mockNotes[pid] || [] });
+                    return;
+                }
+                // POST /notes
+                if (method === 'POST' && path === '/notes') {
+                    if (!mockNotes[body.participantId]) mockNotes[body.participantId] = [];
+                    mockNotes[body.participantId].unshift({
+                        participantId: body.participantId,
+                        timestamp: new Date().toISOString(),
+                        authorId: currentUser.email,
+                        authorName: currentUser.name,
+                        note: body.note,
+                    });
+                    resolve({ success: true });
+                    return;
+                }
+                resolve({ error: 'Not found' });
+            }, 100);
+        });
+    }
+
+    // ===== VIEW MANAGEMENT =====
+    function showView(name) {
+        const views = {
+            login: 'viewLogin',
+            dashboard: 'viewDashboard',
+            assessment: 'viewAssessment',
+            journey: 'viewJourney',
+            admin: 'viewAdmin',
+            auditLog: 'viewAuditLog',
+        };
+
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const viewEl = document.getElementById(views[name]);
+        if (viewEl) viewEl.classList.add('active');
+
+        // Update nav
+        document.querySelectorAll('.nav-item').forEach(n => {
+            n.classList.toggle('active', n.dataset.view === name);
+        });
+
+        // Load data per view
+        if (name === 'dashboard') loadConsensus();
+        if (name === 'assessment') renderAssessmentSelect();
+        if (name === 'journey') renderJourneyList();
+        if (name === 'admin') renderAdminTable();
+        if (name === 'auditLog') loadAuditLog();
+    }
+
+    // ===== PARTICIPANTS =====
+    async function loadParticipants() {
+        try {
+            const data = await api('GET', '/participants');
+            participants = data.participants || [];
+            // Cache
+            localStorage.setItem('mt_participants', JSON.stringify(participants));
+        } catch (e) {
+            console.error('Failed to load participants:', e);
+            // Fallback to cache
+            const cached = localStorage.getItem('mt_participants');
+            if (cached) participants = JSON.parse(cached);
+        }
+    }
+
+    // ===== DASHBOARD =====
+    function renderDaySelector() {
+        const el = document.getElementById('daySelector');
+        el.innerHTML = DAYS.map(d =>
+            `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="selectDay('${d}')">${d}</button>`
+        ).join('');
+    }
+
+    function renderTrackFilter() {
+        const el = document.getElementById('trackFilter');
+        const tracks = [
+            { key: 'all', label: 'All' },
+            { key: 'product', label: 'Product' },
+            { key: 'rnd', label: 'R&D' },
+            { key: 'leadership', label: 'Leadership' },
+        ];
+        el.innerHTML = tracks.map(t =>
+            `<button class="track-btn ${t.key === currentTrack ? 'active' : ''}" data-track="${t.key}" onclick="selectTrack('${t.key}')">${t.label}</button>`
+        ).join('');
+    }
+
+    function selectDay(day) {
+        currentDay = day;
+        renderDaySelector();
+        loadConsensus();
+    }
+
+    function selectTrack(track) {
+        currentTrack = track;
+        renderTrackFilter();
+        renderDashboard();
+    }
+
+    async function loadConsensus() {
+        renderDaySelector();
+        renderTrackFilter();
+        try {
+            const data = await api('GET', `/consensus?day=${currentDay}`);
+            consensusData = data.consensus || [];
+            renderDashboard();
+        } catch (e) {
+            console.error('Failed to load consensus:', e);
+            showToast('Failed to load data');
+        }
+    }
+
+    function renderDashboard() {
+        const filtered = currentTrack === 'all'
+            ? consensusData
+            : consensusData.filter(p => p.track === currentTrack);
+
+        // Stats
+        const stats = { toxic: 0, talker: 0, action: 0, driver: 0, unrated: 0 };
+        for (const p of filtered) {
+            if (p.consensus) stats[p.consensus.label]++;
+            else stats.unrated++;
+        }
+
+        document.getElementById('statsBar').innerHTML = `
+            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-toxic)"></div>${stats.toxic} Toxic</div>
+            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-talker)"></div>${stats.talker} Talker</div>
+            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-action)"></div>${stats.action} Action</div>
+            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-driver)"></div>${stats.driver} Driver</div>
+            <div class="stat-chip"><div class="stat-dot" style="background:var(--cell-border)"></div>${stats.unrated} Unrated</div>
+        `;
+
+        // Group by VBU
+        const groups = {};
+        for (const p of filtered) {
+            const vbu = p.vbu || 'Ungrouped';
+            if (!groups[vbu]) groups[vbu] = [];
+            groups[vbu].push(p);
+        }
+
+        const content = document.getElementById('dashboardContent');
+        if (filtered.length === 0) {
+            content.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No participants yet. Add some in the Admin tab.</p></div>`;
+            return;
+        }
+
+        let html = '';
+        const sortedVBUs = Object.keys(groups).sort();
+        for (const vbu of sortedVBUs) {
+            const group = groups[vbu];
+            html += `<div class="vbu-group"><div class="vbu-label">${escHtml(vbu)}</div><div class="participants-grid">`;
+            for (const p of group) {
+                const level = p.consensus ? p.consensus.label : 'none';
+                const levelLabel = p.consensus ? LEVEL_LABELS[p.consensus.label] : 'Unrated';
+                const trackColor = TRACK_COLORS[p.track] || 'var(--track-general)';
+                const trackLabel = TRACK_LABELS[p.track] || p.track || '';
+                const trackTextColor = p.track === 'product' ? 'var(--white)' : 'var(--navy)';
+
+                let movementHtml = '';
+                if (p.movement === 'up') movementHtml = '<span class="movement-arrow up">&#9650;</span>';
+                else if (p.movement === 'down') movementHtml = '<span class="movement-arrow down">&#9660;</span>';
+                else if (p.movement === 'same') movementHtml = '<span class="movement-arrow same">&#9654;</span>';
+
+                const raterCount = p.consensus ? p.consensus.count : 0;
+
+                html += `
+                    <div class="participant-card" data-level="${level}" onclick="openAssessment('${escAttr(p.userId)}')">
+                        <div class="participant-info">
+                            <div class="participant-name">${escHtml(p.name)}</div>
+                            <div class="participant-meta">
+                                <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                                <span class="rater-count">${raterCount} rater${raterCount !== 1 ? 's' : ''}</span>
+                            </div>
+                        </div>
+                        <span class="level-pill ${level}">${levelLabel}</span>
+                        ${movementHtml}
+                    </div>`;
+            }
+            html += '</div></div>';
+        }
+        content.innerHTML = html;
+    }
+
+    // ===== ASSESSMENT VIEW =====
+    function openAssessment(participantId) {
+        selectedAssessmentParticipant = participantId;
+        showView('assessment');
+        loadAssessmentForParticipant(participantId);
+    }
+
+    function renderAssessmentSelect() {
+        if (selectedAssessmentParticipant) {
+            loadAssessmentForParticipant(selectedAssessmentParticipant);
+            return;
+        }
+
+        const content = document.getElementById('assessmentContent');
+        let html = `
+            <div class="card">
+                <div class="card-header"><div class="card-title">Select Participant</div></div>
+                <div class="day-selector" style="justify-content:flex-start;margin-bottom:12px;">
+                    ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="currentDay='${d}';renderAssessmentSelect()">${d}</button>`).join('')}
+                </div>
+                <div class="search-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="assessSearch" placeholder="Search..." oninput="filterAssessmentList()">
+                </div>
+                <div class="participant-select-list" id="assessParticipantList">
+        `;
+        for (const p of participants) {
+            html += `<div class="participant-select-item" data-name="${escAttr(p.name)}" onclick="openAssessment('${escAttr(p.userId)}')">${escHtml(p.name)} <span style="opacity:0.5;font-size:0.72rem;">${escHtml(p.vbu || '')}</span></div>`;
+        }
+        html += '</div></div>';
+        content.innerHTML = html;
+    }
+
+    function filterAssessmentList() {
+        const q = document.getElementById('assessSearch').value.toLowerCase();
+        document.querySelectorAll('#assessParticipantList .participant-select-item').forEach(el => {
+            el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    async function loadAssessmentForParticipant(participantId) {
+        const participant = participants.find(p => p.userId === participantId);
+        if (!participant) return;
+
+        const content = document.getElementById('assessmentContent');
+
+        // Load existing assessments for this participant + day
+        let assessments = [];
+        try {
+            const data = await api('GET', `/assessments?participantId=${encodeURIComponent(participantId)}&day=${currentDay}`);
+            assessments = data.assessments || [];
+        } catch (e) {
+            console.error('Failed to load assessments:', e);
+        }
+
+        // Find my existing assessment
+        const myAssessment = assessments.find(a => a.assessorId === currentUser.email);
+        const selectedLevel = myAssessment ? myAssessment.level : null;
+
+        // Other assessments
+        const others = assessments.filter(a => a.assessorId !== currentUser.email);
+
+        let html = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${escHtml(participant.name)}</div>
+                    <span class="track-badge" style="background:${TRACK_COLORS[participant.track] || 'var(--track-general)'};color:${participant.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[participant.track] || '')}</span>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:12px;">${escHtml(participant.vbu || '')} &bull; ${currentDay}</div>
+
+                <div class="day-selector" style="justify-content:flex-start;margin-bottom:16px;">
+                    ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="currentDay='${d}';loadAssessmentForParticipant('${escAttr(participantId)}')">${d}</button>`).join('')}
+                </div>
+
+                <div class="level-buttons">
+                    ${LEVELS.map(l => `
+                        <button class="level-btn ${l} ${selectedLevel === l ? 'selected' : ''}" onclick="saveAssessment('${escAttr(participantId)}', '${l}')">
+                            <span class="level-num">Level ${LEVEL_VALUES[l]}</span>
+                            ${LEVEL_LABELS[l]}
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Add a Note</label>
+                    <textarea class="form-textarea" id="assessmentNote" placeholder="What did you observe?"></textarea>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="saveNote('${escAttr(participantId)}')">Save Note</button>
+            </div>
+        `;
+
+        if (others.length > 0) {
+            html += `<div class="card"><div class="other-ratings"><h4>Other Facilitator Ratings (${currentDay})</h4>`;
+            for (const a of others) {
+                html += `<div class="rating-row"><span>${escHtml(a.assessorName)}</span><span class="level-pill ${a.level}">${LEVEL_LABELS[a.level]}</span></div>`;
+            }
+            html += '</div></div>';
+        }
+
+        content.innerHTML = html;
+    }
+
+    async function saveAssessment(participantId, level) {
+        try {
+            await api('POST', '/assessments', { participantId, day: currentDay, level });
+            showToast(`Saved: ${LEVEL_LABELS[level]}`);
+            loadAssessmentForParticipant(participantId);
+        } catch (e) {
+            showToast('Failed to save assessment');
+            console.error(e);
+        }
+    }
+
+    async function saveNote(participantId) {
+        const note = document.getElementById('assessmentNote').value.trim();
+        if (!note) return;
+        try {
+            await api('POST', '/notes', { participantId, note });
+            document.getElementById('assessmentNote').value = '';
+            showToast('Note saved');
+        } catch (e) {
+            showToast('Failed to save note');
+            console.error(e);
+        }
+    }
+
+    // ===== JOURNEY VIEW =====
+    function renderJourneyList() {
+        const listEl = document.getElementById('journeyParticipantList');
+        listEl.innerHTML = participants.map(p =>
+            `<div class="participant-select-item" data-name="${escAttr(p.name)}" onclick="loadJourney('${escAttr(p.userId)}')">${escHtml(p.name)} <span style="opacity:0.5;font-size:0.72rem;">${escHtml(p.vbu || '')}</span></div>`
+        ).join('');
+    }
+
+    function filterJourneyList() {
+        const q = document.getElementById('journeySearch').value.toLowerCase();
+        document.querySelectorAll('#journeyParticipantList .participant-select-item').forEach(el => {
+            el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    async function loadJourney(participantId) {
+        selectedJourneyParticipant = participantId;
+        const participant = participants.find(p => p.userId === participantId);
+        if (!participant) return;
+
+        const detail = document.getElementById('journeyDetail');
+        detail.style.display = 'block';
+
+        // Load all assessments for this participant
+        let allAssessments = [];
+        try {
+            const data = await api('GET', `/assessments?participantId=${encodeURIComponent(participantId)}`);
+            allAssessments = data.assessments || [];
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Load notes
+        let notes = [];
+        try {
+            const data = await api('GET', `/notes/${encodeURIComponent(participantId)}`);
+            notes = data.notes || [];
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Calculate consensus per day
+        const dayData = {};
+        for (const day of DAYS) {
+            const dayAssess = allAssessments.filter(a => a.day === day);
+            if (dayAssess.length === 0) {
+                dayData[day] = { consensus: null, assessments: [] };
+            } else {
+                const sum = dayAssess.reduce((s, a) => s + (LEVEL_VALUES[a.level] || 0), 0);
+                const mean = Math.round(sum / dayAssess.length * 100) / 100;
+                let label;
+                if (mean < 1.5) label = 'toxic';
+                else if (mean < 2.5) label = 'talker';
+                else if (mean < 3.5) label = 'action';
+                else label = 'driver';
+                dayData[day] = { consensus: { mean, label, count: dayAssess.length }, assessments: dayAssess };
+            }
+        }
+
+        let html = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${escHtml(participant.name)}</div>
+                    <span class="track-badge" style="background:${TRACK_COLORS[participant.track] || 'var(--track-general)'};color:${participant.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[participant.track] || '')}</span>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:16px;">${escHtml(participant.vbu || '')}</div>
+
+                <div class="journey-timeline">
+                    ${DAYS.map(d => {
+                        const dd = dayData[d];
+                        const cls = dd.consensus ? dd.consensus.label : '';
+                        const txt = dd.consensus ? LEVEL_LABELS[dd.consensus.label].charAt(0) : '?';
+                        return `
+                            <div class="journey-day">
+                                <div class="journey-connector"></div>
+                                <div class="journey-circle ${cls}">${txt}</div>
+                                <div class="journey-label">${d}</div>
+                            </div>`;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+
+        // Ratings table per day
+        html += '<div class="card"><div class="card-title" style="margin-bottom:8px;">Individual Ratings</div>';
+        for (const day of DAYS) {
+            const dd = dayData[day];
+            if (dd.assessments.length === 0) continue;
+            html += `<h4 style="font-size:0.72rem;font-weight:700;color:var(--teal);margin:8px 0 4px;">${day}</h4>`;
+            for (const a of dd.assessments) {
+                html += `<div class="rating-row"><span>${escHtml(a.assessorName)}</span><span class="level-pill ${a.level}">${LEVEL_LABELS[a.level]}</span></div>`;
+            }
+        }
+        html += '</div>';
+
+        // Notes
+        if (notes.length > 0) {
+            html += '<div class="card"><div class="card-title" style="margin-bottom:8px;">Notes</div>';
+            for (const n of notes) {
+                const time = new Date(n.timestamp).toLocaleString();
+                html += `<div style="padding:6px 0;border-bottom:1px solid var(--cell-border);font-size:0.8rem;"><strong>${escHtml(n.authorName)}</strong> <span style="opacity:0.5;font-size:0.68rem;">${time}</span><p style="margin-top:2px;">${escHtml(n.note)}</p></div>`;
+            }
+            html += '</div>';
+        }
+
+        detail.innerHTML = html;
+    }
+
+    // ===== VBU MANAGEMENT =====
+    let vbuList = JSON.parse(localStorage.getItem('mt_vbus') || '[]');
+
+    // Seed VBUs from existing participant data if empty
+    function seedVbusFromParticipants() {
+        const existing = new Set(vbuList.map(v => v.toLowerCase()));
+        for (const p of participants) {
+            if (p.vbu && !existing.has(p.vbu.toLowerCase())) {
+                vbuList.push(p.vbu);
+                existing.add(p.vbu.toLowerCase());
+            }
+        }
+        saveVbuList();
+    }
+
+    function saveVbuList() {
+        vbuList.sort((a, b) => a.localeCompare(b));
+        localStorage.setItem('mt_vbus', JSON.stringify(vbuList));
+    }
+
+    function renderVbuChips() {
+        const el = document.getElementById('vbuChips');
+        if (!el) return;
+        if (vbuList.length === 0) {
+            el.innerHTML = '<span style="font-size:0.72rem;color:var(--text);opacity:0.5;">No VBUs added yet</span>';
+            return;
+        }
+        el.innerHTML = vbuList.map(v =>
+            `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--cell-bg);border:1px solid var(--cell-border);border-radius:12px;padding:3px 10px;font-size:0.72rem;font-weight:600;color:var(--heading);">${escHtml(v)} <button onclick="removeVbu('${escAttr(v)}')" style="background:none;border:none;color:var(--level-toxic);cursor:pointer;font-size:0.8rem;padding:0 2px;font-weight:700;">&times;</button></span>`
+        ).join('');
+    }
+
+    function populateVbuDropdown() {
+        const sel = document.getElementById('addVbu');
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = '<option value="">Select VBU...</option>' +
+            vbuList.map(v => `<option value="${escAttr(v)}" ${v === current ? 'selected' : ''}>${escHtml(v)}</option>`).join('');
+    }
+
+    function addVbuEntity() {
+        const input = document.getElementById('newVbuInput');
+        const name = input.value.trim();
+        if (!name) return;
+        if (vbuList.some(v => v.toLowerCase() === name.toLowerCase())) {
+            showToast('VBU already exists');
+            return;
+        }
+        vbuList.push(name);
+        saveVbuList();
+        renderVbuChips();
+        populateVbuDropdown();
+        input.value = '';
+        showToast(`Added: ${name}`);
+    }
+
+    function removeVbu(name) {
+        if (!confirm(`Remove VBU "${name}"?`)) return;
+        vbuList = vbuList.filter(v => v !== name);
+        saveVbuList();
+        renderVbuChips();
+        populateVbuDropdown();
+        showToast(`Removed: ${name}`);
+    }
+
+    // ===== ADMIN VIEW =====
+    function renderAdminTable() {
+        seedVbusFromParticipants();
+        renderVbuChips();
+        populateVbuDropdown();
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = participants.map(p => `
+            <tr>
+                <td><strong>${escHtml(p.name)}</strong></td>
+                <td>${escHtml(p.email)}</td>
+                <td>${escHtml(p.vbu || '')}</td>
+                <td><span class="track-badge" style="background:${TRACK_COLORS[p.track] || 'var(--track-general)'};color:${p.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[p.track] || p.track || '')}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteParticipant('${escAttr(p.userId)}')">Del</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function showAddParticipant() {
+        populateVbuDropdown();
+        document.getElementById('addParticipantForm').style.display = 'block';
+        document.getElementById('addName').focus();
+    }
+
+    function hideAddParticipant() {
+        document.getElementById('addParticipantForm').style.display = 'none';
+        document.getElementById('addName').value = '';
+        document.getElementById('addEmail').value = '';
+        document.getElementById('addVbu').selectedIndex = 0;
+    }
+
+    async function saveParticipant() {
+        const name = document.getElementById('addName').value.trim();
+        const email = document.getElementById('addEmail').value.trim();
+        const vbu = document.getElementById('addVbu').value.trim();
+        const track = document.getElementById('addTrack').value;
+
+        if (!name || !email) {
+            showToast('Name and email required');
+            return;
+        }
+
+        try {
+            await api('POST', '/participants', { name, email, vbu, track });
+            hideAddParticipant();
+            showToast('Participant added');
+            await loadParticipants();
+            renderAdminTable();
+        } catch (e) {
+            showToast('Failed to add participant');
+            console.error(e);
+        }
+    }
+
+    async function deleteParticipant(email) {
+        if (!confirm(`Remove ${email}?`)) return;
+        try {
+            await api('DELETE', `/participants/${encodeURIComponent(email)}`);
+            showToast('Participant removed');
+            await loadParticipants();
+            renderAdminTable();
+        } catch (e) {
+            showToast('Failed to remove participant');
+            console.error(e);
+        }
+    }
+
+    function downloadTemplate() {
+        const csv = 'name,email,vbu,track\nJane Doe,jane@example.com,Acme Corp,product\n';
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'participant-template.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Template downloaded');
+    }
+
+    async function importCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        if (lines.length < 2) {
+            showToast('CSV must have header + at least one row');
+            return;
+        }
+
+        const headerLine = lines[0].toLowerCase();
+        const headers = headerLine.split(',').map(h => h.trim());
+        const nameIdx = headers.indexOf('name');
+        const emailIdx = headers.indexOf('email');
+        const vbuIdx = headers.indexOf('vbu');
+        const trackIdx = headers.indexOf('track');
+
+        if (nameIdx === -1 || emailIdx === -1) {
+            showToast('CSV must have name and email columns');
+            return;
+        }
+
+        const imported = [];
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.trim());
+            if (cols[nameIdx] && cols[emailIdx]) {
+                imported.push({
+                    name: cols[nameIdx],
+                    email: cols[emailIdx],
+                    vbu: vbuIdx >= 0 ? (cols[vbuIdx] || '') : '',
+                    track: trackIdx >= 0 ? (cols[trackIdx] || 'product') : 'product',
+                });
+            }
+        }
+
+        if (imported.length === 0) {
+            showToast('No valid rows found');
+            return;
+        }
+
+        try {
+            const data = await api('POST', '/participants/import', { participants: imported });
+            showToast(`Imported ${imported.length} participants`);
+            await loadParticipants();
+            renderAdminTable();
+        } catch (e) {
+            showToast('Import failed');
+            console.error(e);
+        }
+
+        // Reset file input
+        event.target.value = '';
+    }
+
+    async function exportAssessments() {
+        // Build a CSV of all assessment data
+        let csv = 'Participant,Email,VBU,Track,Day,Level,Assessor,Timestamp\n';
+
+        for (const p of participants) {
+            try {
+                const data = await api('GET', `/assessments?participantId=${encodeURIComponent(p.userId)}`);
+                for (const a of (data.assessments || [])) {
+                    csv += `"${p.name}","${p.email}","${p.vbu || ''}","${p.track || ''}","${a.day}","${a.level}","${a.assessorName}","${a.timestamp}"\n`;
+                }
+            } catch (e) {
+                console.error('Export error for', p.userId, e);
+            }
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mindset-tracker-export-${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Export downloaded');
+    }
+
+    // ===== AUDIT LOG =====
+    async function loadAuditLog() {
+        try {
+            const data = await api('GET', '/audit-log');
+            allAuditEntries = data.entries || [];
+            renderAuditLog(allAuditEntries);
+        } catch (e) {
+            console.error('Failed to load audit log:', e);
+            showToast('Failed to load audit log');
+        }
+    }
+
+    function renderAuditLog(entries) {
+        const tbody = document.getElementById('auditTableBody');
+        if (entries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;opacity:0.5;">No audit entries yet</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = entries.map(e => {
+            const time = new Date(e.timestamp).toLocaleString();
+            const participant = participants.find(p => p.userId === e.participantId);
+            const pName = participant ? participant.name : e.participantId;
+            const prev = e.previousLevel ? `<span class="level-pill ${e.previousLevel}" style="font-size:0.6rem;padding:1px 6px;">${LEVEL_LABELS[e.previousLevel] || e.previousLevel}</span>` : '-';
+            const next = `<span class="level-pill ${e.newLevel}" style="font-size:0.6rem;padding:1px 6px;">${LEVEL_LABELS[e.newLevel] || e.newLevel}</span>`;
+            return `<tr>
+                <td style="white-space:nowrap;font-size:0.68rem;">${time}</td>
+                <td><strong>${escHtml(pName)}</strong></td>
+                <td>${e.day || ''}</td>
+                <td>${escHtml(e.assessorName || '')}</td>
+                <td>${e.action || ''}</td>
+                <td>${prev}</td>
+                <td>${next}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function filterAuditLog() {
+        const q = document.getElementById('auditSearch').value.toLowerCase();
+        const filtered = allAuditEntries.filter(e => {
+            const participant = participants.find(p => p.userId === e.participantId);
+            const name = participant ? participant.name.toLowerCase() : e.participantId.toLowerCase();
+            return name.includes(q) || (e.assessorName || '').toLowerCase().includes(q);
+        });
+        renderAuditLog(filtered);
+    }
+
+    // ===== THEME =====
+    function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : '');
+        document.getElementById('themeToggle').textContent = isDarkMode ? 'Light' : 'Dark';
+        localStorage.setItem('mt_theme', isDarkMode ? 'dark' : 'light');
+    }
+
+    function loadTheme() {
+        const saved = localStorage.getItem('mt_theme');
+        if (saved === 'dark') {
+            isDarkMode = true;
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeToggle').textContent = 'Light';
+        }
+    }
+
+    // ===== TOAST =====
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ===== UTILITIES =====
+    function escHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
+    function escAttr(str) {
+        return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // ===== INIT =====
+    function init() {
+        loadTheme();
+        checkAuth();
+    }
+
+    init();
+    </script>
+</body>
+</html>
