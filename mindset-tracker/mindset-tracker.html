@@ -1024,7 +1024,7 @@
                     </div>
                 </div>
 
-                <div id="addParticipantForm" style="display:none;" class="card" style="margin-bottom:12px;">
+                <div id="addParticipantForm" style="display:none;margin-bottom:12px;" class="card">
                     <div class="form-group">
                         <label class="form-label">Name</label>
                         <input type="text" class="form-input" id="addName" placeholder="Full name">
@@ -1931,8 +1931,28 @@
             return;
         }
 
-        const headerLine = lines[0].toLowerCase();
-        const headers = headerLine.split(',').map(h => h.trim());
+        // Parse CSV line handling quoted fields (e.g. "Smith, Jr.")
+        function parseCSVLine(line) {
+            const cols = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+                    else inQuotes = !inQuotes;
+                } else if (ch === ',' && !inQuotes) {
+                    cols.push(current.trim());
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            cols.push(current.trim());
+            return cols;
+        }
+
+        const headers = parseCSVLine(lines[0].toLowerCase());
         const nameIdx = headers.indexOf('name');
         const emailIdx = headers.indexOf('email');
         const vbuIdx = headers.indexOf('vbu');
@@ -1945,7 +1965,7 @@
 
         const imported = [];
         for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split(',').map(c => c.trim());
+            const cols = parseCSVLine(lines[i]);
             if (cols[nameIdx] && cols[emailIdx]) {
                 imported.push({
                     name: cols[nameIdx],
