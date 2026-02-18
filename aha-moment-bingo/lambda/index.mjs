@@ -45,7 +45,7 @@ export const handler = async (event) => {
     // POST /journal - save a journal entry
     if (method === "POST" && path.startsWith("/journal")) {
       const body = JSON.parse(event.body);
-      const { userId, ahaText, note, track, timestamp } = body;
+      const { userId, ahaText, note, track, timestamp, day } = body;
 
       if (!userId || !ahaText) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "userId and ahaText required" }) };
@@ -53,7 +53,7 @@ export const handler = async (event) => {
 
       await ddb.send(new PutCommand({
         TableName: TABLE,
-        Item: { userId, ahaText, note: note || "", track: track || "general", timestamp: timestamp || new Date().toISOString() }
+        Item: { userId, ahaText, note: note || "", track: track || "general", day: day || 1, timestamp: timestamp || new Date().toISOString() }
       }));
 
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };

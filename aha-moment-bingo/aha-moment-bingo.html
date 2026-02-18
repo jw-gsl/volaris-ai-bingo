@@ -404,14 +404,13 @@
         }
 
         .day-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            padding: 6px 14px;
+            border-radius: 20px;
             border: 2px solid var(--cell-border);
             background: var(--cell-bg);
             font-family: 'Barlow', sans-serif;
-            font-size: 0.65rem;
-            font-weight: 800;
+            font-size: 0.75rem;
+            font-weight: 700;
             color: var(--cell-text);
             display: flex;
             align-items: center;
@@ -419,9 +418,11 @@
             cursor: pointer;
             transition: all 0.2s ease;
             opacity: 0.5;
+            position: relative;
+            overflow: hidden;
         }
 
-        .day-dot:hover { transform: scale(1.1); opacity: 0.8; }
+        .day-dot:hover { transform: scale(1.05); opacity: 0.8; }
         .day-dot.active {
             background: var(--teal);
             border-color: var(--teal);
@@ -435,6 +436,136 @@
             color: var(--navy);
             opacity: 1;
         }
+
+        /* Progress bar on day pills */
+        .day-dot::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: calc(var(--day-progress, 0) * 1%);
+            background: var(--lime);
+            transition: width 0.3s ease;
+            border-radius: 0 0 20px 20px;
+        }
+        .day-dot.active::after {
+            background: rgba(255,255,255,0.6);
+        }
+
+        .day-journal-btn {
+            margin-left: 8px;
+            padding: 6px 14px !important;
+            font-size: 0.75rem !important;
+            border-radius: 20px !important;
+        }
+
+        /* ===== Welcome Overlay ===== */
+        .welcome-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--bg);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .welcome-overlay.show { display: flex; }
+        .welcome-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 8px 40px var(--shadow-strong);
+            text-align: center;
+        }
+        .welcome-logo { margin-bottom: 16px; }
+        .welcome-logo img { height: 36px; width: auto; }
+        [data-theme="dark"] .welcome-logo img { filter: brightness(0) invert(1); }
+        .welcome-title {
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: var(--heading);
+            margin-bottom: 4px;
+        }
+        .welcome-subtitle {
+            font-size: 0.85rem;
+            color: var(--teal);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+        .welcome-desc {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+        .welcome-field {
+            text-align: left;
+            margin-bottom: 14px;
+        }
+        .welcome-field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .welcome-field input,
+        .welcome-field select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--cell-border);
+            border-radius: 10px;
+            background: var(--cell-bg);
+            color: var(--cell-text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .welcome-field input:focus,
+        .welcome-field select:focus {
+            outline: none;
+            border-color: var(--teal);
+        }
+        .welcome-submit {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 12px;
+            background: var(--teal);
+            color: var(--white);
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .welcome-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0,138,176,0.4);
+        }
+
+        /* User greeting near card info */
+        .user-greeting {
+            font-size: 0.78rem;
+            color: var(--text);
+            opacity: 0.7;
+        }
+        .user-greeting a {
+            color: var(--teal);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .user-greeting a:hover { text-decoration: underline; }
 
         /* ===== Bingo Card ===== */
         .bingo-card {
@@ -594,6 +725,20 @@
         }
 
         .side-panel-gotit:hover { transform: scale(1.05); }
+
+        .side-panel-share {
+            background: rgba(255,255,255,0.1);
+            color: var(--insight-text);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .side-panel-share:hover { opacity: 0.8; }
 
         /* When side panel is open, widen the container */
         .container.panel-open {
@@ -1163,20 +1308,78 @@
             margin-bottom: 20px;
         }
 
-        .journal-entry {
+        /* Journal stats banner */
+        .journal-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .journal-stat {
+            text-align: center;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px 6px;
+        }
+        .journal-stat-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--lime);
+        }
+        .journal-stat-label {
+            font-size: 0.62rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--insight-text);
+            opacity: 0.5;
+            margin-top: 2px;
+        }
+
+        /* Journal day sections */
+        .journal-day-section {
+            margin-bottom: 16px;
+        }
+        .journal-day-header {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 6px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 14px 0;
+            margin-bottom: 8px;
+        }
+
+        .journal-entry {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 0;
+            position: relative;
         }
 
         .journal-entry:last-child {
             border-bottom: none;
         }
 
+        .journal-entry-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
         .journal-entry-aha {
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--lime);
-            margin-bottom: 4px;
+            flex: 1;
+        }
+
+        .journal-entry-time {
+            font-size: 0.65rem;
+            color: var(--insight-text);
+            opacity: 0.4;
+            white-space: nowrap;
         }
 
         .journal-entry-track {
@@ -1197,6 +1400,41 @@
             opacity: 0.9;
         }
 
+        /* Inline edit textarea */
+        .journal-entry-edit {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--teal);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.06);
+            color: var(--insight-text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.88rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .journal-entry-edit:focus { outline: none; border-color: var(--lime); }
+
+        /* Entry action buttons */
+        .journal-entry-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .journal-entry-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.78rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0.5;
+            transition: opacity 0.15s;
+            color: var(--insight-text);
+        }
+        .journal-entry-actions button:hover { opacity: 1; }
+        .journal-entry-actions .je-delete:hover { color: #EF4444; }
+
         .journal-empty {
             text-align: center;
             color: var(--insight-text);
@@ -1205,9 +1443,14 @@
             padding: 32px 0;
         }
 
-        .journal-close {
-            display: block;
-            margin: 20px auto 0;
+        .journal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .journal-close, .journal-export {
             background: var(--lime);
             color: var(--navy);
             border: none;
@@ -1219,8 +1462,12 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
+        .journal-export {
+            background: rgba(255,255,255,0.1);
+            color: var(--insight-text);
+        }
 
-        .journal-close:hover {
+        .journal-close:hover, .journal-export:hover {
             opacity: 0.85;
         }
 
@@ -1442,7 +1689,8 @@
             .controls { gap: 10px; }
             .bulb-icon { width: 12px; height: 12px; font-size: 10px; top: 1px; right: 1px; }
             .info-btn { width: 15px; height: 15px; font-size: 0.5rem; bottom: 1px; right: 1px; }
-            .day-dot { width: 24px; height: 24px; font-size: 0.6rem; }
+            .day-dot { padding: 4px 10px; font-size: 0.65rem; }
+            .day-journal-btn { padding: 4px 10px !important; font-size: 0.65rem !important; }
             .event-info { font-size: 0.62rem; gap: 8px; }
         }
 
@@ -1459,6 +1707,44 @@
     </style>
 </head>
 <body>
+    <!-- Welcome / Login Overlay -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-card">
+            <div class="welcome-logo">
+                <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="welcomeLogo">
+            </div>
+            <h1 class="welcome-title">&#x1F4A1; Aha Moment Bingo</h1>
+            <p class="welcome-subtitle">CSI Revenue Signals Product Accelerator</p>
+            <p class="welcome-desc">Track your breakthrough moments across the 4-day Denver program.</p>
+            <form id="welcomeForm" onsubmit="submitWelcome(event)">
+                <div class="welcome-field">
+                    <label for="welcomeName">Your Name</label>
+                    <input type="text" id="welcomeName" placeholder="e.g. James Whiting" required autocomplete="name">
+                </div>
+                <div class="welcome-field">
+                    <label for="welcomeEmail">Email</label>
+                    <input type="email" id="welcomeEmail" placeholder="e.g. james@company.com" required autocomplete="email">
+                </div>
+                <div class="welcome-field">
+                    <label for="welcomeVbu">Business Unit</label>
+                    <select id="welcomeVbu" required>
+                        <option value="" disabled selected>Select your VBU...</option>
+                        <option value="Grosvenor Systems">Grosvenor Systems</option>
+                        <option value="Harris Computer">Harris Computer</option>
+                        <option value="N. Harris Computer">N. Harris Computer</option>
+                        <option value="Trapeze Group">Trapeze Group</option>
+                        <option value="Cultura Technologies">Cultura Technologies</option>
+                        <option value="Modaxo">Modaxo</option>
+                        <option value="Lumine Group">Lumine Group</option>
+                        <option value="Volaris HQ">Volaris HQ</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="welcome-submit">Let's Go! &#x26A1;</button>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header slide-down">
@@ -1503,12 +1789,13 @@
             </div>
         </header>
 
-        <!-- Day Tracker -->
+        <!-- Day Tracker + Journal -->
         <div class="day-indicator fade-in">
-            <div class="day-dot active" data-day="1" onclick="selectDay(1)">D1</div>
-            <div class="day-dot" data-day="2" onclick="selectDay(2)">D2</div>
-            <div class="day-dot" data-day="3" onclick="selectDay(3)">D3</div>
-            <div class="day-dot" data-day="4" onclick="selectDay(4)">D4</div>
+            <div class="day-dot active" data-day="1" onclick="selectDay(1)">Day 1</div>
+            <div class="day-dot" data-day="2" onclick="selectDay(2)">Day 2</div>
+            <div class="day-dot" data-day="3" onclick="selectDay(3)">Day 3</div>
+            <div class="day-dot" data-day="4" onclick="selectDay(4)">Day 4</div>
+            <button class="btn btn-journal day-journal-btn" onclick="viewJournal()">&#x1F4D3; My Journal</button>
         </div>
 
         <!-- Track Filter -->
@@ -1537,6 +1824,7 @@
 
         <!-- Card Info -->
         <div class="card-info fade-in">
+            <span class="user-greeting" id="userGreeting"></span>
             <span class="card-id" id="cardId">Card #0000</span>
             <span class="token-counter">
                 <span class="token-icon">&#x26A1;</span>
@@ -1566,6 +1854,7 @@
                 </div>
                 <div class="side-panel-bottom">
                     <span class="side-panel-saved" id="sideSaved">&#x2713; Saved</span>
+                    <button class="side-panel-share" id="sideShare" onclick="shareSidePanelAha()">&#x1F4E4; Share</button>
                     <button class="side-panel-gotit" id="sideGotit">&#x1F4A1; Got it!</button>
                 </div>
             </div>
@@ -1581,7 +1870,6 @@
             <button class="btn btn-primary" onclick="generateNewCard()">New Card</button>
             <button class="btn btn-secondary" onclick="resetMarks()">Reset</button>
             <button class="btn btn-accent" onclick="shareCard()">Share My Card</button>
-            <button class="btn btn-journal" onclick="viewJournal()">&#x1F4D3; My Journal</button>
         </div>
 
         <!-- Footer -->
@@ -1619,8 +1907,12 @@
         <div class="journal-view">
             <h2>&#x1F4D3; My Learning Journal</h2>
             <p class="journal-subtitle">Your aha moments from the Denver Accelerator</p>
+            <div class="journal-stats" id="journalStats"></div>
             <div id="journalEntries"></div>
-            <button class="journal-close" onclick="closeJournal()">Close</button>
+            <div class="journal-footer">
+                <button class="journal-export" onclick="exportJournal()">&#x1F4CB; Export Journal</button>
+                <button class="journal-close" onclick="closeJournal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -2006,8 +2298,49 @@
     let isMuted = false;
     let activeTrack = 'all';
     let activeDay = 1;
-    let journalNotes = {}; // { "aha text": "user note" }
+    let journalNotes = {}; // { "aha text": { note, track, timestamp, day } }
     let currentInsightIndex = -1;
+
+    // Per-day marked cells: { 1: Set, 2: Set, 3: Set, 4: Set }
+    let markedByDay = {
+        1: new Set([12]),
+        2: new Set([12]),
+        3: new Set([12]),
+        4: new Set([12])
+    };
+
+    function saveMarkedByDay() {
+        const serialized = {};
+        for (const d of [1,2,3,4]) {
+            serialized[d] = [...markedByDay[d]];
+        }
+        localStorage.setItem('aha-bingo-markedByDay', JSON.stringify(serialized));
+    }
+
+    function loadMarkedByDay() {
+        try {
+            const saved = localStorage.getItem('aha-bingo-markedByDay');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                for (const d of [1,2,3,4]) {
+                    markedByDay[d] = new Set(parsed[d] || [12]);
+                }
+            }
+        } catch(e) {}
+    }
+
+    function inferDayFromTimestamp(ts) {
+        if (!ts) return 1;
+        // Accelerator days: infer from date
+        // Fallback: just return 1
+        try {
+            const d = new Date(ts);
+            const dayOfWeek = d.getDay(); // 0=Sun
+            // Mon=1, Tue=2, Wed=3, Thu=4 maps to Day 1-4
+            if (dayOfWeek >= 1 && dayOfWeek <= 4) return dayOfWeek;
+            return 1;
+        } catch(e) { return 1; }
+    }
 
     // ===== Web Audio Sound System =====
     let audioCtx = null;
@@ -2089,18 +2422,57 @@
         document.getElementById('muteLabel').textContent = isMuted ? 'Muted' : 'Sound';
     }
 
+    // ===== Welcome / Profile =====
+    function showWelcome() {
+        document.getElementById('welcomeOverlay').classList.add('show');
+    }
+
+    function submitWelcome(e) {
+        e.preventDefault();
+        const name = document.getElementById('welcomeName').value.trim();
+        const email = document.getElementById('welcomeEmail').value.trim();
+        const vbu = document.getElementById('welcomeVbu').value;
+        if (!name || !email || !vbu) return;
+
+        const profile = { name, email, vbu };
+        localStorage.setItem('aha-bingo-profile', JSON.stringify(profile));
+        currentUserId = email;
+        document.getElementById('welcomeOverlay').classList.remove('show');
+        updateUserGreeting(profile);
+        // Continue init
+        loadPreferences();
+        loadMarkedByDay();
+        loadJournal();
+        applyTheme();
+        updateMuteUI();
+        generateNewCard();
+        selectDay(activeDay);
+    }
+
+    function updateUserGreeting(profile) {
+        const el = document.getElementById('userGreeting');
+        if (el && profile) {
+            el.innerHTML = `Hi, ${profile.name} <a onclick="changeProfile()">(change)</a>`;
+        }
+    }
+
+    function changeProfile() {
+        localStorage.removeItem('aha-bingo-profile');
+        showWelcome();
+    }
+
     // ===== Journal API =====
     const JOURNAL_API = 'https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal';
     let currentUserId = null;
 
     function getUserId() {
         if (currentUserId) return currentUserId;
-        currentUserId = localStorage.getItem('aha-bingo-userId');
-        if (!currentUserId) {
-            currentUserId = prompt('Welcome! Enter your name to track your learning journal:');
-            if (!currentUserId) currentUserId = 'anonymous-' + Math.random().toString(36).slice(2, 8);
-            localStorage.setItem('aha-bingo-userId', currentUserId);
+        const profile = JSON.parse(localStorage.getItem('aha-bingo-profile') || 'null');
+        if (profile) {
+            currentUserId = profile.email;
+            return currentUserId;
         }
+        currentUserId = 'anonymous-' + Math.random().toString(36).slice(2, 8);
         return currentUserId;
     }
 
@@ -2122,7 +2494,7 @@
                 const data = await res.json();
                 if (data.entries && data.entries.length > 0) {
                     data.entries.forEach(e => {
-                        journalNotes[e.ahaText] = { note: e.note, track: e.track, timestamp: e.timestamp };
+                        journalNotes[e.ahaText] = { note: e.note, track: e.track, timestamp: e.timestamp, day: e.day || inferDayFromTimestamp(e.timestamp) };
                     });
                     saveJournalLocal();
                 }
@@ -2134,13 +2506,13 @@
         localStorage.setItem('aha-bingo-journal', JSON.stringify(journalNotes));
     }
 
-    async function saveJournalToApi(ahaText, note, track) {
+    async function saveJournalToApi(ahaText, note, track, day) {
         try {
             const uid = getUserId();
             await fetch(JOURNAL_API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: uid, ahaText, note, track, timestamp: new Date().toISOString() })
+                body: JSON.stringify({ userId: uid, ahaText, note, track, day: day || activeDay, timestamp: new Date().toISOString() })
             });
         } catch(e) { console.log('API save failed, saved locally', e); }
     }
@@ -2178,7 +2550,7 @@
 
         if (note) {
             const isNew = !journalNotes[item.aha]?.note;
-            journalNotes[item.aha] = { note, track: item.track, timestamp: new Date().toISOString() };
+            journalNotes[item.aha] = { note, track: item.track, timestamp: new Date().toISOString(), day: activeDay };
             if (savedEl) {
                 savedEl.classList.add('show');
                 setTimeout(() => savedEl.classList.remove('show'), 3000);
@@ -2192,7 +2564,7 @@
                 if (savedEl) savedEl.textContent = `\u2713 Saved! +${bonus.toLocaleString()} tokens (${multiplier}x multiplier!)`;
                 if (hintEl) hintEl.style.display = 'none';
             }
-            saveJournalToApi(item.aha, note, item.track);
+            saveJournalToApi(item.aha, note, item.track, activeDay);
         } else {
             delete journalNotes[item.aha];
             deleteFromApi(item.aha);
@@ -2200,26 +2572,172 @@
         saveJournalLocal();
     }
 
+    function formatTime(ts) {
+        if (!ts) return '';
+        try {
+            const d = new Date(ts);
+            return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch(e) { return ''; }
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     function viewJournal() {
         const container = document.getElementById('journalEntries');
+        const statsEl = document.getElementById('journalStats');
         const entries = Object.entries(journalNotes);
+
+        // Stats
+        const ahaCount = entries.length;
+        const reflections = entries.filter(([, d]) => d.note && d.note.length > 0).length;
+        const bingoCount = celebratedLines.size;
+        statsEl.innerHTML = `
+            <div class="journal-stat"><div class="journal-stat-value">${ahaCount}</div><div class="journal-stat-label">Aha Moments</div></div>
+            <div class="journal-stat"><div class="journal-stat-value">${reflections}</div><div class="journal-stat-label">Reflections</div></div>
+            <div class="journal-stat"><div class="journal-stat-value">${totalTokens.toLocaleString()}</div><div class="journal-stat-label">Tokens</div></div>
+            <div class="journal-stat"><div class="journal-stat-value">${bingoCount}</div><div class="journal-stat-label">Bingos</div></div>
+        `;
 
         if (entries.length === 0) {
             container.innerHTML = '<div class="journal-empty">No notes yet. Click the \u24D8 on any cell and write your thoughts!</div>';
         } else {
-            container.innerHTML = entries.map(([aha, data]) => {
-                const color = TRACK_COLORS[data.track] || TRACK_COLORS.general;
-                const label = TRACK_LABELS[data.track] || 'General';
-                const textColor = data.track === 'product' ? '#fff' : '#0B2340';
-                return `<div class="journal-entry">
-                    <span class="journal-entry-track" style="background:${color};color:${textColor}">${label}</span>
-                    <div class="journal-entry-aha">\u{1F4A1} ${aha}</div>
-                    <div class="journal-entry-note">${data.note}</div>
-                </div>`;
-            }).join('');
+            // Group by day
+            const byDay = { 1: [], 2: [], 3: [], 4: [] };
+            entries.forEach(([aha, data]) => {
+                const day = data.day || inferDayFromTimestamp(data.timestamp);
+                if (!byDay[day]) byDay[day] = [];
+                byDay[day].push([aha, data]);
+            });
+
+            // Sort each day by timestamp
+            for (const d of [1,2,3,4]) {
+                byDay[d].sort((a, b) => (a[1].timestamp || '').localeCompare(b[1].timestamp || ''));
+            }
+
+            let html = '';
+            for (const d of [1,2,3,4]) {
+                if (byDay[d].length === 0) continue;
+                html += `<div class="journal-day-section">
+                    <div class="journal-day-header">Day ${d}</div>`;
+                html += byDay[d].map(([aha, data]) => {
+                    const color = TRACK_COLORS[data.track] || TRACK_COLORS.general;
+                    const label = TRACK_LABELS[data.track] || 'General';
+                    const textColor = data.track === 'product' ? '#fff' : '#0B2340';
+                    const time = formatTime(data.timestamp);
+                    const safeAha = escapeHtml(aha);
+                    const safeNote = escapeHtml(data.note);
+                    return `<div class="journal-entry" data-aha="${safeAha}">
+                        <div class="journal-entry-header">
+                            <span class="journal-entry-track" style="background:${color};color:${textColor}">${label}</span>
+                            <div class="journal-entry-aha">\u{1F4A1} ${safeAha}</div>
+                            <span class="journal-entry-time">${time}</span>
+                        </div>
+                        <div class="journal-entry-note" id="je-note-${safeAha.replace(/[^a-zA-Z0-9]/g,'_')}">${safeNote}</div>
+                        <div class="journal-entry-actions">
+                            <button class="je-edit" onclick="editJournalEntry(this)" title="Edit">&#x270F;&#xFE0F; Edit</button>
+                            <button class="je-share" onclick="shareJournalEntry('${safeAha.replace(/'/g,"\\'")}')" title="Share">&#x1F4E4; Share</button>
+                            <button class="je-delete" onclick="deleteJournalEntry('${safeAha.replace(/'/g,"\\'")}')" title="Delete">&#x1F5D1; Delete</button>
+                        </div>
+                    </div>`;
+                }).join('');
+                html += '</div>';
+            }
+            container.innerHTML = html;
         }
 
         document.getElementById('journalOverlay').classList.add('show');
+    }
+
+    function editJournalEntry(btn) {
+        const entry = btn.closest('.journal-entry');
+        const aha = entry.dataset.aha;
+        const noteEl = entry.querySelector('.journal-entry-note');
+        const currentNote = journalNotes[aha]?.note || '';
+
+        // Replace note with textarea
+        const ta = document.createElement('textarea');
+        ta.className = 'journal-entry-edit';
+        ta.value = currentNote;
+        noteEl.replaceWith(ta);
+        ta.focus();
+
+        // Save on blur
+        ta.addEventListener('blur', () => {
+            const newNote = ta.value.trim();
+            if (newNote && journalNotes[aha]) {
+                journalNotes[aha].note = newNote;
+                saveJournalLocal();
+                saveJournalToApi(aha, newNote, journalNotes[aha].track, journalNotes[aha].day);
+            }
+            // Replace textarea with note div
+            const div = document.createElement('div');
+            div.className = 'journal-entry-note';
+            div.textContent = newNote || currentNote;
+            ta.replaceWith(div);
+        });
+    }
+
+    function deleteJournalEntry(aha) {
+        if (!confirm('Delete this aha moment from your journal?')) return;
+        delete journalNotes[aha];
+        saveJournalLocal();
+        deleteFromApi(aha);
+        viewJournal(); // Re-render
+    }
+
+    function shareJournalEntry(aha) {
+        const data = journalNotes[aha];
+        if (!data) return;
+        const text = `\u{1F4A1} Aha Moment: ${aha}\n\n${data.note}\n\n#AhaMomentBingo #DenverAccelerator`;
+
+        if (navigator.share) {
+            navigator.share({ title: 'Aha Moment', text }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+            });
+        }
+    }
+
+    function exportJournal() {
+        const entries = Object.entries(journalNotes);
+        if (entries.length === 0) { showToast('No entries to export'); return; }
+
+        const profile = JSON.parse(localStorage.getItem('aha-bingo-profile') || '{}');
+        let md = `# \u{1F4A1} My Aha Moment Journal\n`;
+        md += `**${profile.name || 'Participant'}** | ${profile.vbu || ''}\n`;
+        md += `CSI Revenue Signals Accelerator \u2014 Denver, CO\n\n`;
+
+        const byDay = { 1: [], 2: [], 3: [], 4: [] };
+        entries.forEach(([aha, data]) => {
+            const day = data.day || inferDayFromTimestamp(data.timestamp);
+            if (!byDay[day]) byDay[day] = [];
+            byDay[day].push([aha, data]);
+        });
+
+        for (const d of [1,2,3,4]) {
+            if (byDay[d].length === 0) continue;
+            byDay[d].sort((a, b) => (a[1].timestamp || '').localeCompare(b[1].timestamp || ''));
+            md += `## Day ${d}\n\n`;
+            byDay[d].forEach(([aha, data]) => {
+                const time = formatTime(data.timestamp);
+                md += `### \u{1F4A1} ${aha}\n`;
+                if (time) md += `*${time}* | ${TRACK_LABELS[data.track] || 'General'}\n\n`;
+                md += `${data.note}\n\n`;
+            });
+        }
+
+        md += `---\n*Exported from Aha Moment Bingo | ${new Date().toLocaleDateString()}*\n`;
+
+        navigator.clipboard.writeText(md).then(() => {
+            showToast('Journal copied to clipboard as Markdown!');
+        }).catch(() => {
+            showToast('Export failed');
+        });
     }
 
     function closeJournal() {
@@ -2243,11 +2761,28 @@
 
     // ===== Initialize =====
     function init() {
+        // Check for welcome/login
+        const profile = JSON.parse(localStorage.getItem('aha-bingo-profile') || 'null');
+        if (!profile) {
+            showWelcome();
+            return;
+        }
+        currentUserId = profile.email;
+        updateUserGreeting(profile);
+
         loadPreferences();
+        loadMarkedByDay();
+        // Restore active day
+        const savedDay = parseInt(localStorage.getItem('aha-bingo-activeDay'));
+        if (savedDay >= 1 && savedDay <= 4) {
+            activeDay = savedDay;
+            markedCells = new Set(markedByDay[activeDay]);
+        }
         loadJournal();
         applyTheme();
         updateMuteUI();
         generateNewCard();
+        selectDay(activeDay);
     }
 
     // ===== Preferences =====
@@ -2284,10 +2819,38 @@
 
     // ===== Day Selection =====
     function selectDay(day) {
+        // Save current day's marked cells
+        markedByDay[activeDay] = new Set(markedCells);
+        saveMarkedByDay();
+
         activeDay = day;
+        localStorage.setItem('aha-bingo-activeDay', day);
+
+        // Load new day's marked cells
+        markedCells = new Set(markedByDay[day]);
+
         document.querySelectorAll('.day-dot').forEach(d => {
             const dayNum = parseInt(d.dataset.day);
             d.classList.toggle('active', dayNum === day);
+        });
+
+        // Re-render grid with new day's state
+        bingoDetected = false;
+        celebratedLines = new Set();
+        renderGrid();
+        updateScore();
+        checkBingo();
+        updateAllDayProgress();
+    }
+
+    // ===== Day Progress Bars =====
+    function updateAllDayProgress() {
+        document.querySelectorAll('.day-dot').forEach(dot => {
+            const d = parseInt(dot.dataset.day);
+            const marked = markedByDay[d] ? markedByDay[d].size : 1;
+            // 25 cells total, free space always marked
+            const pct = Math.round((marked / 25) * 100);
+            dot.style.setProperty('--day-progress', pct);
         });
     }
 
@@ -2326,7 +2889,11 @@
         });
 
         currentCard = selected;
-        markedCells = new Set([12]); // Free space auto-marked
+        // Use per-day marked cells (don't reset if already loaded)
+        if (markedByDay[activeDay].size === 0) {
+            markedByDay[activeDay] = new Set([12]);
+        }
+        markedCells = new Set(markedByDay[activeDay]);
         bingoDetected = false;
 
         // Generate card seed
@@ -2416,6 +2983,8 @@
         if (markedCells.has(index)) {
             // Already marked - unmark it
             markedCells.delete(index);
+            markedByDay[activeDay] = new Set(markedCells);
+            saveMarkedByDay();
             cell.classList.remove('marked');
             cell.setAttribute('aria-pressed', 'false');
             // Remove tokens
@@ -2426,9 +2995,12 @@
             playUnmarkSound();
             updateScore();
             checkBingo();
+            updateAllDayProgress();
         } else {
             // Mark the cell
             markedCells.add(index);
+            markedByDay[activeDay] = new Set(markedCells);
+            saveMarkedByDay();
             cell.classList.add('marked');
             cell.setAttribute('aria-pressed', 'true');
             cell.classList.remove('stamp-animate');
@@ -2445,6 +3017,7 @@
             setTimeout(() => expandCell(index), 400);
 
             checkBingo();
+            updateAllDayProgress();
         }
     }
 
@@ -2519,6 +3092,24 @@
     document.getElementById('sidePanelClose').addEventListener('click', () => closeSidePanel(true));
     document.getElementById('sideGotit').addEventListener('click', () => closeSidePanel(true));
 
+    function shareSidePanelAha() {
+        if (currentInsightIndex < 0) return;
+        const item = currentCard[currentInsightIndex];
+        if (!item) return;
+        const note = journalNotes[item.aha]?.note || '';
+        let text = `\u{1F4A1} Aha Moment: ${item.aha}`;
+        if (note) text += `\n\n${note}`;
+        text += `\n\n#AhaMomentBingo #DenverAccelerator`;
+
+        if (navigator.share) {
+            navigator.share({ title: 'Aha Moment', text }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+            });
+        }
+    }
+
     const debouncedSideSave = debounce(saveCurrentNote, 500);
 
     document.getElementById('sideTextarea').addEventListener('input', function() {
@@ -2548,11 +3139,12 @@
         bingo: 10000,                                            // 10k bonus for a bingo line
         free: 500                                                // free space
     };
-    let totalTokens = 500; // Start with free space tokens
+    let totalTokens = parseInt(localStorage.getItem('aha-bingo-totalTokens')) || 500;
     let cellTokens = {}; // track tokens per cell index
 
     function updateScore() {
         document.getElementById('scoreDisplay').textContent = totalTokens.toLocaleString();
+        localStorage.setItem('aha-bingo-totalTokens', totalTokens);
     }
 
     function addTokens(amount) {
@@ -2619,6 +3211,8 @@
     // ===== Reset =====
     function resetMarks() {
         markedCells = new Set([12]);
+        markedByDay[activeDay] = new Set([12]);
+        saveMarkedByDay();
         bingoDetected = false;
         celebratedLines = new Set();
         currentInsightIndex = -1;
@@ -2629,6 +3223,7 @@
             cell.classList.remove('bingo-cell');
         });
         updateScore();
+        updateAllDayProgress();
     }
 
     // ===== Win Detection =====
