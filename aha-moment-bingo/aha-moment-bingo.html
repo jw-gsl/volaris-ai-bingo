@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aha Moment Bingo - CSI Revenue Signals Accelerator</title>
+    <title>CSI Accelerator — Denver 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* ===== CSS Custom Properties ===== */
@@ -437,6 +437,12 @@
             opacity: 1;
         }
 
+        .day-dot.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* Progress bar on day pills */
         .day-dot::after {
             content: '';
@@ -469,88 +475,103 @@
             background: var(--bg);
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
+            overflow-y: auto;
         }
         .welcome-overlay.show { display: flex; }
         .welcome-card {
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px 32px;
-            max-width: 440px;
+            border-radius: 24px;
+            padding: 40px 36px 36px;
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 8px 40px var(--shadow-strong);
+            box-shadow: 0 12px 60px var(--shadow-strong);
             text-align: center;
+            margin: auto;
         }
-        .welcome-logo { margin-bottom: 16px; }
-        .welcome-logo img { height: 36px; width: auto; }
+        .welcome-logo { margin-bottom: 20px; }
+        .welcome-logo img { height: 32px; width: auto; opacity: 0.85; }
         [data-theme="dark"] .welcome-logo img { filter: brightness(0) invert(1); }
         .welcome-title {
             font-weight: 900;
-            font-size: 1.8rem;
+            font-size: 1.65rem;
             color: var(--heading);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            line-height: 1.15;
         }
         .welcome-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             color: var(--teal);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
+            margin-bottom: 0;
+        }
+        .welcome-divider {
+            width: 40px;
+            height: 3px;
+            background: var(--lime);
+            border-radius: 2px;
+            margin: 16px auto 20px;
         }
         .welcome-desc {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--text);
-            margin-bottom: 24px;
+            line-height: 1.65;
+            margin-bottom: 28px;
             opacity: 0.8;
         }
         .welcome-field {
             text-align: left;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
         .welcome-field label {
             display: block;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--heading);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            opacity: 0.7;
         }
         .welcome-field input,
         .welcome-field select {
             width: 100%;
-            padding: 10px 14px;
-            border: 2px solid var(--cell-border);
-            border-radius: 10px;
+            padding: 13px 16px;
+            border: 2px solid rgba(11,35,64,0.15);
+            border-radius: 12px;
             background: var(--cell-bg);
             color: var(--cell-text);
             font-family: 'Barlow', sans-serif;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         .welcome-field input:focus,
         .welcome-field select:focus {
             outline: none;
             border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0,138,176,0.12);
         }
         .welcome-submit {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             margin-top: 8px;
             border: none;
-            border-radius: 12px;
-            background: var(--teal);
+            border-radius: 14px;
+            background: var(--navy);
             color: var(--white);
             font-family: 'Barlow', sans-serif;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+            letter-spacing: 0.3px;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
         }
         .welcome-submit:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 16px rgba(0,138,176,0.4);
+            background: var(--teal);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,138,176,0.35);
         }
 
         /* User greeting near card info */
@@ -566,6 +587,346 @@
             font-weight: 600;
         }
         .user-greeting a:hover { text-decoration: underline; }
+
+        /* ===== Landing Overlay ===== */
+        .landing-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--bg);
+            align-items: flex-start;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .landing-overlay.show { display: flex; }
+        .landing-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px 36px 32px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 12px 60px var(--shadow-strong);
+            text-align: center;
+            margin: auto;
+        }
+        .landing-greeting {
+            font-weight: 900;
+            font-size: 1.75rem;
+            color: var(--heading);
+            margin-bottom: 6px;
+        }
+        .landing-event-name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 0;
+        }
+        .landing-divider {
+            width: 40px;
+            height: 3px;
+            background: var(--lime);
+            border-radius: 2px;
+            margin: 16px auto 18px;
+        }
+        .landing-desc {
+            font-size: 0.92rem;
+            color: var(--text);
+            opacity: 0.82;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        .landing-status {
+            background: var(--navy);
+            color: var(--white);
+            border-radius: 14px;
+            padding: 14px 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 0.2px;
+        }
+        [data-theme="dark"] .landing-status {
+            background: rgba(191, 215, 49, 0.12);
+            border: 1px solid rgba(191, 215, 49, 0.3);
+        }
+        .landing-date-highlight {
+            color: var(--lime);
+            font-weight: 800;
+        }
+        .landing-agenda {
+            text-align: left;
+            background: var(--bg);
+            border: 1px solid rgba(11,35,64,0.08);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .landing-agenda-title {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--heading);
+            opacity: 0.45;
+            margin-bottom: 14px;
+        }
+        .landing-day-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(11,35,64,0.07);
+        }
+        .landing-day-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .landing-day-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--navy);
+            color: var(--lime);
+            font-size: 0.7rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+            letter-spacing: 0;
+        }
+        .landing-day-content { flex: 1; min-width: 0; }
+        .landing-day-label { font-size: 0.72rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .landing-day-theme { font-size: 0.95rem; font-weight: 800; color: var(--heading); margin-bottom: 2px; }
+        .landing-day-desc { font-size: 0.8rem; color: var(--text); opacity: 0.65; line-height: 1.4; }
+        .landing-logistics-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.86rem;
+            border-bottom: 1px solid rgba(11,35,64,0.07);
+            line-height: 1.4;
+        }
+        .landing-logistics-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .landing-logistics-icon { flex-shrink: 0; width: 20px; text-align: center; margin-top: 1px; }
+        .landing-change-link {
+            display: inline-block;
+            font-size: 0.78rem;
+            color: var(--teal);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .landing-change-link:hover { text-decoration: underline; }
+
+        /* ===== Wizard Steps ===== */
+        .wizard-progress { margin-bottom: 28px; }
+        .step-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .step-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--cell-border);
+            opacity: 0.2;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .step-dot.active {
+            background: var(--teal);
+            opacity: 1;
+            width: 22px;
+            border-radius: 4px;
+        }
+        .step-dot.done {
+            background: var(--lime);
+            opacity: 1;
+            width: 7px;
+            border-radius: 50%;
+        }
+        .wizard-step-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text);
+            opacity: 0.4;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        .wizard-step { display: none; }
+        .wizard-step.active {
+            display: block;
+            animation: wsFadeIn 0.28s ease;
+        }
+        @keyframes wsFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .wizard-step-heading {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--heading);
+            text-align: left;
+            margin-bottom: 4px;
+            line-height: 1.25;
+        }
+        .wizard-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .wizard-back {
+            flex: 0 0 auto;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(11,35,64,0.15);
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .wizard-back:hover { border-color: var(--teal); color: var(--teal); }
+        .wizard-next {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: var(--navy);
+            color: var(--white);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .wizard-next:hover { background: var(--teal); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,138,176,0.35); }
+        .wizard-next:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ===== Radio Cards ===== */
+        .radio-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+            text-align: left;
+        }
+        .radio-cards-single {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .radio-card { position: relative; cursor: pointer; }
+        .radio-card input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-card-body {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            border: 2px solid rgba(11,35,64,0.12);
+            border-radius: 12px;
+            background: var(--cell-bg);
+            color: var(--cell-text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+        .radio-card input:checked + .radio-card-body {
+            border-color: var(--teal);
+            background: rgba(0,138,176,0.08);
+            color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0,138,176,0.1);
+        }
+        .radio-card-body:hover { border-color: var(--teal); }
+        .radio-card-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        /* Level cards stay centered */
+        .radio-cards-level .radio-card-body {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 8px;
+            text-align: center;
+        }
+        .level-dot {
+            display: block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .level-dot-0 { background: #7A7E8A; }
+        .level-dot-1 { background: #4A7FA8; }
+        .level-dot-2 { background: #2B5F96; }
+        .level-dot-3 { background: #2D6B1A; }
+        .diag-question {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 3px;
+            text-align: left;
+            line-height: 1.3;
+        }
+        .diag-hint {
+            font-size: 0.78rem;
+            color: var(--text);
+            opacity: 0.55;
+            text-align: left;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .diag-textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid rgba(11,35,64,0.12);
+            border-radius: 14px;
+            background: var(--cell-bg);
+            color: var(--cell-text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 160px;
+            margin-bottom: 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .diag-textarea:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0,138,176,0.12);
+        }
+        .wizard-lookup-status {
+            font-size: 0.8rem;
+            color: var(--teal);
+            min-height: 18px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
 
         /* ===== Bingo Card ===== */
         .bingo-card {
@@ -1707,28 +2068,50 @@
     </style>
 </head>
 <body>
-    <!-- Welcome / Login Overlay -->
+    <!-- Welcome / Diagnostic Wizard Overlay -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-card">
             <div class="welcome-logo">
                 <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="welcomeLogo">
             </div>
-            <h1 class="welcome-title">&#x1F4A1; Aha Moment Bingo</h1>
-            <p class="welcome-subtitle">CSI Revenue Signals Product Accelerator</p>
-            <p class="welcome-desc">Track your breakthrough moments across the 4-day Denver program.</p>
-            <form id="welcomeForm" onsubmit="submitWelcome(event)">
+            <h1 class="welcome-title">CSI Accelerator &mdash; Denver 2026</h1>
+            <p class="welcome-subtitle">March 3&ndash;6 &middot; Denver, CO</p>
+            <div class="welcome-divider"></div>
+
+            <!-- Step progress indicator (hidden on step 0) -->
+            <div class="wizard-progress" id="wizardProgress" style="display:none">
+                <div class="step-dots">
+                    <span class="step-dot active" id="sdot0"></span>
+                    <span class="step-dot" id="sdot1"></span>
+                    <span class="step-dot" id="sdot2"></span>
+                    <span class="step-dot" id="sdot3"></span>
+                    <span class="step-dot" id="sdot4"></span>
+                </div>
+                <span class="wizard-step-label" id="wizardStepLabel">Step 1 of 5</span>
+            </div>
+
+            <!-- Step 0: Email lookup -->
+            <div class="wizard-step active" id="wizardStep0">
+                <p class="welcome-desc">This is your event companion for the week. We&rsquo;ll use your answers to personalise your experience and make the next four days as useful as possible.</p>
                 <div class="welcome-field">
-                    <label for="welcomeName">Your Name</label>
-                    <input type="text" id="welcomeName" placeholder="e.g. James Whiting" required autocomplete="name">
+                    <label for="welcomeEmail">Email address</label>
+                    <input type="email" id="welcomeEmail" placeholder="e.g. james@company.com" autocomplete="email"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();submitEmail();}">
+                </div>
+                <p class="wizard-lookup-status" id="lookupStatus"></p>
+                <button type="button" class="welcome-submit" onclick="submitEmail()">Continue &rarr;</button>
+            </div>
+
+            <!-- Step 1: Name + VBU + Q1 Role -->
+            <div class="wizard-step" id="wizardStep1">
+                <div class="welcome-field">
+                    <label for="welcomeName">Your name</label>
+                    <input type="text" id="welcomeName" placeholder="e.g. James Whiting" autocomplete="name">
                 </div>
                 <div class="welcome-field">
-                    <label for="welcomeEmail">Email</label>
-                    <input type="email" id="welcomeEmail" placeholder="e.g. james@company.com" required autocomplete="email">
-                </div>
-                <div class="welcome-field">
-                    <label for="welcomeVbu">Business Unit</label>
-                    <select id="welcomeVbu" required>
-                        <option value="" disabled selected>Select your VBU...</option>
+                    <label for="welcomeVbu">Business unit</label>
+                    <select id="welcomeVbu">
+                        <option value="" disabled selected>Select your VBU&hellip;</option>
                         <option value="Grosvenor Systems">Grosvenor Systems</option>
                         <option value="Harris Computer">Harris Computer</option>
                         <option value="N. Harris Computer">N. Harris Computer</option>
@@ -1740,8 +2123,141 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <button type="submit" class="welcome-submit">Let's Go! &#x26A1;</button>
-            </form>
+                <p class="diag-question">What best describes your role?</p>
+                <div class="radio-cards-single">
+                    <label class="radio-card">
+                        <input type="radio" name="diagRole" value="product">
+                        <span class="radio-card-body"><span class="radio-card-icon">&#x1F4E6;</span>Product representative</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="diagRole" value="rnd">
+                        <span class="radio-card-body"><span class="radio-card-icon">&#x1F9EA;</span>R&amp;D / Engineering</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="diagRole" value="leadership">
+                        <span class="radio-card-body"><span class="radio-card-icon">&#x1F3AF;</span>Leader / GM</span>
+                    </label>
+                </div>
+                <div class="wizard-nav">
+                    <button class="wizard-back" onclick="goToStep(0)" aria-label="Back">&#x2190;</button>
+                    <button class="wizard-next" onclick="goToStep(2)">Next &rarr;</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Q2 Level -->
+            <div class="wizard-step" id="wizardStep2">
+                <p class="diag-question">Where are you on the AI maturity curve?</p>
+                <p class="diag-hint">Refer to your slide deck for level descriptions.</p>
+                <div class="radio-cards radio-cards-level">
+                    <label class="radio-card">
+                        <input type="radio" name="diagLevel" value="0">
+                        <span class="radio-card-body"><span class="level-dot level-dot-0"></span>Level 0</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="diagLevel" value="1">
+                        <span class="radio-card-body"><span class="level-dot level-dot-1"></span>Level 1</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="diagLevel" value="2">
+                        <span class="radio-card-body"><span class="level-dot level-dot-2"></span>Level 2</span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="diagLevel" value="3">
+                        <span class="radio-card-body"><span class="level-dot level-dot-3"></span>Level 3</span>
+                    </label>
+                </div>
+                <div class="wizard-nav">
+                    <button class="wizard-back" onclick="goToStep(1)" aria-label="Back">&#x2190;</button>
+                    <button class="wizard-next" onclick="goToStep(3)">Next &rarr;</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Q3 open text -->
+            <div class="wizard-step" id="wizardStep3">
+                <p class="diag-question">What&rsquo;s your biggest AI challenge right now?</p>
+                <p class="diag-hint">Required &mdash; we&rsquo;ll use this to shape the week for you. No wrong answers.</p>
+                <textarea class="diag-textarea" id="diagQ3" placeholder="e.g. Getting my team to actually try it, not just talk about it&hellip;"></textarea>
+                <div class="wizard-nav">
+                    <button class="wizard-back" onclick="goToStep(2)" aria-label="Back">&#x2190;</button>
+                    <button class="wizard-next" onclick="goToStep(4)">Next &rarr;</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Q4 open text -->
+            <div class="wizard-step" id="wizardStep4">
+                <p class="diag-question">What would a successful week look like for you?</p>
+                <p class="diag-hint">Required &mdash; what would you need to leave with to call this time well spent?</p>
+                <textarea class="diag-textarea" id="diagQ4" placeholder="e.g. One live agent working in my product by Friday&hellip;"></textarea>
+                <div class="wizard-nav">
+                    <button class="wizard-back" onclick="goToStep(3)" aria-label="Back">&#x2190;</button>
+                    <button class="wizard-next" id="submitDiagBtn" onclick="submitDiagnostic()">Let&rsquo;s go &#x26A1;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Landing / Holding Overlay (shown before Day 1 unlocks) -->
+    <div class="landing-overlay" id="landingOverlay">
+        <div class="landing-card">
+            <div class="welcome-logo">
+                <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group">
+            </div>
+            <p class="landing-event-name">CSI Revenue Signals Product Accelerator</p>
+            <h1 class="landing-greeting" id="landingGreeting">Welcome!</h1>
+            <div class="landing-divider"></div>
+            <p class="landing-desc">
+                You&rsquo;re in. Everything&rsquo;s confirmed. This is your companion app for the week &mdash; use it to stay oriented, track what lands, and capture what shifts.
+            </p>
+            <div class="landing-status">
+                <span id="landingStatusText">&#x1F4C5; Day 1 unlocks on <span class="landing-date-highlight" id="landingDate">March 3, 2026</span></span>
+            </div>
+            <div class="landing-agenda">
+                <div class="landing-agenda-title">What&rsquo;s ahead</div>
+                <div class="landing-day-row">
+                    <div class="landing-day-number">D1</div>
+                    <div class="landing-day-content">
+                        <div class="landing-day-label">Mon 3 Mar</div>
+                        <div class="landing-day-theme" id="ldayTheme1">The Shift</div>
+                        <div class="landing-day-desc" id="ldayDesc1">[Placeholder: high-level theme for Day 1]</div>
+                    </div>
+                </div>
+                <div class="landing-day-row">
+                    <div class="landing-day-number">D2</div>
+                    <div class="landing-day-content">
+                        <div class="landing-day-label">Tue 4 Mar</div>
+                        <div class="landing-day-theme" id="ldayTheme2">Build</div>
+                        <div class="landing-day-desc" id="ldayDesc2">[Placeholder: high-level theme for Day 2]</div>
+                    </div>
+                </div>
+                <div class="landing-day-row">
+                    <div class="landing-day-number">D3</div>
+                    <div class="landing-day-content">
+                        <div class="landing-day-label">Wed 5 Mar</div>
+                        <div class="landing-day-theme" id="ldayTheme3">Show</div>
+                        <div class="landing-day-desc" id="ldayDesc3">[Placeholder: high-level theme for Day 3]</div>
+                    </div>
+                </div>
+                <div class="landing-day-row">
+                    <div class="landing-day-number">D4</div>
+                    <div class="landing-day-content">
+                        <div class="landing-day-label">Thu 6 Mar</div>
+                        <div class="landing-day-theme" id="ldayTheme4">Commit</div>
+                        <div class="landing-day-desc" id="ldayDesc4">[Placeholder: high-level theme for Day 4]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="landing-agenda">
+                <div class="landing-agenda-title">Before you arrive</div>
+                <div class="landing-logistics-row">
+                    <span class="landing-logistics-icon">&#x2705;</span>
+                    <span>Ensure you&rsquo;ve submitted all required data and set up accounts</span>
+                </div>
+                <div class="landing-logistics-row">
+                    <span class="landing-logistics-icon">&#x1F4BB;</span>
+                    <span>Bring your laptop &mdash; you&rsquo;ll be building, not just watching</span>
+                </div>
+            </div>
+            <a class="landing-change-link" onclick="changeProfile()">Not you? Switch account</a>
         </div>
     </div>
 
@@ -1750,7 +2266,7 @@
         <header class="header slide-down">
             <div class="logo-area">
                 <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="logoImg">
-                <div class="logo-subtitle">CSI Revenue Signals Program</div>
+                <div class="logo-subtitle">March 3&ndash;6, 2026 &middot; Denver, CO</div>
             </div>
             <!-- Denver mountain skyline -->
             <div class="mountain-header">
@@ -1780,11 +2296,11 @@
                     <path d="M538,33 L542,31 L546,35Z" fill="white" opacity="0.3"/>
                 </svg>
             </div>
-            <h1 class="title" id="mainTitle"><span class="bulb">&#x1F4A1;</span> Aha Moment Bingo</h1>
-            <p class="tagline" id="tagline">Spot the breakthrough. Mark the moment. Collect your tokens.</p>
+            <h1 class="title" id="mainTitle">CSI Revenue Signals Accelerator</h1>
+            <p class="tagline" id="tagline">Four days. Real work. Agents doing it with you.</p>
             <div class="event-info">
                 <span>&#x1F3D4;&#xFE0F; Denver, CO</span>
-                <span>&#x1F4C5; 4-Day Accelerator</span>
+                <span>&#x1F4C5; March 3&ndash;6, 2026</span>
                 <span>&#x26A1; Progress Over Perfection</span>
             </div>
         </header>
@@ -1836,7 +2352,7 @@
         <!-- Bingo Card + Side Panel Layout -->
         <div class="card-layout" id="cardLayout">
             <div class="bingo-card fade-in" id="bingoCard">
-                <div class="grid" id="bingoGrid" role="grid" aria-label="Aha moment bingo card"></div>
+                <div class="grid" id="bingoGrid" role="grid" aria-label="Breakthrough tracker"></div>
             </div>
             <div class="side-panel" id="sidePanel">
                 <button class="side-panel-close" id="sidePanelClose" title="Close">&times;</button>
@@ -1848,7 +2364,7 @@
                     &#x26A1; Write a reflection to earn bonus tokens &mdash; <span class="bonus-amount">the more you write, the bigger the bonus!</span>
                 </div>
                 <div class="side-panel-journal">
-                    <div class="journal-label">&#x1F4D3; Capture your aha moment</div>
+                    <div class="journal-label">&#x1F4D3; Capture your reflection</div>
                     <textarea id="sideTextarea" placeholder="What shifted in your thinking? What will you do differently?"></textarea>
                     <div class="journal-char-count" id="sideCharCount">0 chars &mdash; 1x bonus multiplier (write 50+ for 2x!)</div>
                 </div>
@@ -1862,7 +2378,7 @@
 
         <!-- How to play -->
         <p class="how-to-play fade-in" id="howToPlay">
-            <strong>Click</strong> a cell when you have that aha moment. Hit <strong>&#x24D8;</strong> for the deeper insight. Get <strong>5 in a row</strong> and you've had a breakthrough day!
+            <strong>Tap</strong> a cell the moment something lands. Hit <strong>&#x24D8;</strong> for the insight behind it. <strong>Five in a row</strong> means a breakthrough day.
         </p>
 
         <!-- Action Buttons -->
@@ -1875,7 +2391,7 @@
         <!-- Footer -->
         <footer class="footer fade-in">
             <p class="footer-primary">
-                <strong>CSI Revenue Signals Program</strong> &mdash; Denver Accelerator by <strong>Volaris Business Transformation</strong>
+                <strong>CSI Revenue Signals Accelerator &mdash; Denver 2026</strong> by <strong>Volaris Business Transformation</strong>
             </p>
             <p class="footer-secondary">
                 "Incremental change will NOT work for us this round. Run at this hard!" &mdash; Mark Miller
@@ -1919,7 +2435,7 @@
     <!-- BINGO Celebration Overlay -->
     <div class="bingo-overlay" id="bingoOverlay">
         <div class="bingo-title" id="bingoTitle">&#x1F4A1; BINGO! &#x1F4A1;</div>
-        <div class="bingo-subtitle" id="bingoSubtitle">5 aha moments in a row! Your mind is officially blown.</div>
+        <div class="bingo-subtitle" id="bingoSubtitle">5 breakthroughs in a row. Keep going.</div>
         <button class="btn btn-accent" onclick="closeBingo()">Keep Collecting!</button>
     </div>
 
@@ -2423,30 +2939,226 @@
     }
 
     // ===== Welcome / Profile =====
+    let wizardStep = 0;
+    let wizardEmail = '';
+
     function showWelcome() {
+        goToStep(0);
         document.getElementById('welcomeOverlay').classList.add('show');
     }
 
-    function submitWelcome(e) {
-        e.preventDefault();
-        const name = document.getElementById('welcomeName').value.trim();
+    // Step 0: check DynamoDB for existing record by email
+    async function submitEmail() {
         const email = document.getElementById('welcomeEmail').value.trim();
-        const vbu = document.getElementById('welcomeVbu').value;
-        if (!name || !email || !vbu) return;
+        if (!email || !email.includes('@')) {
+            document.getElementById('lookupStatus').textContent = 'Please enter a valid email.';
+            return;
+        }
+        wizardEmail = email;
+        const statusEl = document.getElementById('lookupStatus');
+        statusEl.textContent = 'Looking you up…';
 
-        const profile = { name, email, vbu };
+        try {
+            const res = await fetch(`${DIAGNOSTIC_API}?userId=${encodeURIComponent(email)}`);
+            if (res.ok) {
+                const data = await res.json();
+                // Record found — restore and skip questionnaire
+                statusEl.textContent = '';
+                const profile = { name: data.name, email, vbu: data.vbu };
+                const diagnostic = {
+                    role: data.role, level: data.level,
+                    q3: data.q3, q4: data.q4,
+                    completedAt: data.completedAt
+                };
+                localStorage.setItem('aha-bingo-profile', JSON.stringify(profile));
+                localStorage.setItem('aha-bingo-diagnostic', JSON.stringify(diagnostic));
+                document.getElementById('welcomeOverlay').classList.remove('show');
+                finishOnboarding(profile, diagnostic);
+                return;
+            }
+        } catch(e) { /* network error — proceed to questionnaire */ }
+
+        // No record found — proceed to questionnaire steps
+        statusEl.textContent = '';
+        document.getElementById('welcomeOverlay').classList.add('show');
+        goToStep(1);
+    }
+
+    function goToStep(n) {
+        // Validate current step before advancing
+        if (n > wizardStep) {
+            if (wizardStep === 1) {
+                const name = document.getElementById('welcomeName').value.trim();
+                const vbu = document.getElementById('welcomeVbu').value;
+                const role = document.querySelector('input[name="diagRole"]:checked')?.value;
+                if (!name) { alert('Please enter your name.'); return; }
+                if (!vbu) { alert('Please select your business unit.'); return; }
+                if (!role) { alert('Please select your role.'); return; }
+            }
+            if (wizardStep === 2) {
+                const level = document.querySelector('input[name="diagLevel"]:checked')?.value;
+                if (level === undefined || level === null) { alert('Please select your level.'); return; }
+            }
+            if (wizardStep === 3) {
+                const q3 = document.getElementById('diagQ3').value.trim();
+                if (!q3) { alert('Please share your biggest AI challenge — this helps us make the week more useful for you.'); return; }
+            }
+        }
+
+        wizardStep = n;
+
+        // Show/hide steps
+        for (let i = 0; i <= 4; i++) {
+            document.getElementById(`wizardStep${i}`).classList.toggle('active', i === n);
+        }
+
+        // Step progress dots & label (hidden on step 0)
+        const progress = document.getElementById('wizardProgress');
+        if (n === 0) {
+            progress.style.display = 'none';
+        } else {
+            progress.style.display = 'block';
+            document.getElementById('wizardStepLabel').textContent = `Step ${n} of 5`;
+            for (let i = 0; i <= 4; i++) {
+                const dot = document.getElementById(`sdot${i}`);
+                dot.classList.toggle('active', i === n - 1);
+                dot.classList.toggle('done', i < n - 1);
+            }
+        }
+    }
+
+    async function submitDiagnostic() {
+        const name = document.getElementById('welcomeName').value.trim();
+        const vbu = document.getElementById('welcomeVbu').value;
+        const role = document.querySelector('input[name="diagRole"]:checked')?.value;
+        const level = document.querySelector('input[name="diagLevel"]:checked')?.value;
+        const q3 = document.getElementById('diagQ3').value.trim();
+        const q4 = document.getElementById('diagQ4').value.trim();
+
+        if (!name || !vbu || !role || level === undefined) {
+            alert('Please complete all required fields.');
+            return;
+        }
+        if (!q4) {
+            alert('Please tell us what a successful week would look like for you.');
+            return;
+        }
+
+        const btn = document.getElementById('submitDiagBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const payload = {
+            userId: wizardEmail,
+            name, vbu, role, level,
+            q3: q3 || '', q4: q4 || '',
+            completedAt: new Date().toISOString()
+        };
+
+        try {
+            await fetch(DIAGNOSTIC_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch(e) { console.log('Diagnostic API save failed, continuing with localStorage', e); }
+
+        const profile = { name, email: wizardEmail, vbu };
+        const diagnostic = { role, level, q3: q3 || '', q4: q4 || '', completedAt: payload.completedAt };
         localStorage.setItem('aha-bingo-profile', JSON.stringify(profile));
-        currentUserId = email;
+        localStorage.setItem('aha-bingo-diagnostic', JSON.stringify(diagnostic));
+
+        btn.disabled = false;
+        btn.textContent = "Let's go! ⚡";
+
         document.getElementById('welcomeOverlay').classList.remove('show');
+        finishOnboarding(profile, diagnostic);
+    }
+
+    function finishOnboarding(profile, diagnostic) {
+        currentUserId = profile.email;
         updateUserGreeting(profile);
-        // Continue init
+
+        const eventDay = getCurrentEventDay();
+
+        if (eventDay === 0) {
+            showLanding(profile);
+            loadPreferences();
+            applyTheme();
+            updateMuteUI();
+            return;
+        }
+
+        // Event is live — initialize the full bingo experience
         loadPreferences();
         loadMarkedByDay();
+        const savedDay = parseInt(localStorage.getItem('aha-bingo-activeDay'));
+        const maxDay = Math.min(eventDay, 4);
+        if (savedDay >= 1 && savedDay <= maxDay) {
+            activeDay = savedDay;
+        } else {
+            activeDay = maxDay;
+        }
+        markedCells = new Set(markedByDay[activeDay]);
         loadJournal();
         applyTheme();
         updateMuteUI();
+
+        // Apply role-based default track
+        const roleToTrack = { product: 'product', rnd: 'rnd', leadership: 'leadership' };
+        const defaultTrack = roleToTrack[diagnostic.role] || 'all';
+        activeTrack = defaultTrack;
+        document.querySelectorAll('.track-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.track === defaultTrack);
+        });
+
         generateNewCard();
         selectDay(activeDay);
+        updateDayTabs();
+    }
+
+    const TRACK_SCHEDULE = {
+        product: {
+            1: { theme: 'Research & Discover',  desc: 'Use AI to explore your market, understand your users, and build a first prototype.' },
+            2: { theme: 'Define & Refine',      desc: 'Sharpen your problem statement, stress-test ideas, and prepare specs for the build.' },
+            3: { theme: 'Collaborate & Build',  desc: 'Work alongside R&D to bring your PoC to life and push your thinking further.' },
+            4: { theme: 'Refine & Share',       desc: 'Tighten your PoC, incorporate feedback, and close with a short lightning demo.' }
+        },
+        rnd: {
+            1: { theme: 'Set Up & Explore',     desc: 'Get your AI-first environment running and tackle real debugging challenges with AI.' },
+            2: { theme: 'Build & Test',         desc: 'Ship your first feature end-to-end, set up CI/CD, and automate your tests.' },
+            3: { theme: 'Build & Iterate',      desc: 'Join forces with Product and drive the PoC forward at AI-first velocity.' },
+            4: { theme: 'Deliver & Demo',       desc: 'Finalise the PoC and close with a short lightning demo alongside Product.' }
+        },
+        leadership: {
+            1: { theme: 'Experience the Shift', desc: 'See AI in action and explore what it means for your team and business.' },
+            2: { theme: 'Meet the Ecosystem',   desc: 'Engage with strategic partners and watch early product ideas take shape.' },
+            3: { theme: 'Deepen & Reflect',     desc: "Go hands-on with AI tools and explore how you'll lead others through this change." },
+            4: { theme: 'Commit & Close',       desc: 'Watch the final demos, share your plans, and commit to what comes next.' }
+        }
+    };
+
+    function populateLandingSchedule(role) {
+        const sched = TRACK_SCHEDULE[role] || TRACK_SCHEDULE.product;
+        for (let d = 1; d <= 4; d++) {
+            document.getElementById(`ldayTheme${d}`).textContent = sched[d].theme;
+            document.getElementById(`ldayDesc${d}`).textContent  = sched[d].desc;
+        }
+    }
+
+    function showLanding(profile) {
+        const firstName = profile.name.split(' ')[0];
+        document.getElementById('landingGreeting').textContent = `Welcome, ${firstName}!`;
+
+        const [y, m, d] = EVENT_CONFIG.startDate.split('-').map(Number);
+        const startDt = new Date(y, m - 1, d);
+        const dateStr = startDt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('landingDate').textContent = dateStr;
+
+        const diag = JSON.parse(localStorage.getItem('aha-bingo-diagnostic') || 'null');
+        populateLandingSchedule(diag && diag.role ? diag.role : 'product');
+
+        document.getElementById('landingOverlay').classList.add('show');
     }
 
     function updateUserGreeting(profile) {
@@ -2458,11 +3170,64 @@
 
     function changeProfile() {
         localStorage.removeItem('aha-bingo-profile');
+        localStorage.removeItem('aha-bingo-diagnostic');
+        document.getElementById('landingOverlay').classList.remove('show');
         showWelcome();
     }
 
+    function updateDayTabs() {
+        const eventDay = getCurrentEventDay();
+        document.querySelectorAll('.day-dot').forEach(dot => {
+            const dayNum = parseInt(dot.dataset.day);
+            if (eventDay > 0 && dayNum > eventDay) {
+                dot.classList.add('locked');
+            } else {
+                dot.classList.remove('locked');
+            }
+        });
+    }
+
+    // ===== Event Configuration =====
+    const EVENT_CONFIG = {
+        startDate: '2026-03-03',   // Day 1 = 3 March 2026
+        endDate:   '2026-03-06',   // Day 4 = 6 March 2026
+        startHour: 8,              // Hour (US Mountain) each day unlocks
+        timezone:  'America/Denver'
+    };
+
+    function getCurrentEventDay() {
+        const { startDate, endDate, startHour, timezone } = EVENT_CONFIG;
+        const now = new Date();
+
+        // Get current date (YYYY-MM-DD) and hour in the event timezone
+        const dateInTz = new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(now);
+        const hourInTz = parseInt(new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone, hour: 'numeric', hour12: false
+        }).format(now));
+
+        if (dateInTz < startDate) return 0;
+        if (dateInTz === startDate && hourInTz < startHour) return 0;
+        if (dateInTz > endDate) return 4;
+
+        const [sy, sm, sd] = startDate.split('-').map(Number);
+        const [ty, tm, td] = dateInTz.split('-').map(Number);
+        const dayDiff = Math.round(
+            (Date.UTC(ty, tm-1, td) - Date.UTC(sy, sm-1, sd)) / 86400000
+        );
+        const eventDay = dayDiff + 1;
+
+        // Before start hour on days 2-4: still on previous day
+        if (hourInTz < startHour) return Math.max(eventDay - 1, 1);
+
+        return Math.min(eventDay, 4);
+    }
+
+    // ===== API Endpoints =====
+    const BASE_API = 'https://qqkykyeiol.execute-api.us-east-1.amazonaws.com';
+    const DIAGNOSTIC_API = BASE_API + '/diagnostic';
+
     // ===== Journal API =====
-    const JOURNAL_API = 'https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal';
+    const JOURNAL_API = BASE_API + '/journal';
     let currentUserId = null;
 
     function getUserId() {
@@ -2708,8 +3473,9 @@
         if (entries.length === 0) { showToast('No entries to export'); return; }
 
         const profile = JSON.parse(localStorage.getItem('aha-bingo-profile') || '{}');
+        const diag = JSON.parse(localStorage.getItem('aha-bingo-diagnostic') || '{}');
         let md = `# \u{1F4A1} My Aha Moment Journal\n`;
-        md += `**${profile.name || 'Participant'}** | ${profile.vbu || ''}\n`;
+        md += `**${profile.name || 'Participant'}** | ${profile.vbu || ''}${diag.role ? ' | ' + diag.role : ''}\n`;
         md += `CSI Revenue Signals Accelerator \u2014 Denver, CO\n\n`;
 
         const byDay = { 1: [], 2: [], 3: [], 4: [] };
@@ -2761,28 +3527,17 @@
 
     // ===== Initialize =====
     function init() {
-        // Check for welcome/login
         const profile = JSON.parse(localStorage.getItem('aha-bingo-profile') || 'null');
-        if (!profile) {
-            showWelcome();
+        const diagnostic = JSON.parse(localStorage.getItem('aha-bingo-diagnostic') || 'null');
+
+        // If localStorage has both, skip the wizard entirely
+        if (profile && diagnostic) {
+            finishOnboarding(profile, diagnostic);
             return;
         }
-        currentUserId = profile.email;
-        updateUserGreeting(profile);
 
-        loadPreferences();
-        loadMarkedByDay();
-        // Restore active day
-        const savedDay = parseInt(localStorage.getItem('aha-bingo-activeDay'));
-        if (savedDay >= 1 && savedDay <= 4) {
-            activeDay = savedDay;
-            markedCells = new Set(markedByDay[activeDay]);
-        }
-        loadJournal();
-        applyTheme();
-        updateMuteUI();
-        generateNewCard();
-        selectDay(activeDay);
+        // Otherwise show the wizard (Step 0 = email entry)
+        showWelcome();
     }
 
     // ===== Preferences =====
@@ -2819,6 +3574,10 @@
 
     // ===== Day Selection =====
     function selectDay(day) {
+        // Reject locked days
+        const eventDay = getCurrentEventDay();
+        if (eventDay > 0 && day > eventDay) return;
+
         // Save current day's marked cells
         markedByDay[activeDay] = new Set(markedCells);
         saveMarkedByDay();
