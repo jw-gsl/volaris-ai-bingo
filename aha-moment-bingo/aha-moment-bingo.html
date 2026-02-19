@@ -775,9 +775,39 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 14px 8px;
+            gap: 0;
+            padding: 0;
             text-align: center;
+            perspective: 600px;
+            min-height: 82px;
+        }
+        /* Flip container */
+        .level-flip {
+            width: 100%;
+            height: 82px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.35s ease;
+        }
+        @media (hover: hover) {
+            .radio-card:hover .level-flip { transform: rotateY(180deg); }
+        }
+        .level-flip.flipped { transform: rotateY(180deg); }
+        .level-front, .level-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 6px;
+        }
+        .level-back {
+            transform: rotateY(180deg);
+            cursor: pointer;
         }
         .level-dot {
             display: block;
@@ -790,6 +820,24 @@
         .level-dot-1 { background: #4A7FA8; }
         .level-dot-2 { background: #2B5F96; }
         .level-dot-3 { background: #2D6B1A; }
+        .level-num { font-size: 0.8rem; font-weight: 700; }
+        .level-name { font-size: 0.74rem; font-weight: 800; color: var(--heading); line-height: 1.2; }
+        .level-desc { font-size: 0.62rem; color: var(--text); opacity: 0.65; line-height: 1.3; }
+        .level-info-btn {
+            display: none;
+            position: absolute;
+            top: 4px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: var(--teal);
+            font-size: 0.7rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.7;
+        }
+        @media (hover: none) { .level-info-btn { display: block; } }
         .diag-question {
             font-size: 1rem;
             font-weight: 800;
@@ -2088,23 +2136,70 @@
             <!-- Step 2: Q2 Level -->
             <div class="wizard-step" id="wizardStep2">
                 <p class="diag-question">Where are you on the AI maturity curve?</p>
-                <p class="diag-hint">Refer to your slide deck for level descriptions.</p>
                 <div class="radio-cards radio-cards-level">
                     <label class="radio-card">
                         <input type="radio" name="diagLevel" value="0">
-                        <span class="radio-card-body"><span class="level-dot level-dot-0"></span>Level 0</span>
+                        <span class="radio-card-body">
+                            <span class="level-flip" id="lf0">
+                                <span class="level-front">
+                                    <span class="level-dot level-dot-0"></span>
+                                    <span class="level-num">Level 0</span>
+                                    <button class="level-info-btn" onclick="toggleLevelFlip(event,'lf0')" aria-label="More info">ⓘ</button>
+                                </span>
+                                <span class="level-back" onclick="toggleLevelFlip(event,'lf0')">
+                                    <span class="level-name">Waterfall / Agile</span>
+                                    <span class="level-desc">Humans run the SDLC manually</span>
+                                </span>
+                            </span>
+                        </span>
                     </label>
                     <label class="radio-card">
                         <input type="radio" name="diagLevel" value="1">
-                        <span class="radio-card-body"><span class="level-dot level-dot-1"></span>Level 1</span>
+                        <span class="radio-card-body">
+                            <span class="level-flip" id="lf1">
+                                <span class="level-front">
+                                    <span class="level-dot level-dot-1"></span>
+                                    <span class="level-num">Level 1</span>
+                                    <button class="level-info-btn" onclick="toggleLevelFlip(event,'lf1')" aria-label="More info">ⓘ</button>
+                                </span>
+                                <span class="level-back" onclick="toggleLevelFlip(event,'lf1')">
+                                    <span class="level-name">AI Assisted</span>
+                                    <span class="level-desc">AI helps with individual tasks</span>
+                                </span>
+                            </span>
+                        </span>
                     </label>
                     <label class="radio-card">
                         <input type="radio" name="diagLevel" value="2">
-                        <span class="radio-card-body"><span class="level-dot level-dot-2"></span>Level 2</span>
+                        <span class="radio-card-body">
+                            <span class="level-flip" id="lf2">
+                                <span class="level-front">
+                                    <span class="level-dot level-dot-2"></span>
+                                    <span class="level-num">Level 2</span>
+                                    <button class="level-info-btn" onclick="toggleLevelFlip(event,'lf2')" aria-label="More info">ⓘ</button>
+                                </span>
+                                <span class="level-back" onclick="toggleLevelFlip(event,'lf2')">
+                                    <span class="level-name">AI Directed</span>
+                                    <span class="level-desc">AI executes from specs, you direct &amp; validate</span>
+                                </span>
+                            </span>
+                        </span>
                     </label>
                     <label class="radio-card">
                         <input type="radio" name="diagLevel" value="3">
-                        <span class="radio-card-body"><span class="level-dot level-dot-3"></span>Level 3</span>
+                        <span class="radio-card-body">
+                            <span class="level-flip" id="lf3">
+                                <span class="level-front">
+                                    <span class="level-dot level-dot-3"></span>
+                                    <span class="level-num">Level 3</span>
+                                    <button class="level-info-btn" onclick="toggleLevelFlip(event,'lf3')" aria-label="More info">ⓘ</button>
+                                </span>
+                                <span class="level-back" onclick="toggleLevelFlip(event,'lf3')">
+                                    <span class="level-name">AI Delegated</span>
+                                    <span class="level-desc">AI agents end-to-end, you review &amp; approve</span>
+                                </span>
+                            </span>
+                        </span>
                     </label>
                 </div>
                 <div class="wizard-nav">
@@ -2157,7 +2252,7 @@
                 <div class="landing-day-row">
                     <div class="landing-day-number">D1</div>
                     <div class="landing-day-content">
-                        <div class="landing-day-label">Mon 3 Mar</div>
+                        <div class="landing-day-label">Tue 3 Mar</div>
                         <div class="landing-day-theme" id="ldayTheme1">The Shift</div>
                         <div class="landing-day-desc" id="ldayDesc1">[Placeholder: high-level theme for Day 1]</div>
                     </div>
@@ -2165,7 +2260,7 @@
                 <div class="landing-day-row">
                     <div class="landing-day-number">D2</div>
                     <div class="landing-day-content">
-                        <div class="landing-day-label">Tue 4 Mar</div>
+                        <div class="landing-day-label">Wed 4 Mar</div>
                         <div class="landing-day-theme" id="ldayTheme2">Build</div>
                         <div class="landing-day-desc" id="ldayDesc2">[Placeholder: high-level theme for Day 2]</div>
                     </div>
@@ -2173,7 +2268,7 @@
                 <div class="landing-day-row">
                     <div class="landing-day-number">D3</div>
                     <div class="landing-day-content">
-                        <div class="landing-day-label">Wed 5 Mar</div>
+                        <div class="landing-day-label">Thu 5 Mar</div>
                         <div class="landing-day-theme" id="ldayTheme3">Show</div>
                         <div class="landing-day-desc" id="ldayDesc3">[Placeholder: high-level theme for Day 3]</div>
                     </div>
@@ -2181,7 +2276,7 @@
                 <div class="landing-day-row">
                     <div class="landing-day-number">D4</div>
                     <div class="landing-day-content">
-                        <div class="landing-day-label">Thu 6 Mar</div>
+                        <div class="landing-day-label">Fri 6 Mar</div>
                         <div class="landing-day-theme" id="ldayTheme4">Commit</div>
                         <div class="landing-day-desc" id="ldayDesc4">[Placeholder: high-level theme for Day 4]</div>
                     </div>
@@ -2879,6 +2974,12 @@
         statusEl.textContent = '';
         document.getElementById('welcomeOverlay').classList.add('show');
         goToStep(1);
+    }
+
+    function toggleLevelFlip(e, id) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById(id).classList.toggle('flipped');
     }
 
     function goToStep(n) {
