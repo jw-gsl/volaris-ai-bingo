@@ -4227,14 +4227,21 @@
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // ===== Dev: Shift+Alt+D cycles through days =====
+    // ===== Dev: Shift+Alt+D cycles Landing→D1→D2→D3→D4→Landing =====
+    let _devStage = 0; // 0=landing, 1-4=days
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && e.altKey && e.key === 'D') {
-            document.getElementById('landingOverlay').classList.remove('show');
-            const next = (activeDay % 4) + 1;
             getCurrentEventDay = () => 4;
-            updateDayTabs();
-            selectDay(next);
+            _devStage = (_devStage % 5) + 1; // 1→2→3→4→5→1…
+            if (_devStage === 5) {
+                _devStage = 0;
+                updateDayTabs();
+                document.getElementById('landingOverlay').classList.add('show');
+            } else {
+                document.getElementById('landingOverlay').classList.remove('show');
+                updateDayTabs();
+                selectDay(_devStage);
+            }
         }
     });
 
