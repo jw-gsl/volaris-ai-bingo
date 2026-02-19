@@ -149,16 +149,20 @@
 
         /* ===== Header ===== */
         .header {
-            text-align: center;
-            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 0;
+            padding: 12px 0 0;
         }
 
         .logo-area {
-            margin-bottom: 12px;
+            margin-bottom: 0;
+            text-align: left;
         }
 
         .logo-area img {
-            height: 40px;
+            height: 32px;
             width: auto;
             transition: filter 0.3s;
         }
@@ -177,12 +181,13 @@
         }
 
         .title {
-            font-weight: 900;
-            font-size: clamp(1.6rem, 5vw, 2.4rem);
-            color: var(--heading);
-            line-height: 1.1;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
+            font-weight: 700;
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+            color: var(--teal);
+            line-height: 1.2;
+            margin-bottom: 12px;
+            letter-spacing: 0;
+            text-align: center;
         }
 
         .title .bulb {
@@ -195,38 +200,13 @@
             50% { filter: drop-shadow(0 0 12px rgba(245,158,11,0.8)); transform: scale(1.1); }
         }
 
-        .tagline {
-            font-size: 0.85rem;
-            color: var(--text);
-            opacity: 0.8;
-            font-style: italic;
-        }
-
-        .event-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--teal);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .event-info span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
         /* Denver mountain header decoration */
         .mountain-header {
             width: 100vw;
             margin-left: calc(-50vw + 50%);
-            margin-bottom: 20px;
+            max-height: 40px;
+            overflow: hidden;
+            margin-bottom: 12px;
             display: block;
             line-height: 0;
         }
@@ -256,56 +236,18 @@
             opacity: 0.85;
         }
 
-        /* ===== Track Filter ===== */
-        .track-filter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .track-btn {
-            font-family: 'Barlow', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 5px 12px;
-            border: 2px solid transparent;
-            border-radius: 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
-            background: var(--cell-bg);
-            color: var(--text);
-        }
-
-        .track-btn:hover { transform: scale(1.05); }
-        .track-btn:active { transform: scale(0.96); }
-
-        .track-btn.active {
-            color: var(--navy);
-            font-weight: 800;
-        }
-
-        .track-btn[data-track="all"].active { background: var(--off-white); border-color: var(--navy); color: var(--navy); }
-        .track-btn[data-track="leadership"].active { background: var(--track-leadership); border-color: var(--track-leadership); }
-        .track-btn[data-track="product"].active { background: var(--track-product); border-color: var(--track-product); color: var(--white); }
-        .track-btn[data-track="rnd"].active { background: var(--track-rnd); border-color: var(--track-rnd); }
-
-        [data-theme="dark"] .track-btn[data-track="all"].active { background: var(--cell-bg); border-color: var(--off-white); color: var(--off-white); }
-
-        /* ===== Controls Bar ===== */
-        .controls {
+        /* ===== Footer Settings ===== */
+        .footer-settings {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 16px;
-            flex-wrap: wrap;
             margin-bottom: 12px;
-            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
+
+        .footer-settings:hover { opacity: 1; }
 
         .toggle-group {
             display: flex;
@@ -2047,12 +1989,14 @@
             .cell .track-dot { width: 5px; height: 5px; top: 2px; left: 2px; }
             .actions { gap: 6px; }
             .btn { padding: 8px 14px; font-size: 0.72rem; }
-            .controls { gap: 10px; }
             .bulb-icon { width: 12px; height: 12px; font-size: 10px; top: 1px; right: 1px; }
             .info-btn { width: 15px; height: 15px; font-size: 0.5rem; bottom: 1px; right: 1px; }
             .day-dot { padding: 4px 10px; font-size: 0.65rem; }
             .day-journal-btn { padding: 4px 10px !important; font-size: 0.65rem !important; }
-            .event-info { font-size: 0.62rem; gap: 8px; }
+            .header { flex-direction: column; align-items: center; text-align: center; }
+            .logo-area { text-align: center; }
+            .mountain-header { max-height: 30px; }
+            .title { font-size: 1rem; }
         }
 
         @media (min-width: 521px) and (max-width: 768px) {
@@ -2062,7 +2006,7 @@
         /* ===== Print ===== */
         @media print {
             body { background: white; }
-            .controls, .actions, .how-to-play, .track-filter, .day-indicator { display: none; }
+            .actions, .how-to-play, .day-indicator, .footer-settings { display: none; }
             .bingo-card { box-shadow: none; border: 2px solid var(--navy); }
         }
     </style>
@@ -2279,42 +2223,36 @@
                 <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="logoImg">
                 <div class="logo-subtitle">March 3&ndash;6, 2026 &middot; Denver, CO</div>
             </div>
-            <!-- Denver mountain skyline -->
-            <div class="mountain-header">
-                <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <!-- Far range -->
-                    <path class="mtn-far" d="M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z" fill="var(--navy)" opacity="0.07"/>
-                    <!-- Mid range -->
-                    <path class="mtn-mid" d="M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z" fill="var(--navy)" opacity="0.12"/>
-                    <!-- Near foothills -->
-                    <path class="mtn-near" d="M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z" fill="var(--navy)" opacity="0.18"/>
-                    <!-- Snow caps on tallest peaks -->
-                    <path d="M205,14 L210,12 L216,17 L210,15Z" fill="white" opacity="0.6"/>
-                    <path d="M207,16 L210,12 L220,20 L212,18Z" fill="white" opacity="0.25"/>
-                    <path d="M415,12 L420,10 L426,16 L420,13Z" fill="white" opacity="0.6"/>
-                    <path d="M417,14 L420,10 L428,18 L422,16Z" fill="white" opacity="0.25"/>
-                    <path d="M145,20 L150,18 L156,24 L150,21Z" fill="white" opacity="0.55"/>
-                    <path d="M147,22 L150,18 L158,26 L152,23Z" fill="white" opacity="0.2"/>
-                    <path d="M335,17 L340,15 L346,21 L340,18Z" fill="white" opacity="0.55"/>
-                    <path d="M337,19 L340,15 L348,23 L342,20Z" fill="white" opacity="0.2"/>
-                    <path d="M75,30 L80,28 L86,34 L80,31Z" fill="white" opacity="0.5"/>
-                    <path d="M77,32 L80,28 L88,36 L82,33Z" fill="white" opacity="0.18"/>
-                    <path d="M495,20 L500,18 L506,24 L500,21Z" fill="white" opacity="0.5"/>
-                    <path d="M497,22 L500,18 L508,26 L502,23Z" fill="white" opacity="0.18"/>
-                    <!-- Additional snow highlights on ridgeline -->
-                    <path d="M268,23 L272,21 L276,25Z" fill="white" opacity="0.35"/>
-                    <path d="M108,39 L112,37 L116,41Z" fill="white" opacity="0.3"/>
-                    <path d="M538,33 L542,31 L546,35Z" fill="white" opacity="0.3"/>
-                </svg>
-            </div>
-            <h1 class="title" id="mainTitle">CSI Revenue Signals Accelerator</h1>
-            <p class="tagline" id="tagline">Four days. Real work. Agents doing it with you.</p>
-            <div class="event-info">
-                <span>&#x1F3D4;&#xFE0F; Denver, CO</span>
-                <span>&#x1F4C5; March 3&ndash;6, 2026</span>
-                <span>&#x26A1; Progress Over Perfection</span>
-            </div>
         </header>
+        <!-- Denver mountain skyline -->
+        <div class="mountain-header">
+            <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Far range -->
+                <path class="mtn-far" d="M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z" fill="var(--navy)" opacity="0.07"/>
+                <!-- Mid range -->
+                <path class="mtn-mid" d="M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z" fill="var(--navy)" opacity="0.12"/>
+                <!-- Near foothills -->
+                <path class="mtn-near" d="M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z" fill="var(--navy)" opacity="0.18"/>
+                <!-- Snow caps on tallest peaks -->
+                <path d="M205,14 L210,12 L216,17 L210,15Z" fill="white" opacity="0.6"/>
+                <path d="M207,16 L210,12 L220,20 L212,18Z" fill="white" opacity="0.25"/>
+                <path d="M415,12 L420,10 L426,16 L420,13Z" fill="white" opacity="0.6"/>
+                <path d="M417,14 L420,10 L428,18 L422,16Z" fill="white" opacity="0.25"/>
+                <path d="M145,20 L150,18 L156,24 L150,21Z" fill="white" opacity="0.55"/>
+                <path d="M147,22 L150,18 L158,26 L152,23Z" fill="white" opacity="0.2"/>
+                <path d="M335,17 L340,15 L346,21 L340,18Z" fill="white" opacity="0.55"/>
+                <path d="M337,19 L340,15 L348,23 L342,20Z" fill="white" opacity="0.2"/>
+                <path d="M75,30 L80,28 L86,34 L80,31Z" fill="white" opacity="0.5"/>
+                <path d="M77,32 L80,28 L88,36 L82,33Z" fill="white" opacity="0.18"/>
+                <path d="M495,20 L500,18 L506,24 L500,21Z" fill="white" opacity="0.5"/>
+                <path d="M497,22 L500,18 L508,26 L502,23Z" fill="white" opacity="0.18"/>
+                <!-- Additional snow highlights on ridgeline -->
+                <path d="M268,23 L272,21 L276,25Z" fill="white" opacity="0.35"/>
+                <path d="M108,39 L112,37 L116,41Z" fill="white" opacity="0.3"/>
+                <path d="M538,33 L542,31 L546,35Z" fill="white" opacity="0.3"/>
+            </svg>
+        </div>
+        <h1 class="title slide-down" id="mainTitle">CSI Revenue Signals Accelerator</h1>
 
         <!-- Day Tracker + Journal -->
         <div class="day-indicator fade-in">
@@ -2323,30 +2261,6 @@
             <div class="day-dot" data-day="3" onclick="selectDay(3)">Day 3</div>
             <div class="day-dot" data-day="4" onclick="selectDay(4)">Day 4</div>
             <button class="btn btn-journal day-journal-btn" onclick="viewJournal()">&#x1F4D3; My Journal</button>
-        </div>
-
-        <!-- Track Filter -->
-        <div class="track-filter fade-in">
-            <button class="track-btn active" data-track="all" onclick="setTrackFilter('all')">All Tracks</button>
-            <button class="track-btn" data-track="leadership" onclick="setTrackFilter('leadership')">Leadership</button>
-            <button class="track-btn" data-track="product" onclick="setTrackFilter('product')">Product</button>
-            <button class="track-btn" data-track="rnd" onclick="setTrackFilter('rnd')">R&D</button>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls fade-in">
-            <div class="toggle-group">
-                <span class="toggle-label">Light</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="themeToggle" aria-label="Toggle dark mode">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">Dark</span>
-            </div>
-            <button class="mute-btn" id="muteBtn" onclick="toggleMute()" aria-label="Toggle sound">
-                <span class="mute-icon" id="muteIcon">&#x1F50A;</span>
-                <span id="muteLabel">Sound</span>
-            </button>
         </div>
 
         <!-- Card Info -->
@@ -2401,6 +2315,20 @@
 
         <!-- Footer -->
         <footer class="footer fade-in">
+            <div class="footer-settings">
+                <div class="toggle-group">
+                    <span class="toggle-label">Light</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" aria-label="Toggle dark mode">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Dark</span>
+                </div>
+                <button class="mute-btn" id="muteBtn" onclick="toggleMute()" aria-label="Toggle sound">
+                    <span class="mute-icon" id="muteIcon">&#x1F50A;</span>
+                    <span id="muteLabel">Sound</span>
+                </button>
+            </div>
             <p class="footer-primary">
                 <strong>CSI Revenue Signals Accelerator &mdash; Denver 2026</strong> by <strong>Volaris Business Transformation</strong>
             </p>
@@ -3092,17 +3020,27 @@
 
         const eventDay = getCurrentEventDay();
 
+        // Apply role-based track regardless of event state
+        const roleToTrack = { product: 'product', rnd: 'rnd', leadership: 'leadership' };
+        activeTrack = roleToTrack[diagnostic.role] || 'all';
+
+        loadPreferences();
+        loadMarkedByDay();
+        applyTheme();
+        updateMuteUI();
+
         if (eventDay === 0) {
+            // Pre-event: generate card so it's ready when landing is dismissed
+            activeDay = 1;
+            markedCells = new Set(markedByDay[activeDay]);
+            loadJournal();
+            generateNewCard();
+            updateDayTabs();
             showLanding(profile);
-            loadPreferences();
-            applyTheme();
-            updateMuteUI();
             return;
         }
 
         // Event is live — initialize the full bingo experience
-        loadPreferences();
-        loadMarkedByDay();
         const savedDay = parseInt(localStorage.getItem('aha-bingo-activeDay'));
         const maxDay = Math.min(eventDay, 4);
         if (savedDay >= 1 && savedDay <= maxDay) {
@@ -3112,16 +3050,6 @@
         }
         markedCells = new Set(markedByDay[activeDay]);
         loadJournal();
-        applyTheme();
-        updateMuteUI();
-
-        // Apply role-based default track
-        const roleToTrack = { product: 'product', rnd: 'rnd', leadership: 'leadership' };
-        const defaultTrack = roleToTrack[diagnostic.role] || 'all';
-        activeTrack = defaultTrack;
-        document.querySelectorAll('.track-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.track === defaultTrack);
-        });
 
         generateNewCard();
         selectDay(activeDay);
@@ -4236,10 +4164,10 @@
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // ===== Dev: Shift+Alt+D cycles Landing→D1→D2→D3→D4→Landing =====
+    // ===== Dev: Ctrl+Shift+. cycles Landing→D1→D2→D3→D4→Landing =====
     let _devStage = 0; // 0=landing, 1-4=days
     document.addEventListener('keydown', function(e) {
-        if (e.shiftKey && e.altKey && e.key === 'D') {
+        if (e.ctrlKey && e.shiftKey && e.code === 'Period') {
             getCurrentEventDay = () => 4;
             _devStage = (_devStage % 5) + 1; // 1→2→3→4→5→1…
             if (_devStage === 5) {
