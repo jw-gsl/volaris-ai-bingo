@@ -7,9 +7,13 @@ All apps are single-file HTML (no build step), hosted on AWS via S3 + CloudFront
 ## Apps
 
 ### [Aha Moment Bingo](aha-moment-bingo/)
-Interactive 5×5 bingo card where accelerator participants mark "aha moments" as they learn. Organized by track (Product, R&D, Leadership, General) with 4-day support, a reflection journal, token rewards, bingo detection with confetti, and dark mode.
+Interactive 5×5 bingo card where accelerator participants mark "aha moments" as they learn. Organized by track (Product, R&D, Leadership) with 4-day support, a reflection journal, token rewards, bingo detection with confetti, and dark mode. Track is set at onboarding and cards are generated automatically on load.
 
 **Live:** [d3c9oon0ixjih5.cloudfront.net/aha-moment-bingo.html](https://d3c9oon0ixjih5.cloudfront.net/aha-moment-bingo.html)
+
+**Header layout:** Compact 2-row header (logo bar + mountains) with the title as a single teal subheading. Tagline, event-info chips, and track-filter buttons removed. Light/Dark and Sound controls moved to the footer.
+
+**Dev shortcut:** `Ctrl+Shift+.` cycles Landing → Day 1 → Day 2 → Day 3 → Day 4 → Landing (useful for testing before the event goes live on 3 March 2026).
 
 ### [Bullshit Bingo](bullshit-bingo/)
 The original satirical bingo card poking fun at common AI adoption buzzwords and excuses ("We need a strategy first", "AI will replace us all", "Let's form a committee"). Each cell has a witty rebuttal in the side panel.

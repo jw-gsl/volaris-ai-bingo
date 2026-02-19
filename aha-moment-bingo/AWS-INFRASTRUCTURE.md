@@ -115,7 +115,7 @@ aws cloudfront create-invalidation \
 
 ---
 
-### 3. DynamoDB Table — Journal Persistence
+### 3a. DynamoDB Table — Journal Persistence
 
 | Detail | Value |
 |--------|-------|
@@ -147,6 +147,62 @@ aws dynamodb query \
 
 ---
 
+### 3b. DynamoDB Table — Diagnostic / Pre-session Survey
+
+> **Status: needs to be created before the accelerator app goes live.**
+
+| Detail | Value |
+|--------|-------|
+| **Table Name** | `csi-bingo-diagnostics` |
+| **Billing Mode** | PAY_PER_REQUEST (on-demand) |
+| **Partition Key** | `userId` (String) — participant email |
+| **Sort Key** | none |
+| **Region** | us-east-1 |
+
+**Item schema:**
+```json
+{
+  "userId": "james.whiting@example.com",
+  "name": "James Whiting",
+  "vbu": "Grosvenor Systems",
+  "role": "product",
+  "level": "1",
+  "q3": "Getting my team to actually try it, not just talk about it.",
+  "q4": "One live agent working in my product by Friday.",
+  "completedAt": "2026-03-03T09:00:00.000Z"
+}
+```
+
+**Role values:** `product` | `rnd` | `leadership`
+**Level values:** `"0"` | `"1"` | `"2"` | `"3"` (stored as strings)
+
+**Create the table:**
+```bash
+aws dynamodb create-table \
+  --table-name csi-bingo-diagnostics \
+  --attribute-definitions AttributeName=userId,AttributeType=S \
+  --key-schema AttributeName=userId,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --profile VolarisAI
+```
+
+**Query a specific participant:**
+```bash
+aws dynamodb get-item \
+  --table-name csi-bingo-diagnostics \
+  --key '{"userId":{"S":"test@example.com"}}' \
+  --profile VolarisAI
+```
+
+**Scan all responses (post-event analysis):**
+```bash
+aws dynamodb scan \
+  --table-name csi-bingo-diagnostics \
+  --profile VolarisAI
+```
+
+---
+
 ### 4. Lambda Function — API Backend
 
 | Detail | Value |
@@ -158,6 +214,8 @@ aws dynamodb query \
 | **Memory** | 128 MB |
 | **Timeout** | 10 seconds |
 | **IAM Role** | `csi-bingo-journal-lambda-role` |
+
+> The Lambda now handles both `/journal` and `/diagnostic` routes in the same function.
 
 **Function code** (`index.mjs`):
 ```javascript
@@ -254,22 +312,47 @@ aws lambda update-function-code \
 | `GET` | `/journal?userId=xxx` | Get all journal entries for a user |
 | `POST` | `/journal` | Save a journal entry |
 | `DELETE` | `/journal?userId=xxx&ahaText=yyy` | Delete a journal entry |
-| `OPTIONS` | `/journal` | CORS preflight |
+| `GET` | `/diagnostic?userId=xxx` | Look up an existing diagnostic record (200 or 404) |
+| `POST` | `/diagnostic` | Save a new diagnostic record |
+| `OPTIONS` | `*` | CORS preflight |
 
 **Integration:** Lambda proxy integration with `csi-bingo-journal`
 
 **Test endpoints:**
 ```bash
+BASE=https://qqkykyeiol.execute-api.us-east-1.amazonaws.com
+
+# --- Journal ---
+
 # Get entries
-curl "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal?userId=test@example.com"
+curl "$BASE/journal?userId=test@example.com"
 
 # Save entry
-curl -X POST "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal" \
+curl -X POST "$BASE/journal" \
   -H "Content-Type: application/json" \
   -d '{"userId":"test@example.com","ahaText":"Test aha","note":"Test note","track":"product"}'
 
 # Delete entry
-curl -X DELETE "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal?userId=test%40example.com&ahaText=Test%20aha"
+curl -X DELETE "$BASE/journal?userId=test%40example.com&ahaText=Test%20aha"
+
+# --- Diagnostic ---
+
+# Look up a participant (404 if new)
+curl "$BASE/diagnostic?userId=test@example.com"
+
+# Save a diagnostic record
+curl -X POST "$BASE/diagnostic" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "test@example.com",
+    "name": "Test User",
+    "vbu": "Grosvenor Systems",
+    "role": "product",
+    "level": "1",
+    "q3": "Getting buy-in from my team",
+    "q4": "One working agent by Friday",
+    "completedAt": "2026-03-03T09:00:00.000Z"
+  }'
 ```
 
 ---
@@ -283,7 +366,7 @@ curl -X DELETE "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal?u
 
 **Attached policies:**
 
-1. **DynamoDB access** (inline):
+1. **DynamoDB access** (inline) — update this to include the diagnostics table:
 ```json
 {
   "Version": "2012-10-17",
@@ -301,6 +384,14 @@ curl -X DELETE "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal?u
     {
       "Effect": "Allow",
       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:354918379520:table/csi-bingo-diagnostics"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
         "logs:PutLogEvents"
@@ -309,6 +400,15 @@ curl -X DELETE "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/journal?u
     }
   ]
 }
+```
+
+**Apply the updated policy via CLI:**
+```bash
+aws iam put-role-policy \
+  --role-name csi-bingo-journal-lambda-role \
+  --policy-name DynamoDBAccess \
+  --policy-document file://iam-policy.json \
+  --profile VolarisAI
 ```
 
 ---
@@ -322,11 +422,12 @@ User Browser
     │                              │
     │                              └──→ S3 (csi-bingo-app) via OAC
     │
-    └── Journal API calls ──→ API Gateway (qqkykyeiol)
-                                   │
-                                   └──→ Lambda (csi-bingo-journal)
-                                            │
-                                            └──→ DynamoDB (csi-bingo-journal)
+    └── API calls ──→ API Gateway (qqkykyeiol)
+                           │
+                           └──→ Lambda (csi-bingo-journal)
+                                    │
+                                    ├──→ DynamoDB (csi-bingo-journal)     ← journal entries
+                                    └──→ DynamoDB (csi-bingo-diagnostics) ← pre-session survey
 ```
 
 ---
@@ -352,6 +453,86 @@ aws resourcegroupstaggingapi get-resources \
 
 ---
 
+## Local Testing
+
+The HTML file is fully self-contained — no build step, no local server needed.
+
+### Open the app
+
+```bash
+open /Users/hom/Documents/Product/app/volaris-ai-bingo/aha-moment-bingo/aha-moment-bingo.html
+```
+
+### Test checklist
+
+| Scenario | How to test |
+|----------|-------------|
+| Fresh visit wizard | DevTools → Application → Local Storage → delete all `aha-bingo-*` keys, refresh |
+| Email step | Enter any email; if not in DynamoDB, advances to Step 1 (DynamoDB calls fail silently locally) |
+| Step validation | Try clicking Next without filling in name/VBU/role — should block with alert |
+| Landing page (pre-event) | In DevTools console: `EVENT_CONFIG.startDate = '2099-01-01'`, then complete wizard |
+| Bingo card (event live) | In DevTools console: `EVENT_CONFIG.startDate = '2026-02-19'` (today's date) |
+| Role → track mapping | Select "Leader" in wizard → bingo opens with Leadership track active |
+| Returning user (same device) | Complete wizard once; refresh — wizard should be skipped entirely |
+| Switch account | Click "(change)" next to name → clears localStorage, shows email step |
+| Day tab locking | `EVENT_CONFIG.startDate = '2026-02-19'; EVENT_CONFIG.endDate = '2026-02-19'` → only Day 1 unlocked |
+
+### Clear localStorage between tests (DevTools console)
+
+```js
+Object.keys(localStorage).filter(k => k.startsWith('aha-bingo')).forEach(k => localStorage.removeItem(k));
+location.reload();
+```
+
+### Simulate different event states (DevTools console)
+
+```js
+// Before event — should show landing page after wizard
+EVENT_CONFIG.startDate = '2099-01-01';
+
+// Event live — should show bingo card
+EVENT_CONFIG.startDate = '2026-02-19';
+EVENT_CONFIG.endDate = '2026-02-22';
+
+// Only Day 1 unlocked (tabs 2-4 greyed)
+EVENT_CONFIG.startDate = '2026-02-19';
+EVENT_CONFIG.endDate = '2026-02-22';
+// (run on Day 1 of the range)
+```
+
+---
+
+## Git Workflow
+
+**Branch:** `app` (main working branch)
+**Remote:** `https://github.com/jw-gsl/volaris-ai-bingo.git`
+
+### Commit and push changes
+
+```bash
+cd /Users/hom/Documents/Product/app/volaris-ai-bingo
+
+# Stage the changed files
+git add aha-moment-bingo/aha-moment-bingo.html
+git add aha-moment-bingo/lambda/index.mjs
+git add aha-moment-bingo/AWS-INFRASTRUCTURE.md
+
+# Commit
+git commit -m "your message here"
+
+# Push to remote
+git push origin app
+```
+
+### Check what's changed before committing
+
+```bash
+git diff aha-moment-bingo/aha-moment-bingo.html
+git status
+```
+
+---
+
 ## Deployment Workflow
 
 ### Full deploy (after code changes):
@@ -361,7 +542,7 @@ aws resourcegroupstaggingapi get-resources \
 aws sso login --profile VolarisAI
 
 # 2. Upload HTML to S3
-aws s3 cp aha-moment-bingo.html s3://csi-bingo-app/aha-moment-bingo.html \
+aws s3 cp aha-moment-bingo/aha-moment-bingo.html s3://csi-bingo-app/aha-moment-bingo.html \
   --content-type "text/html" --profile VolarisAI
 
 # 3. Invalidate CloudFront cache
@@ -374,6 +555,8 @@ aws cloudfront create-invalidation \
 ### Lambda update (after API changes):
 
 ```bash
+# From the repo root
+cp aha-moment-bingo/lambda/index.mjs /tmp/bingo-lambda/index.mjs
 cd /tmp/bingo-lambda
 zip -j function.zip index.mjs
 aws lambda update-function-code \
@@ -381,6 +564,61 @@ aws lambda update-function-code \
   --zip-file fileb://function.zip \
   --profile VolarisAI
 ```
+
+### Pre-event infrastructure checklist (run once before March 3)
+
+```bash
+# 1. Login
+aws sso login --profile VolarisAI
+
+# 2. Create the diagnostics DynamoDB table
+aws dynamodb create-table \
+  --table-name csi-bingo-diagnostics \
+  --attribute-definitions AttributeName=userId,AttributeType=S \
+  --key-schema AttributeName=userId,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --profile VolarisAI
+
+# 3. Update Lambda IAM policy to grant access to new table
+#    (update the inline policy in the AWS Console or via CLI — see IAM section above)
+
+# 4. Deploy updated Lambda code
+cp aha-moment-bingo/lambda/index.mjs /tmp/bingo-lambda/index.mjs
+cd /tmp/bingo-lambda && zip -j function.zip index.mjs
+aws lambda update-function-code \
+  --function-name csi-bingo-journal \
+  --zip-file fileb://function.zip \
+  --profile VolarisAI
+
+# 5. Deploy updated HTML
+cd /Users/hom/Documents/Product/app/volaris-ai-bingo
+aws s3 cp aha-moment-bingo/aha-moment-bingo.html s3://csi-bingo-app/aha-moment-bingo.html \
+  --content-type "text/html" --profile VolarisAI
+
+# 6. Bust the cache
+aws cloudfront create-invalidation \
+  --distribution-id EJEVF4NEXEJDI \
+  --paths "/aha-moment-bingo.html" \
+  --profile VolarisAI
+
+# 7. Smoke test
+curl "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/diagnostic?userId=test@example.com"
+# Expected: {"error":"Not found"} with HTTP 404
+```
+
+---
+
+## Local Development & Testing
+
+### Testing days before the event
+
+The app locks days based on real clock time (Mountain Time). To test any day locally without touching the code, use the built-in dev shortcut:
+
+| Action | Shortcut |
+|--------|----------|
+| Cycle to next day (D1→D2→D3→D4→D1) | **Shift+Option+D** (Mac) / **Shift+Alt+D** (Windows) |
+
+The shortcut also dismisses the pre-event landing overlay automatically. No changes needed before going live — the combo is obscure enough that participants are unlikely to trigger it.
 
 ---
 
