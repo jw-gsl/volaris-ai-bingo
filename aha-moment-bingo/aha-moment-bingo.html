@@ -4236,6 +4236,17 @@
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
+    // ===== Dev: Shift+Alt+D cycles through days =====
+    document.addEventListener('keydown', function(e) {
+        if (e.shiftKey && e.altKey && e.key === 'D') {
+            document.getElementById('landingOverlay').classList.remove('show');
+            const next = (activeDay % 4) + 1;
+            getCurrentEventDay = () => 4;
+            updateDayTabs();
+            selectDay(next);
+        }
+    });
+
     // ===== Start =====
     init();
     </script>
