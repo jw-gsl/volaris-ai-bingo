@@ -200,42 +200,6 @@
             50% { filter: drop-shadow(0 0 12px rgba(245,158,11,0.8)); transform: scale(1.1); }
         }
 
-        /* Denver mountain header decoration */
-        .mountain-header {
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
-            max-height: 40px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            display: block;
-            line-height: 0;
-        }
-
-        .mountain-header svg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        [data-theme="dark"] .mountain-header .mtn-far {
-            fill: #8ba4c4;
-            opacity: 0.2;
-        }
-
-        [data-theme="dark"] .mountain-header .mtn-mid {
-            fill: #6b8ab0;
-            opacity: 0.3;
-        }
-
-        [data-theme="dark"] .mountain-header .mtn-near {
-            fill: #4a6e96;
-            opacity: 0.35;
-        }
-
-        [data-theme="dark"] .mountain-header svg path[fill="white"] {
-            opacity: 0.85;
-        }
-
         /* ===== Footer Settings ===== */
         .footer-settings {
             display: flex;
@@ -1995,7 +1959,7 @@
             .day-journal-btn { padding: 4px 10px !important; font-size: 0.65rem !important; }
             .header { flex-direction: column; align-items: center; text-align: center; }
             .logo-area { text-align: center; }
-            .mountain-header { max-height: 30px; }
+
             .title { font-size: 1rem; }
         }
 
@@ -2224,34 +2188,6 @@
                 <div class="logo-subtitle">March 3&ndash;6, 2026 &middot; Denver, CO</div>
             </div>
         </header>
-        <!-- Denver mountain skyline -->
-        <div class="mountain-header">
-            <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <!-- Far range -->
-                <path class="mtn-far" d="M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z" fill="var(--navy)" opacity="0.07"/>
-                <!-- Mid range -->
-                <path class="mtn-mid" d="M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z" fill="var(--navy)" opacity="0.12"/>
-                <!-- Near foothills -->
-                <path class="mtn-near" d="M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z" fill="var(--navy)" opacity="0.18"/>
-                <!-- Snow caps on tallest peaks -->
-                <path d="M205,14 L210,12 L216,17 L210,15Z" fill="white" opacity="0.6"/>
-                <path d="M207,16 L210,12 L220,20 L212,18Z" fill="white" opacity="0.25"/>
-                <path d="M415,12 L420,10 L426,16 L420,13Z" fill="white" opacity="0.6"/>
-                <path d="M417,14 L420,10 L428,18 L422,16Z" fill="white" opacity="0.25"/>
-                <path d="M145,20 L150,18 L156,24 L150,21Z" fill="white" opacity="0.55"/>
-                <path d="M147,22 L150,18 L158,26 L152,23Z" fill="white" opacity="0.2"/>
-                <path d="M335,17 L340,15 L346,21 L340,18Z" fill="white" opacity="0.55"/>
-                <path d="M337,19 L340,15 L348,23 L342,20Z" fill="white" opacity="0.2"/>
-                <path d="M75,30 L80,28 L86,34 L80,31Z" fill="white" opacity="0.5"/>
-                <path d="M77,32 L80,28 L88,36 L82,33Z" fill="white" opacity="0.18"/>
-                <path d="M495,20 L500,18 L506,24 L500,21Z" fill="white" opacity="0.5"/>
-                <path d="M497,22 L500,18 L508,26 L502,23Z" fill="white" opacity="0.18"/>
-                <!-- Additional snow highlights on ridgeline -->
-                <path d="M268,23 L272,21 L276,25Z" fill="white" opacity="0.35"/>
-                <path d="M108,39 L112,37 L116,41Z" fill="white" opacity="0.3"/>
-                <path d="M538,33 L542,31 L546,35Z" fill="white" opacity="0.3"/>
-            </svg>
-        </div>
         <h1 class="title slide-down" id="mainTitle">CSI Revenue Signals Accelerator</h1>
 
         <!-- Day Tracker + Journal -->
