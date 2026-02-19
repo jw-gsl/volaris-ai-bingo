@@ -608,6 +608,20 @@ curl "https://qqkykyeiol.execute-api.us-east-1.amazonaws.com/diagnostic?userId=t
 
 ---
 
+## Local Development & Testing
+
+### Testing days before the event
+
+The app locks days based on real clock time (Mountain Time). To test any day locally without touching the code, use the built-in dev shortcut:
+
+| Action | Shortcut |
+|--------|----------|
+| Cycle to next day (D1→D2→D3→D4→D1) | **Shift+Option+D** (Mac) / **Shift+Alt+D** (Windows) |
+
+The shortcut also dismisses the pre-event landing overlay automatically. No changes needed before going live — the combo is obscure enough that participants are unlikely to trigger it.
+
+---
+
 ## Future: TTAD Tracker App
 
 The TTAD (Toxic/Talker/Action/Driver) tracker app will use the same AWS account and infrastructure pattern. See `TTAD-TRACKER-HANDOVER.md` for full requirements. Additional resources needed:
