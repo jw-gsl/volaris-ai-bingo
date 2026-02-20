@@ -1346,7 +1346,7 @@
         <header class="header" id="appHeader" style="display:none;">
             <div class="logo-area">
                 <img src="https://www.volarisgroup.com/wp-content/uploads/2024/09/Logo-2.png" alt="Volaris Group" id="logoImg">
-                <div class="logo-subtitle">CSI Revenue Signals Accelerator</div>
+                <div class="logo-subtitle">CSI Revenue Signals Program</div>
             </div>
             <!-- Denver mountain skyline -->
             <div class="mountain-header">
@@ -1369,9 +1369,20 @@
                     <path d="M75,30 L80,28 L86,34 L80,31Z" fill="white" opacity="0.5"/>
                     <path d="M77,32 L80,28 L88,36 L82,33Z" fill="white" opacity="0.18"/>
                     <path d="M495,20 L500,18 L506,24 L500,21Z" fill="white" opacity="0.5"/>
+                    <path d="M497,22 L500,18 L508,26 L502,23Z" fill="white" opacity="0.18"/>
+                    <!-- Additional snow highlights on ridgeline -->
+                    <path d="M268,23 L272,21 L276,25Z" fill="white" opacity="0.35"/>
+                    <path d="M108,39 L112,37 L116,41Z" fill="white" opacity="0.3"/>
+                    <path d="M538,33 L542,31 L546,35Z" fill="white" opacity="0.3"/>
                 </svg>
             </div>
             <div class="title">Mindset Tracker</div>
+            <p class="tagline">Track the shift. See the growth.</p>
+            <div class="event-info">
+                <span>&#x1F3D4;&#xFE0F; Denver, CO</span>
+                <span>&#x1F4C5; 4-Day Accelerator</span>
+                <span>&#x26A1; Mindset Over Outcome</span>
+            </div>
             <div class="header-controls">
                 <span class="user-info" id="userDisplay"></span>
                 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark</button>
@@ -1410,37 +1421,42 @@
         <nav class="top-nav" id="topNav" style="display:none;">
             <button class="nav-item active" data-view="dashboard" onclick="showView('dashboard')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Board
+                <span class="nav-label">Board</span>
             </button>
             <button class="nav-item" data-view="assessment" onclick="showView('assessment')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                Assess
+                <span class="nav-label">Assess</span>
             </button>
             <button class="nav-item" data-view="journey" onclick="showView('journey')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Journey
+                <span class="nav-label">Journey</span>
             </button>
             <button class="nav-item" data-view="admin" onclick="showView('admin')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                Admin
+                <span class="nav-label">Admin</span>
             </button>
             <button class="nav-item" data-view="auditLog" onclick="showView('auditLog')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                Log
+                <span class="nav-label">Log</span>
             </button>
         </nav>
 
         <!-- ===== DASHBOARD VIEW ===== -->
         <div class="view" id="viewDashboard">
             <div class="day-selector" id="daySelector"></div>
-            <div class="track-filter" id="trackFilter"></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <div class="track-filter" id="trackFilter" style="margin-bottom:0;"></div>
+                <select class="form-select" id="dashboardVbuFilter" onchange="selectDashboardVbu(this.value)" style="width:auto;min-width:140px;font-size:0.75rem;padding:6px 10px;">
+                    <option value="all">All VBUs</option>
+                </select>
+            </div>
             <div class="stats-bar" id="statsBar"></div>
             <div id="dashboardContent"></div>
         </div>
 
         <!-- ===== ASSESSMENT VIEW ===== -->
         <div class="view" id="viewAssessment">
-            <button class="back-btn" onclick="showView('dashboard')">&#8592; Back to Dashboard</button>
+            <button class="back-btn" id="assessBackBtn" onclick="assessGoBack()" style="display:none;">&#8592; Back to List</button>
             <div id="assessmentContent"></div>
         </div>
 
@@ -1448,15 +1464,23 @@
         <div class="view" id="viewJourney">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Participant Journey</div>
+                    <div class="card-title">Participant Journeys</div>
                 </div>
-                <div class="search-wrapper">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" class="search-input" id="journeySearch" placeholder="Search participants..." oninput="filterJourneyList()">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+                    <div class="search-wrapper" style="flex:1;min-width:180px;margin-bottom:0;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" class="search-input" id="journeySearch" placeholder="Search participants..." oninput="filterJourneyGrid()">
+                    </div>
+                    <select class="form-select" id="journeyVbuFilter" onchange="selectJourneyVbu(this.value)" style="width:auto;min-width:140px;font-size:0.75rem;padding:8px 10px;">
+                        <option value="all">All VBUs</option>
+                    </select>
                 </div>
-                <div id="journeyParticipantList" class="participant-select-list"></div>
+                <div id="journeyTrackFilter" class="track-filter"></div>
+                <div class="journey-grid-wrapper">
+                    <div id="journeyGridContainer"></div>
+                </div>
             </div>
-            <div id="journeyDetail" style="display:none;"></div>
+            <div id="journeyDetail"></div>
         </div>
 
         <!-- ===== ADMIN VIEW ===== -->
@@ -1475,16 +1499,54 @@
                 <!-- VBU Management -->
                 <div class="card" id="vbuManagement" style="margin-bottom:12px;">
                     <div class="card-header">
-                        <div class="card-title" style="font-size:0.85rem;">VBU / Companies</div>
+                        <div class="card-title" style="font-size:0.85rem;">VBU / Companies <span id="vbuCount" style="font-weight:400;opacity:0.5;font-size:0.72rem;"></span></div>
                     </div>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="vbuChips"></div>
-                    <div style="display:flex;gap:6px;">
-                        <input type="text" class="form-input" id="newVbuInput" placeholder="Add VBU name..." style="flex:1;" onkeydown="if(event.key==='Enter')addVbuEntity()">
-                        <button class="btn btn-primary btn-sm" onclick="addVbuEntity()">Add</button>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table" style="font-size:0.75rem;">
+                            <thead><tr><th>Name</th><th style="width:60px;"></th></tr></thead>
+                            <tbody id="vbuTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:8px;">
+                        <input type="text" class="form-input" id="newVbuInput" placeholder="Add VBU name..." style="flex:1;font-size:0.75rem;" onkeydown="if(event.key==='Enter')addVbuEntity()">
+                        <button class="btn btn-lime btn-sm" onclick="addVbuEntity()">Add</button>
                     </div>
                 </div>
 
+                <!-- Facilitators -->
+                <div class="card" style="margin-bottom:12px;">
+                    <div class="card-header">
+                        <div class="card-title" style="font-size:0.85rem;">Facilitators <span id="facilitatorCount" style="font-weight:400;opacity:0.5;font-size:0.72rem;"></span></div>
+                    </div>
+                    <table class="data-table" style="font-size:0.75rem;">
+                        <thead><tr><th>Name</th><th>Email</th><th>Status</th><th></th></tr></thead>
+                        <tbody id="facilitatorTableBody"></tbody>
+                    </table>
+                    <div id="addFacilitatorForm" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:end;">
+                            <div style="flex:1;min-width:100px;"><label class="form-label" style="font-size:0.65rem;">Name</label><input type="text" class="form-input" id="facName" placeholder="Full name" style="font-size:0.75rem;"></div>
+                            <div style="flex:1;min-width:140px;"><label class="form-label" style="font-size:0.65rem;">Email</label><input type="email" class="form-input" id="facEmail" placeholder="email@example.com" style="font-size:0.75rem;"></div>
+                            <div style="flex:0;"><button class="btn btn-lime btn-sm" onclick="addFacilitator()">Add</button></div>
+                            <div style="flex:0;"><button class="btn btn-outline btn-sm" onclick="document.getElementById('addFacilitatorForm').style.display='none'">Cancel</button></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px;"><button class="btn btn-outline btn-sm" onclick="document.getElementById('addFacilitatorForm').style.display='block';document.getElementById('facName').focus();">+ Add Facilitator</button></div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="card" style="margin-bottom:12px;">
+                    <div class="card-header">
+                        <div class="card-title" style="font-size:0.85rem;">Data Management</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="btn btn-outline btn-sm" onclick="resetAssessments()" style="color:var(--level-toxic);border-color:var(--level-toxic);">Clear Assessments</button>
+                        <button class="btn btn-outline btn-sm" onclick="resetAllData()" style="color:var(--level-toxic);border-color:var(--level-toxic);">Reset All Data</button>
+                    </div>
+                    <p style="font-size:0.65rem;color:var(--muted);margin-top:6px;">Clear Assessments removes all ratings, audit log entries, and notes. Reset All also removes participants.</p>
+                </div>
+
                 <div id="addParticipantForm" style="display:none;margin-bottom:12px;" class="card">
+                    <h3 id="participantFormTitle" style="margin:0 0 8px 0;font-size:0.85rem;">Add Participant</h3>
                     <div class="form-group">
                         <label class="form-label">Name</label>
                         <input type="text" class="form-input" id="addName" placeholder="Full name">
@@ -1507,19 +1569,27 @@
                             <option value="leadership">Leadership</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">AI Maturity Level</label>
+                        <select class="form-select" id="addAiLevel">
+                            <option value="">Not Set</option>
+                            <option value="0">Level 0</option>
+                            <option value="1">Level 1</option>
+                            <option value="2">Level 2</option>
+                            <option value="3">Level 3</option>
+                        </select>
+                    </div>
                     <div style="display:flex;gap:8px;margin-top:8px;">
                         <button class="btn btn-lime btn-sm" onclick="saveParticipant()">Save</button>
                         <button class="btn btn-outline btn-sm" onclick="hideAddParticipant()">Cancel</button>
                     </div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="data-table" id="adminTable">
-                        <thead>
-                            <tr><th>Name</th><th>Email</th><th>VBU</th><th>Track</th><th></th></tr>
-                        </thead>
-                        <tbody id="adminTableBody"></tbody>
-                    </table>
-                </div>
+                <table class="data-table" id="adminTable">
+                    <thead>
+                        <tr><th>Name</th><th class="hide-mobile">Email</th><th class="hide-mobile">VBU</th><th>Track</th><th>AI</th><th></th></tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
             </div>
         </div>
 
@@ -1533,7 +1603,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <input type="text" class="search-input" id="auditSearch" placeholder="Filter by participant..." oninput="filterAuditLog()">
                 </div>
-                <div style="overflow-x:auto;">
+                <div class="audit-table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr><th>Time</th><th>Participant</th><th>Day</th><th>Assessor</th><th>Action</th><th>From</th><th>To</th></tr>
@@ -1541,11 +1611,21 @@
                         <tbody id="auditTableBody"></tbody>
                     </table>
                 </div>
+                <div class="audit-cards-container" id="auditCardsContainer"></div>
             </div>
         </div>
     </div>
 
     <!-- nav moved to inside container -->
+
+    <footer class="footer" id="appFooter" style="display:none;">
+        <p class="footer-primary">
+            <strong>CSI Revenue Signals Program</strong> &mdash; Denver Accelerator by <strong>Volaris Business Transformation</strong>
+        </p>
+        <p class="footer-secondary">
+            &ldquo;Incremental change will NOT work for us this round. Our business unit leaders MUST recognize this&hellip;Please run at this hard!&rdquo; &mdash; Mark Miller
+        </p>
+    </footer>
 
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
