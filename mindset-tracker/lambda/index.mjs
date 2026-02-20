@@ -6,16 +6,30 @@ import {
   DeleteCommand,
   ScanCommand,
   BatchWriteCommand,
+  UpdateCommand,
+  GetCommand,
 } from "@aws-sdk/lib-dynamodb";
+import {
+  CognitoIdentityProviderClient,
+  ListUsersCommand,
+  AdminCreateUserCommand,
+  AdminDeleteUserCommand,
+  AdminResetUserPasswordCommand,
+  AdminSetUserPasswordCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
 
 const client = new DynamoDBClient({ region: "us-east-1" });
 const ddb = DynamoDBDocumentClient.from(client);
+const cognito = new CognitoIdentityProviderClient({ region: "us-east-1" });
+
+const USER_POOL_ID = "us-east-1_AatsAsuay";
 
 const TABLES = {
   users: "mindset-users",
   assessments: "mindset-assessments",
   auditLog: "mindset-audit-log",
   notes: "mindset-notes",
+  vbus: "mindset-vbus",
 };
 
 const headers = {
@@ -51,27 +65,30 @@ export const handler = async (event) => {
     // GET /participants
     if (method === "GET" && path === "/participants") {
       const result = await ddb.send(new ScanCommand({ TableName: TABLES.users }));
-      return ok({ participants: result.Items || [] });
+      const participants = (result.Items || []).map((p) => ({
+        ...p,
+        vbu: p.vbu || p.vpiName || "",
+      }));
+      return ok({ participants });
     }
 
     // POST /participants — add single participant
     if (method === "POST" && path === "/participants") {
       const body = JSON.parse(event.body);
-      const { email, name, vbu, track } = body;
+      const { email, name, vbu, track, aiMaturityLevel } = body;
       if (!email || !name) return err(400, "email and name required");
-      await ddb.send(
-        new PutCommand({
-          TableName: TABLES.users,
-          Item: {
-            userId: email.toLowerCase(),
-            name,
-            email: email.toLowerCase(),
-            vbu: vbu || "",
-            track: track || "product",
-            createdAt: new Date().toISOString(),
-          },
-        })
-      );
+      const item = {
+        userId: email.toLowerCase(),
+        name,
+        email: email.toLowerCase(),
+        vbu: vbu || "",
+        track: track || "product",
+        createdAt: new Date().toISOString(),
+      };
+      if (aiMaturityLevel !== undefined && aiMaturityLevel !== null && aiMaturityLevel !== "") {
+        item.aiMaturityLevel = Number(aiMaturityLevel);
+      }
+      await ddb.send(new PutCommand({ TableName: TABLES.users, Item: item }));
       return ok({ success: true });
     }
 
@@ -82,6 +99,60 @@ export const handler = async (event) => {
       await ddb.send(
         new DeleteCommand({ TableName: TABLES.users, Key: { userId: email.toLowerCase() } })
       );
+      return ok({ success: true });
+    }
+
+    // POST /participants/ai-level — update AI maturity level
+    if (method === "POST" && path === "/participants/ai-level") {
+      const assessor = getAssessor(event);
+      const body = JSON.parse(event.body);
+      const { participantId, aiLevel } = body;
+      if (!participantId || aiLevel === undefined || aiLevel === null) {
+        return err(400, "participantId and aiLevel required");
+      }
+      const level = Number(aiLevel);
+      if (![0, 1, 2, 3].includes(level)) {
+        return err(400, "aiLevel must be 0, 1, 2, or 3");
+      }
+
+      // Read current value
+      let previousLevel = null;
+      try {
+        const existing = await ddb.send(
+          new GetCommand({ TableName: TABLES.users, Key: { userId: participantId } })
+        );
+        if (existing.Item) {
+          previousLevel = existing.Item.aiMaturityLevel !== undefined ? existing.Item.aiMaturityLevel : null;
+        }
+      } catch (_) {}
+
+      // Update participant record
+      await ddb.send(
+        new UpdateCommand({
+          TableName: TABLES.users,
+          Key: { userId: participantId },
+          UpdateExpression: "SET aiMaturityLevel = :lvl",
+          ExpressionAttributeValues: { ":lvl": level },
+        })
+      );
+
+      // Write audit log
+      await ddb.send(
+        new PutCommand({
+          TableName: TABLES.auditLog,
+          Item: {
+            participantId,
+            timestamp: new Date().toISOString(),
+            action: "ai-level-update",
+            assessorId: assessor.id,
+            assessorName: assessor.name,
+            day: "AI",
+            previousLevel: previousLevel !== null ? String(previousLevel) : null,
+            newLevel: String(level),
+          },
+        })
+      );
+
       return ok({ success: true });
     }
 
@@ -101,18 +172,20 @@ export const handler = async (event) => {
 
       let imported = 0;
       for (const chunk of chunks) {
-        const requests = chunk.map((p) => ({
-          PutRequest: {
-            Item: {
-              userId: p.email.toLowerCase(),
-              name: p.name,
-              email: p.email.toLowerCase(),
-              vbu: p.vbu || "",
-              track: p.track || "product",
-              createdAt: new Date().toISOString(),
-            },
-          },
-        }));
+        const requests = chunk.map((p) => {
+          const item = {
+            userId: p.email.toLowerCase(),
+            name: p.name,
+            email: p.email.toLowerCase(),
+            vbu: p.vbu || "",
+            track: p.track || "product",
+            createdAt: new Date().toISOString(),
+          };
+          if (p.aiMaturityLevel !== undefined && p.aiMaturityLevel !== null && p.aiMaturityLevel !== "") {
+            item.aiMaturityLevel = Number(p.aiMaturityLevel);
+          }
+          return { PutRequest: { Item: item } };
+        });
         await ddb.send(
           new BatchWriteCommand({ RequestItems: { [TABLES.users]: requests } })
         );
@@ -214,6 +287,62 @@ export const handler = async (event) => {
       return ok({ success: true });
     }
 
+    // DELETE /assessments — remove an assessment
+    if (method === "DELETE" && path === "/assessments") {
+      const assessor = getAssessor(event);
+      const { participantId, day } = qs;
+      if (!participantId || !day) {
+        return err(400, "participantId and day required");
+      }
+
+      const sk = `${day}#${assessor.id}`;
+
+      // Get existing assessment for audit log
+      let previousLevel = null;
+      try {
+        const existing = await ddb.send(
+          new QueryCommand({
+            TableName: TABLES.assessments,
+            KeyConditionExpression: "participantId = :pid AND dayAssessor = :sk",
+            ExpressionAttributeValues: { ":pid": participantId, ":sk": sk },
+          })
+        );
+        if (existing.Items && existing.Items.length > 0) {
+          previousLevel = existing.Items[0].level;
+        }
+      } catch (_) {}
+
+      if (!previousLevel) {
+        return ok({ success: true, message: "No assessment found to delete" });
+      }
+
+      await ddb.send(
+        new DeleteCommand({
+          TableName: TABLES.assessments,
+          Key: { participantId, dayAssessor: sk },
+        })
+      );
+
+      // Write audit log
+      await ddb.send(
+        new PutCommand({
+          TableName: TABLES.auditLog,
+          Item: {
+            participantId,
+            timestamp: new Date().toISOString(),
+            action: "delete",
+            assessorId: assessor.id,
+            assessorName: assessor.name,
+            day,
+            previousLevel,
+            newLevel: null,
+          },
+        })
+      );
+
+      return ok({ success: true });
+    }
+
     // ===== CONSENSUS =====
 
     // GET /consensus?day=D1
@@ -295,6 +424,7 @@ export const handler = async (event) => {
         }
         return {
           ...p,
+          vbu: p.vbu || p.vpiName || "",
           consensus: current,
           movement,
           assessments: assessByParticipant[p.userId] || [],
@@ -365,6 +495,76 @@ export const handler = async (event) => {
             note,
           },
         })
+      );
+      return ok({ success: true });
+    }
+
+    // ===== VBUs =====
+
+    // GET /vbus
+    if (method === "GET" && path === "/vbus") {
+      const result = await ddb.send(new ScanCommand({ TableName: TABLES.vbus }));
+      const vbus = (result.Items || []).sort((a, b) => a.name.localeCompare(b.name));
+      return ok({ vbus });
+    }
+
+    // POST /vbus — add VBU
+    if (method === "POST" && path === "/vbus") {
+      const body = JSON.parse(event.body);
+      const { name } = body;
+      if (!name) return err(400, "name required");
+      const vbuId = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      await ddb.send(
+        new PutCommand({
+          TableName: TABLES.vbus,
+          Item: { vbuId, name, createdAt: new Date().toISOString() },
+        })
+      );
+      return ok({ success: true, vbuId, name });
+    }
+
+    // PUT /vbus/{vbuId} — rename VBU and update all participants
+    if (method === "PUT" && path.startsWith("/vbus/")) {
+      const vbuId = decodeURIComponent(path.split("/vbus/")[1]);
+      if (!vbuId) return err(400, "vbuId required");
+      const body = JSON.parse(event.body);
+      const { name: newName, oldName } = body;
+      if (!newName) return err(400, "name required");
+      // Update VBU record
+      const newVbuId = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (newVbuId !== vbuId) {
+        await ddb.send(new DeleteCommand({ TableName: TABLES.vbus, Key: { vbuId } }));
+      }
+      await ddb.send(
+        new PutCommand({
+          TableName: TABLES.vbus,
+          Item: { vbuId: newVbuId, name: newName, createdAt: new Date().toISOString() },
+        })
+      );
+      // Update all participants with the old VBU name
+      if (oldName) {
+        const scan = await ddb.send(new ScanCommand({ TableName: TABLES.users }));
+        const toUpdate = (scan.Items || []).filter(p => p.vbu === oldName || p.vpiName === oldName);
+        for (const p of toUpdate) {
+          await ddb.send(
+            new UpdateCommand({
+              TableName: TABLES.users,
+              Key: { userId: p.userId },
+              UpdateExpression: "SET vbu = :v REMOVE vpiName",
+              ExpressionAttributeValues: { ":v": newName },
+            })
+          );
+        }
+      }
+      return ok({ success: true, vbuId: newVbuId, name: newName });
+    }
+
+    // DELETE /vbus/{vbuId}
+    if (method === "DELETE" && path.startsWith("/vbus/")) {
+      const vbuId = decodeURIComponent(path.split("/vbus/")[1]);
+      if (!vbuId) return err(400, "vbuId required");
+      await ddb.send(
+        new DeleteCommand({ TableName: TABLES.vbus, Key: { vbuId } })
       );
       return ok({ success: true });
     }
