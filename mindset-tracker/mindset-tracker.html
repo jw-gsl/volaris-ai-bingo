@@ -2983,19 +2983,20 @@
 
         let html = `
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title">${escHtml(participant.name)}</div>
+                <div class="card-header" style="display:flex;align-items:center;gap:8px;">
+                    <div class="card-title" style="flex:1;">${escHtml(participant.name)}</div>
                     <span class="track-badge" style="background:${TRACK_COLORS[participant.track] || 'var(--track-general)'};color:${participant.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[participant.track] || '')}</span>
+                    <button class="btn btn-sm" id="skipConfirmBtn" style="background:var(--red);color:var(--white);border:none;padding:4px 12px;border-radius:8px;font-size:0.7rem;font-weight:700;cursor:pointer;" onclick="confirmSkip('${escAttr(participantId)}')">Skip</button>
                 </div>
-                <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:12px;">${escHtml(participant.vbu || '')} &bull; ${currentDay}</div>
+                <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:12px;">${escHtml(participant.vbu || '')} &bull; Day ${currentDay.slice(1)}</div>
 
                 <div class="day-selector" style="justify-content:flex-start;margin-bottom:16px;">
-                    ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="currentDay='${d}';loadAssessmentForParticipant('${escAttr(participantId)}')">${d}</button>`).join('')}
+                    ${ASSESSMENT_DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="currentDay='${d}';loadAssessmentForParticipant('${escAttr(participantId)}')">Day ${d.slice(1)}</button>`).join('')}
                 </div>
 
                 <div class="level-buttons">
                     ${LEVELS.map(l => `
-                        <button class="level-btn ${l} ${selectedLevel === l ? 'selected' : ''}" onclick="saveAssessment('${escAttr(participantId)}', '${l}')">
+                        <button class="level-btn ${l} ${selectedLevel === l ? 'selected' : ''}" onclick="saveAssessment('${escAttr(participantId)}', '${l}', ${selectedLevel ? `'${selectedLevel}'` : 'null'})">
                             <span class="level-num">Level ${LEVEL_VALUES[l]}</span>
                             ${LEVEL_LABELS[l]}
                         </button>
@@ -3006,12 +3007,14 @@
                     <label class="form-label">Add a Note</label>
                     <textarea class="form-textarea" id="assessmentNote" placeholder="What did you observe?"></textarea>
                 </div>
-                <button class="btn btn-outline btn-sm" onclick="saveNote('${escAttr(participantId)}')">Save Note</button>
+                <div style="display:flex;justify-content:flex-end;">
+                    <button class="btn btn-outline btn-sm" onclick="saveNote('${escAttr(participantId)}')">Save Note</button>
+                </div>
             </div>
         `;
 
         if (others.length > 0) {
-            html += `<div class="card"><div class="other-ratings"><h4>Other Facilitator Ratings (${currentDay})</h4>`;
+            html += `<div class="card"><div class="other-ratings"><h4>Other Facilitator Ratings (Day ${currentDay.slice(1)})</h4>`;
             for (const a of others) {
                 html += `<div class="rating-row"><span>${escHtml(a.assessorName)}</span><span class="level-pill ${a.level}">${LEVEL_LABELS[a.level]}</span></div>`;
             }
@@ -3021,10 +3024,16 @@
         content.innerHTML = html;
     }
 
-    async function saveAssessment(participantId, level) {
+    async function saveAssessment(participantId, level, currentSelectedLevel) {
         try {
-            await api('POST', '/assessments', { participantId, day: currentDay, level });
-            showToast(`Saved: ${LEVEL_LABELS[level]}`);
+            if (currentSelectedLevel === level) {
+                // Toggle off — delete the assessment
+                await api('DELETE', `/assessments?participantId=${encodeURIComponent(participantId)}&day=${currentDay}`);
+                showToast('Assessment removed');
+            } else {
+                await api('POST', '/assessments', { participantId, day: currentDay, level });
+                showToast(`Saved: ${LEVEL_LABELS[level]}`);
+            }
             loadAssessmentForParticipant(participantId);
         } catch (e) {
             showToast('Failed to save assessment');
@@ -3046,142 +3055,275 @@
     }
 
     // ===== JOURNEY VIEW =====
-    function renderJourneyList() {
-        const listEl = document.getElementById('journeyParticipantList');
-        listEl.innerHTML = participants.map(p =>
-            `<div class="participant-select-item" data-name="${escAttr(p.name)}" onclick="loadJourney('${escAttr(p.userId)}')">${escHtml(p.name)} <span style="opacity:0.5;font-size:0.72rem;">${escHtml(p.vbu || '')}</span></div>`
+    let journeyData = {}; // { D1: [...consensus], D2: [...], ... }
+    let journeyTrack = 'all';
+    let journeyVbu = 'all';
+    let journeyExpandedParticipant = null;
+
+    async function loadJourneyGrid() {
+        const container = document.getElementById('journeyGridContainer');
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;">Loading journey data...</div>';
+        document.getElementById('journeyDetail').innerHTML = '';
+        journeyExpandedParticipant = null;
+
+        // Render filters
+        renderJourneyTrackFilter();
+
+        // Fetch consensus for all days in parallel
+        try {
+            const results = await Promise.all(
+                ASSESSMENT_DAYS.map(d => api('GET', `/consensus?day=${d}`).then(r => ({ day: d, consensus: r.consensus || [] })))
+            );
+            journeyData = {};
+            for (const r of results) {
+                journeyData[r.day] = r.consensus;
+            }
+        } catch (e) {
+            console.error('Failed to load journey data:', e);
+            showToast('Failed to load journey data');
+            return;
+        }
+
+        populateJourneyVbuDropdown();
+        renderJourneyGrid();
+    }
+
+    function renderJourneyTrackFilter() {
+        const tracks = [
+            { key: 'all', label: 'All Tracks' },
+            { key: 'leadership', label: 'Leadership' },
+            { key: 'product', label: 'Product' },
+            { key: 'rnd', label: 'R&D' },
+        ];
+        document.getElementById('journeyTrackFilter').innerHTML = tracks.map(t =>
+            `<button class="track-btn ${journeyTrack === t.key ? 'active' : ''}" onclick="selectJourneyTrack('${t.key}')">${t.label}</button>`
         ).join('');
     }
 
-    function filterJourneyList() {
+    function selectJourneyTrack(track) {
+        journeyTrack = track;
+        renderJourneyTrackFilter();
+        renderJourneyGrid();
+    }
+
+    function populateJourneyVbuDropdown() {
+        const sel = document.getElementById('journeyVbuFilter');
+        if (!sel) return;
+        const allData = [...participants, ...(journeyData.D1 || [])];
+        const vbus = [...new Set(allData.map(p => p.vbu).filter(Boolean))].sort();
+        sel.innerHTML = '<option value="all">All VBUs</option>' +
+            vbus.map(v => `<option value="${escAttr(v)}" ${v === journeyVbu ? 'selected' : ''}>${escHtml(v)}</option>`).join('');
+    }
+
+    function selectJourneyVbu(vbu) {
+        journeyVbu = vbu;
+        renderJourneyGrid();
+    }
+
+    function filterJourneyGrid() {
         const q = document.getElementById('journeySearch').value.toLowerCase();
-        document.querySelectorAll('#journeyParticipantList .participant-select-item').forEach(el => {
-            el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+        document.querySelectorAll('.journey-grid tbody tr:not(.journey-vbu-header)').forEach(row => {
+            if (!row.dataset.name) return;
+            row.style.display = row.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+        });
+        // Hide VBU headers with no visible rows
+        document.querySelectorAll('.journey-grid .journey-vbu-header').forEach(header => {
+            let next = header.nextElementSibling;
+            let anyVisible = false;
+            while (next && !next.classList.contains('journey-vbu-header')) {
+                if (next.style.display !== 'none') anyVisible = true;
+                next = next.nextElementSibling;
+            }
+            header.style.display = anyVisible ? '' : 'none';
         });
     }
 
-    async function loadJourney(participantId) {
-        selectedJourneyParticipant = participantId;
+    function renderJourneyGrid() {
+        const container = document.getElementById('journeyGridContainer');
+
+        // Build per-participant day map
+        const pMap = {}; // { participantId: { participant, days: { D1: consensus, D2: ... } } }
+        for (const p of participants) {
+            pMap[p.userId] = { participant: p, days: {} };
+        }
+        for (const day of ASSESSMENT_DAYS) {
+            for (const c of (journeyData[day] || [])) {
+                const id = c.userId || c.email;
+                if (!pMap[id]) continue;
+                pMap[id].days[day] = c.consensus || null;
+            }
+        }
+
+        // Filter by track and VBU
+        let pList = Object.values(pMap);
+        if (journeyTrack !== 'all') {
+            pList = pList.filter(p => p.participant.track === journeyTrack);
+        }
+        if (journeyVbu !== 'all') {
+            pList = pList.filter(p => p.participant.vbu === journeyVbu);
+        }
+
+        if (pList.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;">No participants found.</div>';
+            return;
+        }
+
+        // Group by VBU
+        const groups = {};
+        for (const p of pList) {
+            const vbu = p.participant.vbu || 'Unassigned';
+            if (!groups[vbu]) groups[vbu] = [];
+            groups[vbu].push(p);
+        }
+        // Sort groups by VBU name, each group alphabetically by name
+        const sortedVbus = sortVBUs(Object.keys(groups));
+        for (const v of sortedVbus) {
+            groups[v].sort((a, b) => a.participant.name.localeCompare(b.participant.name));
+        }
+
+        let html = `<table class="journey-grid"><thead><tr>
+            <th>Participant</th>
+            ${ASSESSMENT_DAYS.map(d => `<th>Day ${d.slice(1)}</th>`).join('')}
+            <th>Trend</th>
+        </tr></thead><tbody>`;
+
+        for (const vbu of sortedVbus) {
+            html += `<tr class="journey-vbu-header"><td colspan="${ASSESSMENT_DAYS.length + 2}">${escHtml(vbu)}</td></tr>`;
+            for (const entry of groups[vbu]) {
+                const p = entry.participant;
+                const trackLabel = TRACK_LABELS[p.track] || '';
+
+                // Day cells
+                const dayCells = ASSESSMENT_DAYS.map(d => {
+                    const c = entry.days[d];
+                    if (!c) return '<td><span class="journey-light">—</span></td>';
+                    const cls = c.label;
+                    const letter = LEVEL_LABELS[c.label].charAt(0);
+                    const tooltip = `${LEVEL_LABELS[c.label]} (${c.count} rater${c.count !== 1 ? 's' : ''})`;
+                    return `<td><span class="journey-light ${cls}" title="${tooltip}" onclick="expandJourneyParticipant('${escAttr(p.userId)}')">${letter}</span></td>`;
+                }).join('');
+
+                // Trend: compare first rated day to last rated day
+                const ratedDays = ASSESSMENT_DAYS.filter(d => entry.days[d]);
+                let trendHtml = '<td>—</td>';
+                if (ratedDays.length >= 2) {
+                    const first = LEVEL_VALUES[entry.days[ratedDays[0]].label];
+                    const last = LEVEL_VALUES[entry.days[ratedDays[ratedDays.length - 1]].label];
+                    if (last > first) trendHtml = '<td><span class="journey-arrow up">&#9650;</span></td>';
+                    else if (last < first) trendHtml = '<td><span class="journey-arrow down">&#9660;</span></td>';
+                    else trendHtml = '<td><span style="font-size:0.6rem;color:var(--muted);">&#9644;</span></td>';
+                }
+
+                html += `<tr data-name="${escAttr(p.name)}" data-id="${escAttr(p.userId)}">
+                    <td><span class="journey-name" onclick="expandJourneyParticipant('${escAttr(p.userId)}')">${escHtml(p.name)}<span class="journey-track">${escHtml(trackLabel)}</span></span></td>
+                    ${dayCells}
+                    ${trendHtml}
+                </tr>`;
+            }
+        }
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    async function expandJourneyParticipant(participantId) {
+        const detail = document.getElementById('journeyDetail');
+
+        // Toggle off if already expanded
+        if (journeyExpandedParticipant === participantId) {
+            journeyExpandedParticipant = null;
+            detail.innerHTML = '';
+            return;
+        }
+
+        journeyExpandedParticipant = participantId;
         const participant = participants.find(p => p.userId === participantId);
         if (!participant) return;
 
-        const detail = document.getElementById('journeyDetail');
-        detail.style.display = 'block';
+        detail.innerHTML = '<div class="card journey-detail-card" style="text-align:center;padding:16px;color:var(--muted);font-size:0.8rem;">Loading details...</div>';
 
-        // Load all assessments for this participant
+        // Load assessments and notes
         let allAssessments = [];
-        try {
-            const data = await api('GET', `/assessments?participantId=${encodeURIComponent(participantId)}`);
-            allAssessments = data.assessments || [];
-        } catch (e) {
-            console.error(e);
-        }
-
-        // Load notes
         let notes = [];
         try {
-            const data = await api('GET', `/notes/${encodeURIComponent(participantId)}`);
-            notes = data.notes || [];
+            const [aData, nData] = await Promise.all([
+                api('GET', `/assessments?participantId=${encodeURIComponent(participantId)}`),
+                api('GET', `/notes/${encodeURIComponent(participantId)}`)
+            ]);
+            allAssessments = aData.assessments || [];
+            notes = nData.notes || [];
         } catch (e) {
             console.error(e);
         }
 
-        // Calculate consensus per day
+        // Group assessments by day
         const dayData = {};
-        for (const day of DAYS) {
+        for (const day of ASSESSMENT_DAYS) {
             const dayAssess = allAssessments.filter(a => a.day === day);
-            if (dayAssess.length === 0) {
-                dayData[day] = { consensus: null, assessments: [] };
-            } else {
-                const sum = dayAssess.reduce((s, a) => s + (LEVEL_VALUES[a.level] || 0), 0);
-                const mean = Math.round(sum / dayAssess.length * 100) / 100;
-                let label;
-                if (mean < 1.5) label = 'toxic';
-                else if (mean < 2.5) label = 'talker';
-                else if (mean < 3.5) label = 'action';
-                else label = 'driver';
-                dayData[day] = { consensus: { mean, label, count: dayAssess.length }, assessments: dayAssess };
-            }
+            dayData[day] = dayAssess;
         }
 
-        let html = `
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">${escHtml(participant.name)}</div>
-                    <span class="track-badge" style="background:${TRACK_COLORS[participant.track] || 'var(--track-general)'};color:${participant.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[participant.track] || '')}</span>
-                </div>
-                <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:16px;">${escHtml(participant.vbu || '')}</div>
-
-                <div class="journey-timeline">
-                    ${DAYS.map(d => {
-                        const dd = dayData[d];
-                        const cls = dd.consensus ? dd.consensus.label : '';
-                        const txt = dd.consensus ? LEVEL_LABELS[dd.consensus.label].charAt(0) : '?';
-                        return `
-                            <div class="journey-day">
-                                <div class="journey-connector"></div>
-                                <div class="journey-circle ${cls}">${txt}</div>
-                                <div class="journey-label">${d}</div>
-                            </div>`;
-                    }).join('')}
-                </div>
+        let html = `<div class="card journey-detail-card">
+            <div class="card-header">
+                <div class="card-title">${escHtml(participant.name)}</div>
+                <button class="btn btn-outline btn-sm" onclick="collapseJourneyDetail()" style="font-size:0.7rem;">Close</button>
             </div>
-        `;
+            <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:12px;">
+                ${escHtml(participant.vbu || '')} &middot;
+                <span class="track-badge" style="background:${TRACK_COLORS[participant.track] || 'var(--track-general)'};color:${participant.track === 'product' ? 'var(--white)' : 'var(--navy)'};font-size:0.6rem;padding:1px 6px;">${escHtml(TRACK_LABELS[participant.track] || '')}</span>
+            </div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--teal);margin-bottom:6px;">Individual Ratings</div>`;
 
-        // Ratings table per day
-        html += '<div class="card"><div class="card-title" style="margin-bottom:8px;">Individual Ratings</div>';
-        for (const day of DAYS) {
-            const dd = dayData[day];
-            if (dd.assessments.length === 0) continue;
-            html += `<h4 style="font-size:0.72rem;font-weight:700;color:var(--teal);margin:8px 0 4px;">${day}</h4>`;
-            for (const a of dd.assessments) {
+        for (const day of ASSESSMENT_DAYS) {
+            const assessments = dayData[day];
+            if (assessments.length === 0) continue;
+            html += `<h4 style="font-size:0.68rem;font-weight:700;color:var(--muted);margin:8px 0 4px;">Day ${day.slice(1)}</h4>`;
+            for (const a of assessments) {
                 html += `<div class="rating-row"><span>${escHtml(a.assessorName)}</span><span class="level-pill ${a.level}">${LEVEL_LABELS[a.level]}</span></div>`;
             }
         }
-        html += '</div>';
 
         // Notes
         if (notes.length > 0) {
-            html += '<div class="card"><div class="card-title" style="margin-bottom:8px;">Notes</div>';
+            html += '<div style="font-size:0.72rem;font-weight:700;color:var(--teal);margin:12px 0 6px;">Notes</div>';
             for (const n of notes) {
                 const time = new Date(n.timestamp).toLocaleString();
                 html += `<div style="padding:6px 0;border-bottom:1px solid var(--cell-border);font-size:0.8rem;"><strong>${escHtml(n.authorName)}</strong> <span style="opacity:0.5;font-size:0.68rem;">${time}</span><p style="margin-top:2px;">${escHtml(n.note)}</p></div>`;
             }
-            html += '</div>';
         }
 
+        html += '</div>';
         detail.innerHTML = html;
+        detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // ===== VBU MANAGEMENT =====
-    let vbuList = JSON.parse(localStorage.getItem('mt_vbus') || '[]');
+    function collapseJourneyDetail() {
+        journeyExpandedParticipant = null;
+        document.getElementById('journeyDetail').innerHTML = '';
+    }
 
-    // Seed VBUs from existing participant data if empty
-    function seedVbusFromParticipants() {
-        const existing = new Set(vbuList.map(v => v.toLowerCase()));
-        for (const p of participants) {
-            if (p.vbu && !existing.has(p.vbu.toLowerCase())) {
-                vbuList.push(p.vbu);
-                existing.add(p.vbu.toLowerCase());
-            }
+    // ===== VBU MANAGEMENT (API-backed) =====
+    let vbuList = []; // { vbuId, name }
+
+    async function loadVbus() {
+        try {
+            const data = await api('GET', '/vbus');
+            vbuList = (data.vbus || []).sort((a, b) => a.name.localeCompare(b.name));
+        } catch (e) {
+            console.error('Failed to load VBUs:', e);
         }
-        saveVbuList();
     }
 
-    function saveVbuList() {
-        vbuList.sort((a, b) => a.localeCompare(b));
-        localStorage.setItem('mt_vbus', JSON.stringify(vbuList));
-    }
-
-    function renderVbuChips() {
-        const el = document.getElementById('vbuChips');
-        if (!el) return;
+    function renderVbuTable() {
+        const tbody = document.getElementById('vbuTableBody');
+        if (!tbody) return;
+        document.getElementById('vbuCount').textContent = `(${vbuList.length})`;
         if (vbuList.length === 0) {
-            el.innerHTML = '<span style="font-size:0.72rem;color:var(--text);opacity:0.5;">No VBUs added yet</span>';
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--muted);">No VBUs added yet</td></tr>';
             return;
         }
-        el.innerHTML = vbuList.map(v =>
-            `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--cell-bg);border:1px solid var(--cell-border);border-radius:12px;padding:3px 10px;font-size:0.72rem;font-weight:600;color:var(--heading);">${escHtml(v)} <button onclick="removeVbu('${escAttr(v)}')" style="background:none;border:none;color:var(--level-toxic);cursor:pointer;font-size:0.8rem;padding:0 2px;font-weight:700;">&times;</button></span>`
+        tbody.innerHTML = vbuList.map(v =>
+            `<tr><td>${escHtml(v.name)}</td><td style="white-space:nowrap;"><button class="btn btn-outline btn-sm" style="font-size:0.65rem;padding:2px 8px;" onclick="editVbu('${escAttr(v.vbuId)}','${escAttr(v.name)}')">Edit</button> <button class="btn btn-danger btn-sm" style="font-size:0.65rem;padding:2px 8px;" onclick="removeVbu('${escAttr(v.vbuId)}','${escAttr(v.name)}')">Del</button></td></tr>`
         ).join('');
     }
 
