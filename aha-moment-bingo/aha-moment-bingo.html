@@ -120,7 +120,7 @@
             right: 0;
             height: 45vh;
             background: var(--mountain-scene);
-            background-size: 100% 100%;
+            background-size: 100% auto;
             background-repeat: no-repeat;
             background-position: bottom center;
             pointer-events: none;
@@ -130,13 +130,13 @@
         :root {
             --star-color: transparent;
             --sky-gradient: linear-gradient(180deg, transparent 0%, rgba(11, 35, 64, 0.02) 60%, rgba(11, 35, 64, 0.06) 100%);
-            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='mfar' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.12'/%3E%3C/linearGradient%3E%3ClinearGradient id='mmid' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.18'/%3E%3C/linearGradient%3E%3ClinearGradient id='mnear' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2340' stop-opacity='0.18'/%3E%3Cstop offset='100%25' stop-color='%230B2340' stop-opacity='0.25'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,400 L0,180 L80,200 L160,120 L240,170 L320,80 L400,150 L480,60 L560,140 L640,90 L720,160 L800,50 L880,130 L960,70 L1040,140 L1120,100 L1200,160 L1280,110 L1360,150 L1440,120 L1440,400Z' fill='url(%23mfar)'/%3E%3Cpath d='M0,400 L0,240 L100,220 L200,180 L280,230 L380,160 L460,210 L540,150 L640,200 L720,170 L820,220 L920,160 L1000,200 L1100,180 L1200,220 L1300,190 L1440,210 L1440,400Z' fill='url(%23mmid)'/%3E%3Cpath d='M0,400 L0,300 L120,280 L240,300 L360,270 L480,290 L600,260 L720,285 L840,265 L960,290 L1080,275 L1200,295 L1320,280 L1440,290 L1440,400Z' fill='url(%23mnear)'/%3E%3Cpath d='M475,58 L480,60 L485,64' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M795,48 L800,50 L805,55' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M315,78 L320,80 L325,85' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M955,68 L960,70 L965,75' fill='none' stroke='white' stroke-width='2' opacity='0.25'/%3E%3Cpath d='M635,88 L640,90 L645,95' fill='none' stroke='white' stroke-width='2.5' opacity='0.2'/%3E%3Cpath d='M1115,98 L1120,100 L1125,105' fill='none' stroke='white' stroke-width='2' opacity='0.2'/%3E%3C/svg%3E");
+            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMax meet'%3E%3Cpath d='M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z' fill='%230B2340' opacity='0.07'/%3E%3Cpath d='M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z' fill='%230B2340' opacity='0.12'/%3E%3Cpath d='M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z' fill='%230B2340' opacity='0.18'/%3E%3Cpath d='M205,14 L210,12 L216,17 L210,15Z' fill='white' opacity='0.6'/%3E%3Cpath d='M207,16 L210,12 L220,20 L212,18Z' fill='white' opacity='0.25'/%3E%3Cpath d='M415,12 L420,10 L426,16 L420,13Z' fill='white' opacity='0.6'/%3E%3Cpath d='M417,14 L420,10 L428,18 L422,16Z' fill='white' opacity='0.25'/%3E%3Cpath d='M145,20 L150,18 L156,24 L150,21Z' fill='white' opacity='0.55'/%3E%3Cpath d='M147,22 L150,18 L158,26 L152,23Z' fill='white' opacity='0.2'/%3E%3Cpath d='M335,17 L340,15 L346,21 L340,18Z' fill='white' opacity='0.55'/%3E%3Cpath d='M337,19 L340,15 L348,23 L342,20Z' fill='white' opacity='0.2'/%3E%3Cpath d='M75,30 L80,28 L86,34 L80,31Z' fill='white' opacity='0.5'/%3E%3Cpath d='M77,32 L80,28 L88,36 L82,33Z' fill='white' opacity='0.18'/%3E%3Cpath d='M495,20 L500,18 L506,24 L500,21Z' fill='white' opacity='0.5'/%3E%3Cpath d='M497,22 L500,18 L508,26 L502,23Z' fill='white' opacity='0.18'/%3E%3Cpath d='M268,23 L272,21 L276,25Z' fill='white' opacity='0.35'/%3E%3Cpath d='M108,39 L112,37 L116,41Z' fill='white' opacity='0.3'/%3E%3Cpath d='M538,33 L542,31 L546,35Z' fill='white' opacity='0.3'/%3E%3C/svg%3E");
         }
 
         [data-theme="dark"] {
             --star-color: rgba(255, 255, 255, 0.5);
             --sky-gradient: linear-gradient(180deg, transparent 0%, transparent 40%, rgba(15, 25, 50, 0.2) 65%, rgba(20, 35, 65, 0.4) 85%, rgba(15, 23, 41, 0.6) 100%);
-            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='mfar' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%231a3050' stop-opacity='0.5'/%3E%3Cstop offset='100%25' stop-color='%23122040' stop-opacity='0.7'/%3E%3C/linearGradient%3E%3ClinearGradient id='mmid' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23142838' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%230e1c2e' stop-opacity='0.85'/%3E%3C/linearGradient%3E%3ClinearGradient id='mnear' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f1e30' stop-opacity='0.85'/%3E%3Cstop offset='100%25' stop-color='%230a1420' stop-opacity='0.95'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,400 L0,180 L80,200 L160,120 L240,170 L320,80 L400,150 L480,60 L560,140 L640,90 L720,160 L800,50 L880,130 L960,70 L1040,140 L1120,100 L1200,160 L1280,110 L1360,150 L1440,120 L1440,400Z' fill='url(%23mfar)'/%3E%3Cpath d='M0,400 L0,240 L100,220 L200,180 L280,230 L380,160 L460,210 L540,150 L640,200 L720,170 L820,220 L920,160 L1000,200 L1100,180 L1200,220 L1300,190 L1440,210 L1440,400Z' fill='url(%23mmid)'/%3E%3Cpath d='M0,400 L0,300 L120,280 L240,300 L360,270 L480,290 L600,260 L720,285 L840,265 L960,290 L1080,275 L1200,295 L1320,280 L1440,290 L1440,400Z' fill='url(%23mnear)'/%3E%3Cpath d='M475,58 L480,60 L485,64' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M795,48 L800,50 L805,55' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M315,78 L320,80 L325,85' fill='none' stroke='%23E8F0FF' stroke-width='1.5' opacity='0.3'/%3E%3Cpath d='M955,68 L960,70 L965,75' fill='none' stroke='%23E8F0FF' stroke-width='2' opacity='0.35'/%3E%3Cpath d='M635,88 L640,90 L645,95' fill='none' stroke='%23E8F0FF' stroke-width='2.5' opacity='0.3'/%3E%3Cpath d='M1115,98 L1120,100 L1125,105' fill='none' stroke='%23E8F0FF' stroke-width='1.5' opacity='0.25'/%3E%3C/svg%3E");
+            --mountain-scene: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='xMidYMax meet'%3E%3Cpath d='M0,80 L0,42 L40,48 L80,28 L110,38 L150,18 L180,32 L210,12 L250,30 L280,22 L310,35 L340,15 L380,28 L420,10 L460,25 L500,18 L540,32 L570,24 L600,30 L600,80Z' fill='%238ba4c4' opacity='0.2'/%3E%3Cpath d='M0,80 L0,52 L50,48 L100,36 L140,44 L190,28 L230,40 L270,24 L310,38 L360,30 L400,42 L440,28 L480,38 L530,32 L580,40 L600,36 L600,80Z' fill='%236b8ab0' opacity='0.3'/%3E%3Cpath d='M0,80 L0,60 L60,56 L120,62 L180,54 L240,58 L300,52 L360,58 L420,54 L480,60 L540,56 L600,58 L600,80Z' fill='%234a6e96' opacity='0.35'/%3E%3Cpath d='M205,14 L210,12 L216,17 L210,15Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M207,16 L210,12 L220,20 L212,18Z' fill='%23E8F0FF' opacity='0.35'/%3E%3Cpath d='M415,12 L420,10 L426,16 L420,13Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M417,14 L420,10 L428,18 L422,16Z' fill='%23E8F0FF' opacity='0.35'/%3E%3Cpath d='M145,20 L150,18 L156,24 L150,21Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M147,22 L150,18 L158,26 L152,23Z' fill='%23E8F0FF' opacity='0.3'/%3E%3Cpath d='M335,17 L340,15 L346,21 L340,18Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M337,19 L340,15 L348,23 L342,20Z' fill='%23E8F0FF' opacity='0.3'/%3E%3Cpath d='M75,30 L80,28 L86,34 L80,31Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M77,32 L80,28 L88,36 L82,33Z' fill='%23E8F0FF' opacity='0.25'/%3E%3Cpath d='M495,20 L500,18 L506,24 L500,21Z' fill='%23E8F0FF' opacity='0.85'/%3E%3Cpath d='M497,22 L500,18 L508,26 L502,23Z' fill='%23E8F0FF' opacity='0.25'/%3E%3Cpath d='M268,23 L272,21 L276,25Z' fill='%23E8F0FF' opacity='0.5'/%3E%3Cpath d='M108,39 L112,37 L116,41Z' fill='%23E8F0FF' opacity='0.45'/%3E%3Cpath d='M538,33 L542,31 L546,35Z' fill='%23E8F0FF' opacity='0.45'/%3E%3C/svg%3E");
         }
 
         /* ===== Layout ===== */
@@ -1938,338 +1938,329 @@
     // Grounded in what people EXPERIENCE when they work AI-first for the first time
     const AHA_POOL = [
         // ===== PRODUCT TRACK =====
-        // Radical shifts in how product work happens when agents do the execution
+        // Grounded in what product people actually do during the accelerator:
+        // market research with AI, building prototypes, client demos, data analysis
         {
-            aha: "I gave an agent a problem statement and it came back with a working product",
-            insight: "Not a mockup. Not a wireframe. A clickable, functional application\u2014built from a plain-language brief. You didn't manage a backlog, write tickets, or wait for sprint capacity. You described intent and an agent executed. The entire concept of product-to-dev handover is dead.",
-            insightSource: "Agentic PoC Build",
+            aha: "I described what I wanted in plain English and had a working prototype by lunch",
+            insight: "No wireframes. No Jira tickets. No waiting for dev capacity. You typed what the product should do, iterated through three versions with an agent, and had something clickable to show your team. The distance between 'I have an idea' and 'try this' just shrank from weeks to hours.",
+            insightSource: "Hands-on Prototype Build",
             track: "product"
         },
         {
-            aha: "I ran a complete market analysis in a single conversation",
-            insight: "Competitive landscape, TAM/SAM/SOM, customer segments, pricing benchmarks, market gaps\u2014all from one agentic session. Not a research phase. Not a consulting engagement. A conversation. The entire market research function just collapsed into a skill, not a team.",
-            insightSource: "Agentic Market Research",
+            aha: "I built a customer-facing demo for a product that didn't exist on Monday",
+            insight: "Four days ago this was a whiteboard sketch. Now there's a working application a client can click through. You didn't wait for a sprint, a designer, or a dev team. You built it. The concept of 'we'll get to it next quarter' sounds absurd when you can show it next Tuesday.",
+            insightSource: "Rapid Prototyping",
             track: "product"
         },
         {
-            aha: "I validated and killed three ideas before the planning meeting started",
-            insight: "Each concept got stress-tested against customer data, market conditions, and competitive pressure\u2014by an agent, in minutes. Two ideas died. One survived stronger. The politics of prioritisation lose their power when validation is instant and evidence-based.",
-            insightSource: "Agentic Validation",
+            aha: "AI found three competitor products I'd never heard of — and summarised their pricing",
+            insight: "You pasted a problem statement into a conversation and got back a competitive landscape with pricing tiers, feature gaps, and market positioning. Research that would take your team a week of Googling happened in a single chat. The barrier to being well-informed just disappeared.",
+            insightSource: "Market Research",
             track: "product"
         },
         {
-            aha: "The agent iterated the product three times while I made coffee",
-            insight: "Describe the change. Agent builds it. You review. Repeat. Three full iterations in the time it takes to get a drink. The concept of a sprint as a unit of product iteration is absurd when the feedback loop is measured in minutes, not weeks.",
-            insightSource: "Agentic Iteration",
+            aha: "I asked it to poke holes in my business case and it found the fatal flaw",
+            insight: "You thought your assumptions were solid. AI challenged your TAM calculation, questioned your pricing model, and pointed out a competitor you'd overlooked. It didn't agree with you to be polite. It stress-tested your thinking harder than most colleagues would.",
+            insightSource: "Idea Validation",
             track: "product"
         },
         {
-            aha: "My spec became a running application without a developer touching it",
-            insight: "A structured markdown document\u2014your product spec\u2014was consumed by an agent that generated the database, API, and frontend. Directly. The translation layer between product intent and working code\u2014the misinterpretations, the re-scoping\u2014just ceased to exist.",
-            insightSource: "Spec-to-Software",
-            track: "product"
-        },
-        {
-            aha: "A client asked about pricing for something that didn't exist on Monday",
-            insight: "Four days: problem \u2192 research \u2192 prototype \u2192 client demo \u2192 revenue signal. The entire discovery-to-validation pipeline that fills your quarterly roadmap happened in a single week. Every timeline assumption in your business case is now wrong.",
-            insightSource: "Revenue Signal Generation",
-            track: "product"
-        },
-        {
-            aha: "I interrogated a synthetic customer panel at 11pm and got real insights",
-            insight: "Built from actual customer data, always available, never fatigued, brutally honest. You ran a user research session with no scheduling, no recruitment, no moderation. The gating function on customer insight just evaporated. Research happens whenever you think of the question.",
+            aha: "I ran user interviews with a synthetic customer panel — at 10pm in my hotel room",
+            insight: "You built personas from real customer data and had a conversation with them. They pushed back on your feature priorities, flagged usability concerns, and suggested a use case you hadn't considered. No recruitment. No scheduling. Just insight, whenever you need it.",
             insightSource: "Synthetic User Research",
             track: "product"
         },
         {
-            aha: "I'm not a developer\u2014but I just shipped software to a real client",
-            insight: "Job title: Product Manager. Output: working application, deployed and client-tested. The entire gatekeeping structure of who can and can't build software just collapsed. In an agentic SDLC, the person closest to the problem IS the builder.",
-            insightSource: "Agentic Product Development",
+            aha: "My markdown spec turned into a running application — I didn't write a single line of code",
+            insight: "You structured your thinking in a document. An agent read it and built the thing. Database, UI, logic — all from your spec. The translation layer between 'what I want' and 'what gets built' used to be the most expensive part. It's gone.",
+            insightSource: "Spec to Software",
             track: "product"
         },
         {
-            aha: "The agent challenged my hypothesis harder than any stakeholder ever has",
-            insight: "You asked it to stress-test your concept from the customer's perspective. It found fatal assumptions, asked questions you hadn't considered, and proposed alternatives. It killed your idea in five minutes\u2014saving you six months of building the wrong thing.",
-            insightSource: "Agentic Challenge",
+            aha: "I iterated the UI three times before my coffee went cold",
+            insight: "Change the layout. Swap the colour scheme. Add a filtering feature. Each iteration took minutes, not days. When the feedback loop is this fast, you stop guessing what users want and start showing them options. Product decisions get better when experimentation is cheap.",
+            insightSource: "Rapid Iteration",
             track: "product"
         },
         {
-            aha: "I turned a chaotic Miro board into a ranked backlog in one prompt",
-            insight: "Sticky notes, fragments, contradictory signals, half-formed hypotheses\u2014all fed into an agent. Out came ranked, testable problem statements with effort estimates. The skill isn't having clear thoughts. It's knowing how to feed your mess to the machine.",
-            insightSource: "Agentic Synthesis",
+            aha: "I'm a product manager and I just deployed something to a real URL",
+            insight: "Not a mockup in Figma. A live application on the internet that people can use. You went from 'I need a developer to build this' to 'I just built this.' The line between product and engineering didn't blur — it moved. And you're now on the other side of it.",
+            insightSource: "Builder Mindset",
             track: "product"
         },
         {
-            aha: "The go-to-market pack built itself as a by-product of building the product",
-            insight: "Pitch deck, demo video script, one-pager, competitive positioning\u2014generated by agents from the product itself. GTM is no longer a phase after you build. It's a by-product of building. The weeks between 'we have a product' and 'we can sell it' just vanished.",
-            insightSource: "Agentic GTM",
+            aha: "AI analysed 200 support tickets and found the pattern our team had missed",
+            insight: "You dumped raw customer data into a conversation and asked 'what are people actually complaining about?' It clustered the themes, ranked them by frequency, and surfaced a root cause buried across dozens of tickets. Data analysis isn't a specialist skill anymore — it's a conversation.",
+            insightSource: "Data-Driven Discovery",
             track: "product"
         },
         {
-            aha: "I became dangerous in an unfamiliar vertical in a single afternoon",
-            insight: "Someone else's data. An industry you've never worked in. An agent found patterns, proposed use cases, identified revenue opportunities. Domain expertise used to be a moat that took years to build. Now it's a prompt that takes minutes to write.",
-            insightSource: "Covert Ops",
+            aha: "I fed it our product's help docs and it wrote better onboarding copy than we have",
+            insight: "It read your existing documentation, understood the product, and generated user-facing content that's clearer than what your team spent weeks writing. Content creation just became a by-product of having a product, not a separate workstream.",
+            insightSource: "Content Generation",
             track: "product"
         },
         {
-            aha: "The full product lifecycle\u2014research to client demo\u2014happened in four days",
-            insight: "Research \u2192 insights \u2192 problem \u2192 ideation \u2192 build \u2192 test \u2192 client feedback \u2192 pitch. Every phase agent-accelerated. What your org plans in quarters happened this week. This isn't a productivity hack. It's a completely different operating model.",
-            insightSource: "Agentic SDLC in Action",
+            aha: "The pitch deck wrote itself from the prototype we built",
+            insight: "Problem statement, solution demo, market size, competitive positioning — all generated from the product you actually built this week. The go-to-market pack isn't a phase after building. It's a side effect of building. You're already ready to sell.",
+            insightSource: "Go-to-Market",
             track: "product"
         },
         {
-            aha: "I write instructions now, not documents\u2014and machines execute them",
-            insight: "Markdown isn't a format choice. It's how you program agents. Structure your thinking in markdown and agents parse it, build from it, execute against it. Product managers aren't writers anymore. They're programmers who write in English.",
-            insightSource: "Intent-as-Code",
+            aha: "I understood a vertical I've never worked in — in a single afternoon",
+            insight: "Different industry. Different data. Different jargon. You asked AI to explain the domain, identify pain points, and suggest revenue opportunities. The years of domain expertise that used to be a competitive moat? Now it's a conversation you can have in an hour.",
+            insightSource: "Domain Ramp-up",
+            track: "product"
+        },
+        {
+            aha: "We went from 'what should we build?' to 'here's the client demo' in four days",
+            insight: "Research, ideation, build, test, demo — the full product lifecycle happened this week. Not because you cut corners, but because agents removed the dead time between steps. The quarterly roadmap rhythm feels strange when you can cycle this fast.",
+            insightSource: "Full Lifecycle",
+            track: "product"
+        },
+        {
+            aha: "I stopped writing requirements documents and started writing instructions agents can execute",
+            insight: "Structure your thinking clearly and agents can build from it directly. The 30-page PRD that nobody reads is dead. A well-structured markdown file is both the plan and the build instruction. Your writing is now a programming language.",
+            insightSource: "Intent as Instruction",
             track: "product"
         },
         {
             aha: "Waiting for dev capacity to test an idea feels absurd now",
-            insight: "The dependency on design, development, and sprint capacity to validate a concept is gone. You can prove or kill an idea before the planning meeting happens. Product management just shifted from requesting builds to doing builds. The backlog is a relic.",
-            insightSource: "Agentic Prototyping",
-            track: "product"
-        },
-        {
-            aha: "I had a better conversation with an agent than with most stakeholders",
-            insight: "It didn't have politics. It didn't protect territory. It didn't say 'that's not my department.' It engaged with your problem purely on merit, challenged your thinking, and proposed solutions. The best sparring partner you've ever had isn't human.",
-            insightSource: "Agentic Collaboration",
+            insight: "You used to put ideas on a backlog and wait. Now you can validate or kill a concept in an afternoon. The dependency on sprint capacity to test a hypothesis is gone. Product management just shifted from 'requesting builds' to 'doing builds.'",
+            insightSource: "Self-Sufficient PM",
             track: "product"
         },
 
         // ===== R&D TRACK =====
-        // The shift from writing code to directing agents that write code
+        // Grounded in what developers actually experience: Git for the first time,
+        // Git, infrastructure, SDLC, vibe coding, debugging, deployment
         {
-            aha: "I gave an agent a codebase and a task\u2014and came back to a pull request",
-            insight: "Not autocomplete. Not suggestions. A fully autonomous agent that read the codebase, understood the architecture, wrote the feature, added tests, and opened a PR. You went from coding to reviewing. The developer role just fundamentally changed.",
-            insightSource: "Agentic Development",
+            aha: "I made my first ever Git commit — and it felt less scary than I expected",
+            insight: "git add, git commit, git push. Three commands that used to feel like developer magic. You just did them. The terminal isn't a scary place when an agent explains what each command does and catches your mistakes. Version control is a life skill, not a developer skill.",
+            insightSource: "First Git Commit",
             track: "rnd"
         },
         {
-            aha: "The agent set up the entire environment while I read the architecture doc",
-            insight: "Provisioned services, configured dependencies, resolved conflicts, verified everything worked\u2014autonomously. The tribal knowledge, the README lies, the 'works on my machine' ritual\u2014all extinct. Environment setup is now a single instruction to an agent.",
-            insightSource: "Agentic Environment Setup",
+            aha: "I described a bug in plain English and the agent fixed it across four files",
+            insight: "You didn't trace the stack. You didn't set breakpoints. You said 'the save button doesn't work' and the agent found the disconnected event handler, the missing API call, and the error in the response parser. Debugging just became a conversation.",
+            insightSource: "Agent-Assisted Debugging",
             track: "rnd"
         },
         {
-            aha: "I described the problem and the agent chose a better approach than I would have",
-            insight: "You caught yourself about to dictate implementation details. Instead, you described the problem. The agent proposed an approach you hadn't considered\u2014cleaner, more maintainable, better tested. Your implementation instincts are now a liability. Problem description is the skill.",
-            insightSource: "L2 Agentic Working",
+            aha: "Someone who's never coded built a working app — and the code is actually clean",
+            insight: "You reviewed their output expecting a mess. Instead: proper structure, error handling, consistent naming. The agent doesn't write sloppy code because it's Friday afternoon. Code quality is no longer correlated with developer experience. That changes everything about who can build.",
+            insightSource: "Vibe Coding Quality",
             track: "rnd"
         },
         {
-            aha: "An agent shipped a sprint's worth of features before lunch",
-            insight: "Database schema, API endpoints, working UI, tests, documentation\u2014built in a single morning by directing an agent. Not scaffolded. Actually working. Every estimate you've ever given\u2014to your manager, to your team, to your client\u2014is provably wrong now.",
-            insightSource: "Agentic Build Sprint",
+            aha: "We went from a static HTML page to a full database-backed application in one afternoon",
+            insight: "API endpoints, a real database, authentication, deployment — the entire backend infrastructure that used to take a sprint to provision happened in a few hours. The gap between 'demo' and 'production' used to be months. Now it's an afternoon.",
+            insightSource: "Infrastructure Sprint",
             track: "rnd"
         },
         {
-            aha: "I pasted logs into an agent and it found the root cause in 30 seconds",
-            insight: "No code context. No stack trace walkthrough. Raw log output. The agent identified the root cause, explained the failure chain, and wrote the fix. The entire discipline of debugging\u2014the detective work, the intuition, the hours of tracing\u2014just became a prompt.",
-            insightSource: "Agentic Debugging",
+            aha: "The entire CI/CD pipeline — build, test, deploy — was set up from a single conversation",
+            insight: "You described what you needed: run tests on every push, deploy to staging, promote to production. The agent wrote the pipeline config, set up the environments, and had it running. Infrastructure-as-conversation is faster than infrastructure-as-code.",
+            insightSource: "Pipeline in Minutes",
             track: "rnd"
         },
         {
-            aha: "The agent writes better tests than I do\u2014and doesn't skip them under pressure",
-            insight: "Test coverage went UP when the agent took over. Edge cases you'd skip on a Friday. Race conditions you'd miss under deadline pressure. It doesn't get lazy. Doesn't negotiate on quality. Quality and speed are no longer a trade-off in an agentic workflow.",
-            insightSource: "Agentic Quality",
+            aha: "I pasted an error message I didn't understand and got a fix I could actually apply",
+            insight: "Stack traces used to be hieroglyphics. You pasted it into a conversation and got back: here's what broke, here's why, here's the fix, here's how to prevent it. The years of experience needed to interpret error messages just got compressed into a prompt.",
+            insightSource: "Error Translation",
             track: "rnd"
         },
         {
-            aha: "The agent refactored 15 files, updated all references, and every test still passed",
-            insight: "A codebase-wide refactor that you'd budget a week for\u2014completed in minutes. The agent understood the dependency graph, made coordinated changes everywhere, and verified the result. Scale is no longer a factor in the decision to improve code.",
-            insightSource: "Agentic Refactoring",
+            aha: "I reviewed code an agent wrote — and learned a pattern I didn't know existed",
+            insight: "The agent used a cleaner approach than you would have. You read it, understood it, and now it's in your toolkit. Agents aren't just productivity tools — they're teaching you while they work. Code review became a learning session.",
+            insightSource: "Learning by Reviewing",
             track: "rnd"
         },
         {
-            aha: "I told an agent what to deploy and had a working pipeline in ten minutes",
-            insight: "Plain language description of deployment needs \u2192 working CI/CD pipeline. Build, test, deploy\u2014configured from a conversation. Infrastructure-as-code is already legacy thinking. Infrastructure-as-conversation is how agents work.",
-            insightSource: "Agentic Infrastructure",
+            aha: "We had a working API, database, and frontend talking to each other — before lunch on Day 2",
+            insight: "The full stack. Connected. Deployed. Serving real requests. Not scaffolded — actually working. Every estimate you've ever given for standing up a new service is based on assumptions that just shattered.",
+            insightSource: "Full Stack in Hours",
             track: "rnd"
         },
         {
-            aha: "The product team's vibe-coded prototype is now hitting production APIs",
-            insight: "What started as a non-developer's rough PoC\u2014built by directing an agent\u2014is now connected to real endpoints, querying production data. The gap between 'demo' and 'real software' shrank to hours. Throwaway prototypes are dead\u2014everything is a starting point now.",
-            insightSource: "Agentic Productionisation",
+            aha: "The agent wrote tests I wouldn't have thought to write — and one of them caught a bug",
+            insight: "You asked for tests. It generated edge cases you'd have skipped. One failed — revealing a logic error you didn't know was there. The agent didn't just test your code. It made your code correct. Testing and debugging merged into one step.",
+            insightSource: "Agent-Written Tests",
             track: "rnd"
         },
         {
-            aha: "An agent found a bug in my logic\u2014while writing tests for it",
-            insight: "You asked for tests. The agent generated a case that failed\u2014exposing a logic error you didn't know existed. It didn't just test your code. It made your code correct. In an agentic workflow, testing and debugging merge into a single activity.",
-            insightSource: "Agentic Testing",
+            aha: "I said 'deploy this to production' and it configured the hosting, DNS, and SSL",
+            insight: "Cloud storage, CDN distributions, API gateways, serverless functions — all provisioned and configured from a conversation. The cloud infrastructure that used to require a dedicated DevOps engineer happened as a side effect of shipping the feature.",
+            insightSource: "One-Command Deploy",
             track: "rnd"
         },
         {
-            aha: "Documentation generated itself from the codebase\u2014and it's actually good",
-            insight: "API docs, architecture diagrams, user guides\u2014all generated by agents, more complete than what you'd write. The 'we'll document later' lie is finally over. Documentation is a by-product of agentic development, not a chore humans skip.",
-            insightSource: "Agentic Documentation",
+            aha: "I shipped working software to a real URL — from a blank folder — in four days",
+            insight: "Not a localhost demo. A deployed application on HTTPS that real users can access. You went from an empty directory to production in less than a week. Your entire mental model of how long software takes is built on assumptions that just broke.",
+            insightSource: "Blank to Deployed",
             track: "rnd"
         },
         {
-            aha: "We shipped production software in four days from a blank repo",
-            insight: "Not a mockup. Working software connected to real services, tested, documented, deployed. Your entire mental model of what a team can accomplish is shattered. The constraint was never talent or effort\u2014it was the speed of the feedback loop. Agents fixed that.",
-            insightSource: "Agentic Delivery",
+            aha: "I asked 'how does this codebase work?' and finally understood how all the pieces connect",
+            insight: "Reading someone else's code used to mean hours of tracing function calls and guessing at intent. You asked 'how does this work?' and got a clear walkthrough of the architecture, data flow, and design decisions. Codebase onboarding just became a conversation.",
+            insightSource: "Code Comprehension",
             track: "rnd"
         },
         {
-            aha: "I went from writing every line to reviewing agent output\u2014and my code got better",
-            insight: "Monday: typing code manually. Thursday: directing agents from specs, reviewing their PRs, validating architecture. Your code quality improved because you stopped being the bottleneck. L2 isn't a slide deck metric. It's what you just lived.",
-            insightSource: "L0 to L2 Journey",
+            aha: "The SDLC that used to take us six weeks happened in a single sprint — with higher quality",
+            insight: "Requirements, architecture, implementation, testing, documentation, deployment — the full software development lifecycle, compressed. Not by cutting corners, but by removing the dead time between steps. The process didn't get worse. The waiting got eliminated.",
+            insightSource: "Compressed SDLC",
             track: "rnd"
         },
         {
-            aha: "The agent understood my INTENT, not just my syntax",
-            insight: "It didn't complete your line of code. It understood the feature you were building and completed the thought. The jump from code completion to intent completion is the moment you realise: agents aren't typing assistants. They're thinking partners. And that's only L1.",
-            insightSource: "Agentic Pair Programming",
+            aha: "A non-developer's prototype connected to our production API — and it actually worked",
+            insight: "Someone from the product team built something with an agent. You expected to rebuild it from scratch. Instead, you connected it to real endpoints and it held up. The code was structured, the error handling was there. 'Throwaway prototype' isn't a category anymore.",
+            insightSource: "Vibe Code to Production",
             track: "rnd"
         },
         {
-            aha: "I directed the architecture while agents wrote every line of implementation",
-            insight: "You made the design decisions. Agents handled the code. The ratio flipped: 80% thinking, 20% doing\u2014instead of the reverse. Your value is no longer in the typing. It's in the judgement, the taste, the architectural vision. That's the L2 developer.",
-            insightSource: "Agentic Architecture",
-            track: "rnd"
-        },
-        {
-            aha: "The agent resolved a crash dump faster than I could open the file",
-            insight: "Memory state analysis, stack trace correlation, root cause isolation\u2014resolved in minutes by an agent. Your worst debugging nightmare is now a brief conversation. The years of hard-won debugging intuition? Commoditised. The new skill is knowing what to ask.",
-            insightSource: "Agentic Troubleshooting",
+            aha: "The documentation wrote itself from the code — and it's more complete than what I'd have written",
+            insight: "API docs, setup guides, architecture notes — generated by the agent, accurate and thorough. The 'we'll document it later' lie is finally dead. Documentation is a by-product of building, not a chore that gets skipped.",
+            insightSource: "Auto-Documentation",
             track: "rnd"
         },
 
         // ===== LEADERSHIP TRACK =====
-        // What leaders see when they witness agentic teams in action
+        // What leaders actually witness and feel during the accelerator:
+        // seeing their teams build, rethinking budgets, watching non-devs ship
         {
-            aha: "I watched a product manager build software\u2014without a single developer",
-            insight: "They described what they wanted. An agent built it. Clickable, functional, real. No developer dependency. No sprint capacity. The org chart you designed\u2014the handoffs, the specialisations, the team boundaries\u2014is built around bottlenecks that agents just removed.",
-            insightSource: "Agentic Teams in Action",
+            aha: "I watched a product manager build and deploy software — without asking a developer",
+            insight: "They described what they wanted. An agent built it. They iterated. They shipped it. No sprint planning. No handoff. No waiting. The org chart you designed — with its handoffs and specialisations — is built around bottlenecks that just got removed.",
+            insightSource: "Witnessing the Shift",
             track: "leadership"
         },
         {
-            aha: "Everything I've ever scoped at three months just happened in four days",
-            insight: "You watched it happen. Concept to working demo to client feedback in one week. Every estimate, timeline, and resource plan in your portfolio is built on human-only assumptions that are now provably wrong. The question isn't whether to recalibrate\u2014it's how fast.",
-            insightSource: "Agentic Delivery Speed",
+            aha: "The team built a working client demo in four days — I'd have scoped that at three months",
+            insight: "You watched it happen. Research, prototype, iteration, client-ready demo — in one week. Every estimate, timeline, and resource plan in your portfolio is built on assumptions that just broke. The question isn't whether to recalibrate — it's how fast.",
+            insightSource: "Timeline Reset",
             track: "leadership"
         },
         {
-            aha: "Agents don't just help my dev team\u2014they transform every function I lead",
-            insight: "Customer support, sales, marketing, PS, finance\u2014you saw agents transform actual workflows across every function. This isn't an IT initiative or a developer tool. The entire operating model of every department you oversee has a new possibility frontier.",
-            insightSource: "Enterprise Agentic Transformation",
+            aha: "I fed my actual QSR into AI and got insights my finance team hadn't flagged",
+            insight: "Your real quarterly data — variance analysis, trend identification, strategic recommendations. Not a generic demo. YOUR numbers, analysed in minutes. This isn't something you adopt for the team. It changes how you think and decide.",
+            insightSource: "QSR Analysis",
             track: "leadership"
         },
         {
-            aha: "My instinct shifted from 'how do I solve this' to 'which agent do I send'",
-            insight: "It happened mid-week and you barely noticed. Your default cognitive loop changed. That's not delegation\u2014it's a fundamentally different operating system for decision-making. You just upgraded how you think, not just how you work.",
-            insightSource: "Agentic Mindset",
+            aha: "I realised this isn't a dev tool — it changes how every function in my business operates",
+            insight: "You came thinking this was about software development. Then you saw it applied to market research, customer analysis, content creation, financial modelling, and ops. Every department you lead has workflows that just got fundamentally cheaper and faster.",
+            insightSource: "Enterprise Impact",
             track: "leadership"
         },
         {
-            aha: "Tuesday's 'impossible' is Thursday's 'obvious'",
-            insight: "The technology didn't change between Tuesday and Thursday\u2014your understanding of it did. Now multiply that gap across your entire org. Everyone who hasn't had this week still thinks Tuesday's reality is true. That's both your biggest risk and your biggest opportunity.",
-            insightSource: "Paradigm Shift",
+            aha: "My team found a revenue opportunity we'd been sitting on — because they could finally analyse the data",
+            insight: "The data was always there. The analysis was too expensive, too slow, or too dependent on a specialist who was busy. AI made it accessible. The bottleneck was never the data — it was the cost of looking at it.",
+            insightSource: "Data Unlock",
             track: "leadership"
         },
         {
-            aha: "I fed my QSR to an agent and got strategic options I hadn't considered",
-            insight: "Your actual quarterly data, analysed by an agent, producing benchmarks, variance analysis, and recommendations you'd missed. This isn't something you adopt 'for the team.' It changes how YOU think and decide. The transformation starts with the leader.",
-            insightSource: "Agentic Decision Support",
+            aha: "Tuesday's 'that's impossible' became Thursday's 'obviously we should do that'",
+            insight: "The technology didn't change between Tuesday and Thursday — your understanding of it did. Now multiply that gap across your org. Everyone who hasn't had this week still thinks Tuesday's reality is true. That's both your biggest risk and your biggest opportunity.",
+            insightSource: "Mindset Shift",
             track: "leadership"
         },
         {
-            aha: "Security and compliance are solved\u2014that excuse is now eighteen months expired",
-            insight: "Enterprise guardrails, data residency, audit trails, compliance frameworks\u2014all production-ready and battle-tested. The concerns were valid two years ago. They're not anymore. Every leader still citing security is protecting comfort, not data.",
+            aha: "The security and compliance concerns I had were already solved — months ago",
+            insight: "Enterprise guardrails, data residency, audit trails, access controls — all production-ready. The concerns were valid two years ago. They're solved now. Every leader still citing security as a blocker is protecting comfort, not data.",
             insightSource: "Enterprise Readiness",
             track: "leadership"
         },
         {
-            aha: "The spec-to-code handover\u2014our most expensive friction point\u2014is gone",
-            insight: "Product wrote specs. Agents had working code the same day. The sprints of misinterpretation, back-and-forth, and re-scoping collapsed to nothing. The most expensive friction point in your delivery model just ceased to exist. Every process built around that handover is now waste.",
-            insightSource: "Agentic SDLC",
+            aha: "I saw three people with agents match the output of an eight-person team",
+            insight: "Same scope. Same quality. Fraction of the people. This isn't about replacing headcount — it's about what your existing people can now accomplish. The hiring model built on 'we need more people' is competing with 'we need better tools.'",
+            insightSource: "Team Economics",
             track: "leadership"
         },
         {
-            aha: "Every budget and business case I've approved is based on wrong maths",
-            insight: "The cost and time assumptions in every plan you own are based on human-only work. You just saw what agent-assisted teams deliver. The maths isn't slightly different\u2014it's fundamentally different. Your margin assumptions, your ROI models, your hiring plans\u2014all need rebuilding.",
+            aha: "Every budget I've approved this year is based on the wrong maths",
+            insight: "The cost and time assumptions in every plan are based on human-only work. You just saw what agent-assisted teams deliver. The maths isn't slightly different — it's fundamentally different. Margin assumptions, ROI models, hiring plans — all need rethinking.",
             insightSource: "Economic Reset",
             track: "leadership"
         },
         {
-            aha: "That team of eight? Three people with agents just matched their output",
-            insight: "You watched it happen. Same scope, same quality, fraction of the people. The question isn't 'how many people do we need' anymore. It's 'what's the right human-to-agent ratio?' Your hiring model is built on constraints that agents just eliminated.",
-            insightSource: "Agentic Team Economics",
+            aha: "The spec-to-code handover — our most expensive friction point — just disappeared",
+            insight: "Product wrote a spec. An agent had working code the same day. The sprints of misinterpretation, back-and-forth, and re-scoping collapsed to nothing. The most expensive part of your delivery model just ceased to exist.",
+            insightSource: "Handover Elimination",
             track: "leadership"
         },
         {
-            aha: "A PS ratio of 5 isn't aspirational\u2014it's the floor now",
-            insight: "Scoping, delivery, documentation, QA\u2014agents mapped to every stage of professional services. The efficiency gains aren't incremental. The entire economics of service delivery shifted. What you thought was the ceiling is now the starting point.",
-            insightSource: "Agentic Professional Services",
-            track: "leadership"
-        },
-        {
-            aha: "I showed my actual work being transformed by an agent\u2014live, on screen",
-            insight: "Your real QSR, your actual client emails, your live pipeline\u2014processed and improved by agents in front of your peers. Not a vendor demo. YOUR work. When leaders see each other working this way, permission to change spreads faster than any mandate.",
+            aha: "I showed my actual work being transformed by an agent — live, in front of peers",
+            insight: "Real emails, real data, real workflows — processed and improved by agents on screen. Not a vendor demo. YOUR work. When leaders see each other working this way, permission to change spreads faster than any top-down mandate.",
             insightSource: "Leader Show and Tell",
+            track: "leadership"
+        },
+        {
+            aha: "My instinct shifted from 'how do I solve this' to 'what do I ask the agent'",
+            insight: "It happened mid-week and you barely noticed. Your default problem-solving loop changed. That's not delegation — it's a fundamentally different way of operating. You upgraded how you think, not just how you work.",
+            insightSource: "Operating System Upgrade",
             track: "leadership"
         },
 
         // ===== GENERAL / CROSS-CUTTING =====
-        // The paradigm shifts that hit everyone regardless of role
+        // The shared realisations that hit everyone regardless of role
         {
-            aha: "One person with agents is now a team",
-            insight: "Same scope. Same quality. One person directing agents instead of eight people in meetings. The unit economics of building software, running research, creating content\u2014all fundamentally changed. Scale is no longer a headcount question. It's an agent question.",
-            insightSource: "Agentic Scale",
+            aha: "I haven't Googled anything in three days — and I've been more productive than ever",
+            insight: "Your reflex for finding answers shifted from searching to conversing. That's not a tool preference — it's a fundamentally different relationship with information. You stopped context-switching between browser tabs and started getting answers inside the work.",
+            insightSource: "New Information Reflex",
             track: "general"
         },
         {
-            aha: "Half our meetings exist because work used to be slow\u2014agents killed that",
-            insight: "Status updates, alignment sessions, review meetings\u2014most exist because work moved slowly and needed coordination. When agents collapse cycle times from days to minutes, the coordination overhead becomes the bottleneck. The calendar clears itself.",
-            insightSource: "Agentic Working",
+            aha: "I was afraid of the terminal on Monday — now I'm running Git commands from it",
+            insight: "The command line felt like developer territory. By Wednesday you were navigating folders, running scripts, and committing code. The technical barrier wasn't skill — it was confidence. An agent that explains each step removed the fear, not just the difficulty.",
+            insightSource: "Terminal Confidence",
             track: "general"
         },
         {
-            aha: "Every plan I own was made before agents\u2014and none account for them",
-            insight: "Roadmaps, budgets, hiring plans, strategic goals\u2014all bounded by what humans alone could do. Agents moved the ceiling. Your plans didn't update. The gap between what's now possible and what you're planning for is the biggest risk nobody's managing.",
-            insightSource: "Agentic SDLC",
-            track: "general"
-        },
-        {
-            aha: "I haven't Googled anything in three days and I'm more productive than ever",
-            insight: "Your reflex for finding answers shifted from searching to conversing with agents. That's not a tool preference\u2014it's a fundamentally different relationship with information. Search is already legacy behaviour. The answer comes from the conversation now.",
-            insightSource: "Agentic Information",
-            track: "general"
-        },
-        {
-            aha: "Years of domain expertise just became a one-paragraph prompt for an agent",
-            insight: "You applied the same agentic workflow to a completely unfamiliar domain and it worked. The accumulated knowledge that makes someone an expert\u2014years of experience, pattern recognition, institutional memory\u2014is now context an agent can consume in seconds.",
-            insightSource: "Agentic Knowledge Transfer",
+            aha: "I built something real — not a slide deck about building something",
+            insight: "No more 'here's what we would build if we had resources.' You built the thing. It works. People can use it. The gap between strategy and execution collapsed. This week, thinking and doing were the same activity.",
+            insightSource: "From Talking to Doing",
             track: "general"
         },
         {
             aha: "My Day 1 fear is embarrassing by Day 4",
-            insight: "Tuesday: 'AI will replace us.' Thursday: 'AI amplifies us.' Every fear was either disproven by what you experienced or has a concrete mitigation. The gap between fear and reality is where growth happens\u2014and you just closed it in four days.",
-            insightSource: "Paradigm Shift",
+            insight: "'It'll take my job.' 'I'm too old for this.' 'This is just hype.' Every fear from Monday was either disproven by what you built or has a clear answer now. The gap between fear and reality is where growth happens — and you just closed it in four days.",
+            insightSource: "Fear to Confidence",
             track: "general"
         },
         {
-            aha: "The gap between imagining something and having it built is now zero",
-            insight: "Describe intent. Agent translates to implementation. Working software appears. The weeks of miscommunication, handoff delays, and re-work between 'I want this' and 'here it is' just collapsed. Agents are the universal translator between imagination and reality.",
-            insightSource: "Agentic Execution",
+            aha: "The person next to me — who has a completely different role — used the same tool to solve a completely different problem",
+            insight: "A product manager used it for market research. A developer used it for debugging. A leader used it for financial analysis. Same tool, different problems, same result: faster, better, cheaper. This isn't a specialist tool. It's a thinking amplifier.",
+            insightSource: "Universal Applicability",
             track: "general"
         },
         {
-            aha: "Speed of learning just became the only competitive advantage that matters",
-            insight: "Ship rough today, iterate tomorrow, demo-ready by Thursday. The company that learns fastest wins\u2014and agents compress the learning cycle from quarters to days. Perfection is the enemy. Speed of iteration is the strategy. Progress over perfection isn't a slogan\u2014it's survival.",
-            insightSource: "Agentic Competitive Advantage",
+            aha: "I learned more about my own product by asking AI about it than from our internal docs",
+            insight: "You fed it your product data and asked questions you'd been meaning to investigate for months. It connected dots across support tickets, feature requests, and usage patterns. The insight was always in your data — you just couldn't access it fast enough.",
+            insightSource: "Self-Discovery",
             track: "general"
         },
         {
-            aha: "The ability to direct agents is the new foundational skill\u2014for everyone",
-            insight: "Someone shared a prompting pattern. You applied it to a different problem. Better results instantly. The ability to effectively direct agents is transferable across every role, function, and domain. It's not a technical skill. It's the skill. For everyone.",
-            insightSource: "Agentic Literacy",
+            aha: "Progress over perfection isn't a slogan — it's literally how we built this week",
+            insight: "Ship rough, get feedback, iterate, improve. Every day the prototype got better because you showed it to someone and learned what to change. Perfection would have meant nothing got built. The messy version that exists beats the perfect version that doesn't.",
+            insightSource: "Iteration Mindset",
             track: "general"
         },
         {
-            aha: "This week wasn't a preview of 2030\u2014it's what's possible RIGHT NOW",
-            insight: "Research, build, test, ship, sell\u2014the entire lifecycle, agent-first, in four days. Not future technology. Not a lab demo. Production-ready tools, available today. The only question is how fast your organisation closes the gap between what's possible and what you're doing.",
-            insightSource: "The Agentic Present",
+            aha: "I went from 'I don't know where to start' to 'I know exactly what to build next'",
+            insight: "The paralysis of a blank page disappeared when you could have a conversation about it. Brainstorm, narrow down, validate, build — AI didn't just help you execute. It helped you think. The hardest part of any project is starting. That just got radically easier.",
+            insightSource: "Unblocked Thinking",
+            track: "general"
+        },
+        {
+            aha: "I explained what I needed to an agent better than I've ever explained it to a colleague",
+            insight: "Because the agent asked clarifying questions without ego. Because it didn't assume it knew what you meant. Because the feedback loop was instant. You got better at articulating your intent — and that skill transfers to every human conversation too.",
+            insightSource: "Clarity of Intent",
+            track: "general"
+        },
+        {
+            aha: "This isn't a preview of 2030 — we did this with tools available right now",
+            insight: "No beta access. No special hardware. No 'coming soon.' Everything you built this week used production tools anyone can access today. The gap isn't technology — it's adoption. And you just closed it.",
+            insightSource: "Available Now",
             track: "general"
         }
     ];
