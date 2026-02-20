@@ -1649,7 +1649,22 @@
     const LEVEL_VALUES = { toxic: 1, talker: 2, action: 3, driver: 4 };
     const TRACK_LABELS = { product: 'Product', rnd: 'R&D', leadership: 'Leadership' };
     const TRACK_COLORS = { product: 'var(--track-product)', rnd: 'var(--track-rnd)', leadership: 'var(--track-leadership)' };
-    const DAYS = ['D1', 'D2', 'D3', 'D4'];
+    const DAYS = ['D1', 'D2', 'D3', 'D4', 'AI'];
+    const ASSESSMENT_DAYS = ['D1', 'D2', 'D3', 'D4'];
+    const VBU_BOTTOM = ['Jonas', 'TSS-Yonder', 'Omegro', 'Rob Turner Portfolio', 'Volaris Group'];
+    function sortVBUs(vbuKeys) {
+        const bottomSet = new Map(VBU_BOTTOM.map((v, i) => [v, i]));
+        return [...vbuKeys].sort((a, b) => {
+            const aBottom = bottomSet.has(a);
+            const bBottom = bottomSet.has(b);
+            if (aBottom && bBottom) return bottomSet.get(a) - bottomSet.get(b);
+            if (aBottom) return 1;
+            if (bBottom) return -1;
+            return a.localeCompare(b, undefined, { sensitivity: 'base' });
+        });
+    }
+    const AI_LEVEL_LABELS = { 0: 'Level 0', 1: 'Level 1', 2: 'Level 2', 3: 'Level 3' };
+    const AI_LEVEL_COLORS = { 0: 'var(--level-toxic)', 1: 'var(--level-talker)', 2: 'var(--level-action)', 3: 'var(--level-driver)' };
 
     // ===== STATE =====
     let currentUser = null;
@@ -1657,11 +1672,23 @@
     let participants = [];
     let currentDay = 'D1';
     let currentTrack = 'all';
+    let currentVbu = 'all';
     let consensusData = [];
     let allAuditEntries = [];
     let isDarkMode = false;
+    let currentLevelFilter = 'all';
     let selectedAssessmentParticipant = null;
     let selectedJourneyParticipant = null;
+
+    // Assess card grid state
+    let assessConsensusData = [];
+    let assessFilter = 'unassessed';
+    let assessTrack = 'all';
+    let assessVbu = 'all';
+    let assessSearchQuery = '';
+    let skippedAssessments = {};
+    let aiLevelFilter = 'all';
+    let aiParticipantsData = [];
 
     // ===== AUTH =====
     function signIn() {
@@ -1738,6 +1765,7 @@
     function onAuthenticated() {
         document.getElementById('appHeader').style.display = '';
         document.getElementById('topNav').style.display = '';
+        document.getElementById('appFooter').style.display = '';
         document.getElementById('userDisplay').textContent = currentUser.name;
         showView('dashboard');
         loadParticipants();
@@ -1774,16 +1802,170 @@
 
     // ===== MOCK API (for local dev without backend) =====
     let mockParticipants = [
-        { userId: 'alice@acme.com', name: 'Alice Johnson', email: 'alice@acme.com', vbu: 'Acme Corp', track: 'product' },
-        { userId: 'bob@acme.com', name: 'Bob Smith', email: 'bob@acme.com', vbu: 'Acme Corp', track: 'rnd' },
-        { userId: 'carol@beta.com', name: 'Carol Williams', email: 'carol@beta.com', vbu: 'Beta Inc', track: 'leadership' },
-        { userId: 'david@beta.com', name: 'David Brown', email: 'david@beta.com', vbu: 'Beta Inc', track: 'product' },
-        { userId: 'eve@gamma.com', name: 'Eve Davis', email: 'eve@gamma.com', vbu: 'Gamma Ltd', track: 'rnd' },
-        { userId: 'frank@gamma.com', name: 'Frank Miller', email: 'frank@gamma.com', vbu: 'Gamma Ltd', track: 'product' },
+        // A Test VBU — one per track with ratings
+        { userId: 'test.leader@testvbu.com', name: 'Test Leader', email: 'test.leader@testvbu.com', vbu: 'A Test VBU', track: 'leadership' },
+        { userId: 'test.product@testvbu.com', name: 'Test Product', email: 'test.product@testvbu.com', vbu: 'A Test VBU', track: 'product' },
+        { userId: 'test.dev@testvbu.com', name: 'Test Developer', email: 'test.dev@testvbu.com', vbu: 'A Test VBU', track: 'rnd' },
+        // AssetWorks Facilities
+        { userId: 'benjamin.smith@assetworks.com', name: 'Benjamin Smith', email: 'benjamin.smith@assetworks.com', vbu: 'AssetWorks Facilities', track: 'leadership' },
+        { userId: 'kyle.isenhour@assetworks.com', name: 'Kyle Isenhour', email: 'kyle.isenhour@assetworks.com', vbu: 'AssetWorks Facilities', track: 'product' },
+        { userId: 'adam.desilvester@assetworks.com', name: 'Adam DeSilvester', email: 'adam.desilvester@assetworks.com', vbu: 'AssetWorks Facilities', track: 'rnd' },
+        { userId: 'gabriel.larson@assetworks.com', name: 'Gabriel Larson', email: 'gabriel.larson@assetworks.com', vbu: 'AssetWorks Facilities', track: 'rnd' },
+        { userId: 'surabhi.umarani@assetworks.com', name: 'Surabhi Umarani', email: 'surabhi.umarani@assetworks.com', vbu: 'AssetWorks Facilities', track: 'rnd' },
+        // Assetworks Fleet
+        { userId: 'gary.wong@assetworks.com', name: 'Gary Wong', email: 'gary.wong@assetworks.com', vbu: 'Assetworks Fleet', track: 'leadership' },
+        { userId: 'jim.hammond@assetworks.com', name: 'Jim Hammond', email: 'jim.hammond@assetworks.com', vbu: 'Assetworks Fleet', track: 'product' },
+        { userId: 'michael.collison@assetworks.com', name: 'Michael Collison', email: 'michael.collison@assetworks.com', vbu: 'Assetworks Fleet', track: 'rnd' },
+        { userId: 'alessandro.santos@assetworks.com', name: 'Alessandro Santos', email: 'alessandro.santos@assetworks.com', vbu: 'Assetworks Fleet', track: 'rnd' },
+        // Crealogix
+        { userId: 'yannick.decaumont@crealogix.com', name: 'Yannick Decaumont', email: 'yannick.decaumont@crealogix.com', vbu: 'Crealogix', track: 'leadership' },
+        { userId: 'alberto.sanjuan@crealogix.com', name: 'Alberto San Juan', email: 'alberto.sanjuan@crealogix.com', vbu: 'Crealogix', track: 'product' },
+        { userId: 'oriol.bergas@crealogix.com', name: 'Oriol Bergas', email: 'oriol.bergas@crealogix.com', vbu: 'Crealogix', track: 'rnd' },
+        // DataAction
+        { userId: 'dcook@da.com.au', name: 'David Cook', email: 'dcook@da.com.au', vbu: 'DataAction', track: 'leadership' },
+        { userId: 'nreed@da.com.au', name: 'Nathan Reed', email: 'nreed@da.com.au', vbu: 'DataAction', track: 'product' },
+        { userId: 'psanderson@da.com.au', name: 'Phillip Sanderson', email: 'psanderson@da.com.au', vbu: 'DataAction', track: 'rnd' },
+        { userId: 'hshao@da.com.au', name: 'Han-Wei Shao', email: 'hshao@da.com.au', vbu: 'DataAction', track: 'rnd' },
+        { userId: 'malfaro@da.com.au', name: 'Marc Alfaro', email: 'malfaro@da.com.au', vbu: 'DataAction', track: 'rnd' },
+        { userId: 'mtickle@da.com.au', name: 'Matthew Tickle', email: 'mtickle@da.com.au', vbu: 'DataAction', track: 'rnd' },
+        // Databics
+        { userId: 'cbaird@samprosoftware.com', name: 'Che Baird', email: 'cbaird@samprosoftware.com', vbu: 'Databics', track: 'leadership' },
+        { userId: 'nbauer@samprosoftware.com', name: 'Nik Bauer', email: 'nbauer@samprosoftware.com', vbu: 'Databics', track: 'rnd' },
+        { userId: 'dkuchna@samprosoftware.com', name: 'Doug Kuchna', email: 'dkuchna@samprosoftware.com', vbu: 'Databics', track: 'rnd' },
+        { userId: 'mgaurav@samprosoftware.com', name: 'Mrinali Gaurav', email: 'mgaurav@samprosoftware.com', vbu: 'Databics', track: 'rnd' },
+        { userId: 'pcamardo@samprosoftware.com', name: 'Paul Camardo', email: 'pcamardo@samprosoftware.com', vbu: 'Databics', track: 'rnd' },
+        { userId: 'tmckibbin@samprosoftware.com', name: 'Trisha McKibbin', email: 'tmckibbin@samprosoftware.com', vbu: 'Databics', track: 'rnd' },
+        // equivant - Court
+        { userId: 'patricia.jacoby@equivant.com', name: 'Patricia Jacoby', email: 'patricia.jacoby@equivant.com', vbu: 'equivant - Court', track: 'leadership' },
+        { userId: 'skip.gorski@equivant.com', name: 'Skip Gorski', email: 'skip.gorski@equivant.com', vbu: 'equivant - Court', track: 'product' },
+        { userId: 'chris.dye@equivant.com', name: 'Chris Dye', email: 'chris.dye@equivant.com', vbu: 'equivant - Court', track: 'product' },
+        { userId: 'margaret.czarney@equivant.com', name: 'Margaret Czarney', email: 'margaret.czarney@equivant.com', vbu: 'equivant - Court', track: 'rnd' },
+        { userId: 'jared.buchanan@equivant.com', name: 'Jared Buchanan', email: 'jared.buchanan@equivant.com', vbu: 'equivant - Court', track: 'rnd' },
+        // Helm Operations
+        { userId: 'matt.freire@helmoperations.com', name: 'Matt Freire', email: 'matt.freire@helmoperations.com', vbu: 'Helm Operations', track: 'leadership' },
+        { userId: 'liam.cameron@helmoperations.com', name: 'Liam Cameron', email: 'liam.cameron@helmoperations.com', vbu: 'Helm Operations', track: 'product' },
+        { userId: 'max.verigin@helmoperations.com', name: 'Max Verigin', email: 'max.verigin@helmoperations.com', vbu: 'Helm Operations', track: 'rnd' },
+        { userId: 'eric.choiniere@helmoperations.com', name: 'Eric Choiniere', email: 'eric.choiniere@helmoperations.com', vbu: 'Helm Operations', track: 'rnd' },
+        // HUSK
+        { userId: 'emarkowski@huskwellness.com', name: 'Erin Markowski', email: 'emarkowski@huskwellness.com', vbu: 'HUSK', track: 'leadership' },
+        { userId: 'amorton@huskwellness.com', name: 'Ashley Morton', email: 'amorton@huskwellness.com', vbu: 'HUSK', track: 'rnd' },
+        { userId: 'sdewitsky@huskwellness.com', name: 'Stephen Dewitsky', email: 'sdewitsky@huskwellness.com', vbu: 'HUSK', track: 'rnd' },
+        { userId: 'dpaterson@huskwellness.com', name: 'Derek Patterson', email: 'dpaterson@huskwellness.com', vbu: 'HUSK', track: 'rnd' },
+        // Intellicene
+        { userId: 'greg.colaluca@intellicene.com', name: 'Greg Colaluca', email: 'greg.colaluca@intellicene.com', vbu: 'Intellicene', track: 'leadership' },
+        { userId: 'derek.shoaf@intellicene.com', name: 'Derek Shoaf', email: 'derek.shoaf@intellicene.com', vbu: 'Intellicene', track: 'product' },
+        { userId: 'matthew.drulias@intellicene.com', name: 'Matthew Drulias', email: 'matthew.drulias@intellicene.com', vbu: 'Intellicene', track: 'rnd' },
+        { userId: 'amit.kahn@intellicene.com', name: 'Amir Kahn', email: 'amit.kahn@intellicene.com', vbu: 'Intellicene', track: 'rnd' },
+        // InTempo
+        { userId: 'scott.alexander@intemposoftware.com', name: 'Scott Alexander', email: 'scott.alexander@intemposoftware.com', vbu: 'InTempo', track: 'leadership' },
+        { userId: 'anthony.tye@intemposoftware.com', name: 'Anthony Tye', email: 'anthony.tye@intemposoftware.com', vbu: 'InTempo', track: 'product' },
+        { userId: 'lyndsey.duff@intemposoftware.com', name: 'Lyndsey Duff', email: 'lyndsey.duff@intemposoftware.com', vbu: 'InTempo', track: 'rnd' },
+        { userId: 'chris.kennedy@intemposoftware.com', name: 'Chris Kennedy', email: 'chris.kennedy@intemposoftware.com', vbu: 'InTempo', track: 'rnd' },
+        { userId: 'jonathan.paolozzi@curbstone.com', name: 'Jonathan Paolozzi', email: 'jonathan.paolozzi@curbstone.com', vbu: 'InTempo', track: 'rnd' },
+        { userId: 'josh.thurman@curbstone.com', name: 'Josh Thurman', email: 'josh.thurman@curbstone.com', vbu: 'InTempo', track: 'rnd' },
+        // Medaptus
+        { userId: 'malachi.charbonneau@medaptus.com', name: 'Malachi Charbonneau', email: 'malachi.charbonneau@medaptus.com', vbu: 'Medaptus', track: 'leadership' },
+        { userId: 'tim.mccoy@medaptus.com', name: 'Tim McCoy', email: 'tim.mccoy@medaptus.com', vbu: 'Medaptus', track: 'leadership' },
+        { userId: 'jaclyn.corbett@medaptus.com', name: 'Jaclyn Corbett', email: 'jaclyn.corbett@medaptus.com', vbu: 'Medaptus', track: 'product' },
+        { userId: 'aaron.alessi@medaptus.com', name: 'Aaron Alessi', email: 'aaron.alessi@medaptus.com', vbu: 'Medaptus', track: 'rnd' },
+        { userId: 'dan.walsh@medaptus.com', name: 'Dan Walsh', email: 'dan.walsh@medaptus.com', vbu: 'Medaptus', track: 'rnd' },
+        { userId: 'zach.page@medaptus.com', name: 'Zach Page', email: 'zach.page@medaptus.com', vbu: 'Medaptus', track: 'rnd' },
+        // Portfolio+
+        { userId: 'anna.fiorino@portfolioplus.com', name: 'Anna Fiorino', email: 'anna.fiorino@portfolioplus.com', vbu: 'Portfolio+', track: 'leadership' },
+        { userId: 'kathy.muloin@portfolioplus.com', name: 'Kathy Muloin', email: 'kathy.muloin@portfolioplus.com', vbu: 'Portfolio+', track: 'product' },
+        { userId: 'chris.riddell@portfolioplus.com', name: 'Chris Riddell', email: 'chris.riddell@portfolioplus.com', vbu: 'Portfolio+', track: 'rnd' },
+        { userId: 'siddhant.sapru@portfolioplus.com', name: 'Siddhant Sapru', email: 'siddhant.sapru@portfolioplus.com', vbu: 'Portfolio+', track: 'rnd' },
+        // Sansio
+        { userId: 'stephanie.patterson@sansio.com', name: 'Stephanie Patterson', email: 'stephanie.patterson@sansio.com', vbu: 'Sansio', track: 'leadership' },
+        { userId: 'kris.ruhl@sansio.com', name: 'Kris Ruhl', email: 'kris.ruhl@sansio.com', vbu: 'Sansio', track: 'product' },
+        { userId: 'derek.mccorison@sansio.com', name: 'Derek McCorison', email: 'derek.mccorison@sansio.com', vbu: 'Sansio', track: 'rnd' },
+        { userId: 'melissa.zamzow@sansio.com', name: 'Melissa Zamzow', email: 'melissa.zamzow@sansio.com', vbu: 'Sansio', track: 'rnd' },
+        { userId: 'taylor.kuno@sansio.com', name: 'Taylor Kuno', email: 'taylor.kuno@sansio.com', vbu: 'Sansio', track: 'rnd' },
+        // Smartrak
+        { userId: 'richard.biffin@smartrak.com', name: 'Richard Biffin', email: 'richard.biffin@smartrak.com', vbu: 'Smartrak', track: 'leadership' },
+        { userId: 'rob.horton@smartrak.com', name: 'Rob Horton', email: 'rob.horton@smartrak.com', vbu: 'Smartrak', track: 'product' },
+        { userId: 'scott.heighway@smartrak.com', name: 'Scott Heighway', email: 'scott.heighway@smartrak.com', vbu: 'Smartrak', track: 'rnd' },
+        { userId: 'sautong.tan@smartrak.com', name: 'Sau Tong Tan', email: 'sautong.tan@smartrak.com', vbu: 'Smartrak', track: 'rnd' },
+        // Spectec
+        { userId: 'garry.clarke@spectec.net', name: 'Garry Clarke', email: 'garry.clarke@spectec.net', vbu: 'Spectec', track: 'leadership' },
+        { userId: 'sas.huntwood@spectec.net', name: 'Sas Huntwood', email: 'sas.huntwood@spectec.net', vbu: 'Spectec', track: 'product' },
+        // SSP Insurer
+        { userId: 'iain.shillingford@ssp-worldwide.com', name: 'Iain Shillingford', email: 'iain.shillingford@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'leadership' },
+        { userId: 'sucheta.mohan@ssp-worldwide.com', name: 'Sucheta Mohan', email: 'sucheta.mohan@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'product' },
+        { userId: 'adam.lewis@ssp-worldwide.com', name: 'Adam Lewis', email: 'adam.lewis@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'product' },
+        { userId: 'andrew.wilcock@ssp-worldwide.com', name: 'Andrew Wilcock', email: 'andrew.wilcock@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'rnd' },
+        { userId: 'nick.ward@ssp-worldwide.com', name: 'Nick Ward', email: 'nick.ward@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'rnd' },
+        { userId: 'rahul.jaiswal@ssp-worldwide.com', name: 'Rahul Jaiswal', email: 'rahul.jaiswal@ssp-worldwide.com', vbu: 'SSP Insurer', track: 'rnd' },
+        // Wellington IT
+        { userId: 'colin.mitchell@well-it.com', name: 'Colin Mitchell', email: 'colin.mitchell@well-it.com', vbu: 'Wellington IT', track: 'leadership' },
+        { userId: 'paul.cruchley@well-it.com', name: 'Paul Cruchley', email: 'paul.cruchley@well-it.com', vbu: 'Wellington IT', track: 'product' },
+        { userId: 'navajit.maitra@well-it.com', name: 'Navajit Maitra', email: 'navajit.maitra@well-it.com', vbu: 'Wellington IT', track: 'rnd' },
+        { userId: 'dovydas.pliauga@well-it.com', name: 'Dovydas Pliauga', email: 'dovydas.pliauga@well-it.com', vbu: 'Wellington IT', track: 'rnd' },
+        { userId: 'simon.bacon@well-it.com', name: 'Simon Bacon', email: 'simon.bacon@well-it.com', vbu: 'Wellington IT', track: 'rnd' },
     ];
+    // Seed AI maturity levels for Test VBU only
+    (function seedAILevels() {
+        const testVbu = mockParticipants.filter(p => p.vbu === 'A Test VBU');
+        testVbu[0].aiMaturityLevel = 0; // Leader = L0
+        testVbu[1].aiMaturityLevel = 1; // Product = L1
+        testVbu[2].aiMaturityLevel = 2; // Developer = L2
+    })();
     let mockAssessments = {};
     let mockAuditLog = [];
     let mockNotes = {};
+    let mockVbus = [
+        { vbuId: 'a-test-vbu', name: 'A Test VBU' },
+        { vbuId: 'assetworks-facilities', name: 'AssetWorks Facilities' },
+        { vbuId: 'assetworks-fleet', name: 'Assetworks Fleet' },
+        { vbuId: 'crealogix', name: 'Crealogix' },
+        { vbuId: 'dataaction', name: 'DataAction' },
+        { vbuId: 'databics', name: 'Databics' },
+        { vbuId: 'equivant-court', name: 'equivant - Court' },
+        { vbuId: 'helm-operations', name: 'Helm Operations' },
+        { vbuId: 'husk', name: 'HUSK' },
+        { vbuId: 'intellicene', name: 'Intellicene' },
+        { vbuId: 'intempo', name: 'InTempo' },
+        { vbuId: 'medaptus', name: 'Medaptus' },
+        { vbuId: 'portfolio-plus', name: 'Portfolio+' },
+        { vbuId: 'sansio', name: 'Sansio' },
+        { vbuId: 'smartrak', name: 'Smartrak' },
+        { vbuId: 'spectec', name: 'Spectec' },
+        { vbuId: 'ssp-insurer', name: 'SSP Insurer' },
+        { vbuId: 'wellington-it', name: 'Wellington IT' },
+    ];
+
+    // Auto-generate mock assessments for Test VBU only
+    (function seedMockAssessments() {
+        const levels = ['toxic', 'talker', 'action', 'driver'];
+        const assessors = [
+            { id: 'james@example.com', name: 'James' },
+            { id: 'ellen@example.com', name: 'Ellen' },
+            { id: 'hom@example.com', name: 'Hom' },
+        ];
+        const testVbuParticipants = mockParticipants.filter(p => p.vbu === 'A Test VBU');
+        for (let pi = 0; pi < testVbuParticipants.length; pi++) {
+            const p = testVbuParticipants[pi];
+            const baseIdx = pi; // toxic, talker, action — one each
+            for (let di = 0; di < 4; di++) {
+                const day = `D${di + 1}`;
+                const lvlIdx = Math.min(3, Math.max(0, baseIdx + Math.floor(di * 0.5)));
+                const numRaters = 1 + Math.floor(Math.random() * assessors.length);
+                for (let r = 0; r < numRaters; r++) {
+                    const assessor = assessors[r];
+                    const raterIdx = Math.min(3, Math.max(0, lvlIdx + (Math.random() > 0.6 ? (Math.random() > 0.5 ? 1 : -1) : 0)));
+                    const key = `${p.userId}#${day}#${assessor.id}`;
+                    mockAssessments[key] = {
+                        participantId: p.userId,
+                        day,
+                        assessorId: assessor.id,
+                        assessorName: assessor.name,
+                        level: levels[raterIdx],
+                        timestamp: new Date().toISOString(),
+                    };
+                }
+            }
+        }
+    })();
 
     function mockApi(method, path, body) {
         return new Promise(resolve => {
