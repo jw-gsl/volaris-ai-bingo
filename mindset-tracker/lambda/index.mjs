@@ -649,6 +649,27 @@ export const handler = async (event) => {
       return ok({ success: true });
     }
 
+    // ===== ADMIN DATA MANAGEMENT =====
+
+    // POST /admin/reset-assessments — clear assessments, audit log, notes
+    if (method === "POST" && path === "/admin/reset-assessments") {
+      const tables = [TABLES.assessments, TABLES.auditLog, TABLES.notes];
+      let deleted = 0;
+      for (const tableName of tables) {
+        deleted += await clearTable(tableName);
+      }
+      return ok({ success: true, deleted });
+    }
+
+    // POST /admin/reset-all — clear everything including participants
+    if (method === "POST" && path === "/admin/reset-all") {
+      const tables = [TABLES.users, TABLES.assessments, TABLES.auditLog, TABLES.notes];
+      let deleted = 0;
+      for (const tableName of tables) {
+        deleted += await clearTable(tableName);
+      }
+      return ok({ success: true, deleted });
+    }
 
     return err(404, "Not found");
   } catch (e) {
@@ -656,3 +677,35 @@ export const handler = async (event) => {
     return err(500, e.message);
   }
 };
+
+async function clearTable(tableName) {
+  // Get table key schema
+  const keyMap = {
+    "mindset-users": ["userId"],
+    "mindset-assessments": ["participantId", "dayAssessor"],
+    "mindset-audit-log": ["participantId", "timestamp"],
+    "mindset-notes": ["participantId", "timestamp"],
+  };
+  const keys = keyMap[tableName];
+  if (!keys) return 0;
+
+  const result = await ddb.send(new ScanCommand({ TableName: tableName }));
+  const items = result.Items || [];
+  if (items.length === 0) return 0;
+
+  // Delete in batches of 25
+  let deleted = 0;
+  for (let i = 0; i < items.length; i += 25) {
+    const batch = items.slice(i, i + 25);
+    const requests = batch.map((item) => ({
+      DeleteRequest: {
+        Key: Object.fromEntries(keys.map((k) => [k, item[k]])),
+      },
+    }));
+    await ddb.send(
+      new BatchWriteCommand({ RequestItems: { [tableName]: requests } })
+    );
+    deleted += batch.length;
+  }
+  return deleted;
+}
