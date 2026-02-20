@@ -2038,6 +2038,29 @@
                     resolve({ success: true });
                     return;
                 }
+                // DELETE /assessments
+                if (method === 'DELETE' && path.startsWith('/assessments')) {
+                    const params = new URLSearchParams(path.split('?')[1] || '');
+                    const pid = params.get('participantId');
+                    const day = params.get('day');
+                    const key = `${pid}#${day}#${currentUser.email}`;
+                    const existing = mockAssessments[key];
+                    if (existing) {
+                        mockAuditLog.unshift({
+                            participantId: pid,
+                            timestamp: new Date().toISOString(),
+                            action: 'delete',
+                            assessorId: currentUser.email,
+                            assessorName: currentUser.name,
+                            day,
+                            previousLevel: existing.level,
+                            newLevel: null,
+                        });
+                        delete mockAssessments[key];
+                    }
+                    resolve({ success: true });
+                    return;
+                }
                 // GET /consensus
                 if (method === 'GET' && path.startsWith('/consensus')) {
                     const params = new URLSearchParams(path.split('?')[1] || '');
@@ -2100,6 +2123,93 @@
                     resolve({ success: true });
                     return;
                 }
+                // GET /vbus
+                if (method === 'GET' && path === '/vbus') {
+                    resolve({ vbus: mockVbus });
+                    return;
+                }
+                // POST /vbus
+                if (method === 'POST' && path === '/vbus') {
+                    const vbuId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                    mockVbus.push({ vbuId, name: body.name });
+                    mockVbus.sort((a, b) => a.name.localeCompare(b.name));
+                    resolve({ success: true, vbuId, name: body.name });
+                    return;
+                }
+                // DELETE /vbus/xxx
+                if (method === 'DELETE' && path.startsWith('/vbus/')) {
+                    const id = decodeURIComponent(path.split('/vbus/')[1]);
+                    mockVbus = mockVbus.filter(v => v.vbuId !== id);
+                    resolve({ success: true });
+                    return;
+                }
+                // POST /participants/ai-level
+                if (method === 'POST' && path === '/participants/ai-level') {
+                    const p = mockParticipants.find(x => x.userId === body.participantId);
+                    const prevLevel = p && p.aiMaturityLevel !== undefined ? String(p.aiMaturityLevel) : null;
+                    if (p) p.aiMaturityLevel = Number(body.aiLevel);
+                    mockAuditLog.unshift({
+                        participantId: body.participantId,
+                        timestamp: new Date().toISOString(),
+                        action: 'ai-level-update',
+                        assessorId: currentUser.email,
+                        assessorName: currentUser.name,
+                        day: 'AI',
+                        previousLevel: prevLevel,
+                        newLevel: String(body.aiLevel),
+                    });
+                    resolve({ success: true });
+                    return;
+                }
+                // GET /facilitators
+                if (method === 'GET' && path === '/facilitators') {
+                    resolve({ facilitators: [
+                        { username: 'dev-user', name: currentUser.name, email: currentUser.email, status: 'CONFIRMED', enabled: true }
+                    ]});
+                    return;
+                }
+                // POST /facilitators — add facilitator
+                if (method === 'POST' && path === '/facilitators') {
+                    resolve({ success: true });
+                    return;
+                }
+                // DELETE /facilitators/{username}
+                if (method === 'DELETE' && path.startsWith('/facilitators/')) {
+                    resolve({ success: true });
+                    return;
+                }
+                // POST /facilitators/reset-password
+                if (method === 'POST' && path === '/facilitators/reset-password') {
+                    resolve({ success: true });
+                    return;
+                }
+                // POST /facilitators/set-password
+                if (method === 'POST' && path === '/facilitators/set-password') {
+                    resolve({ success: true });
+                    return;
+                }
+                // PUT /vbus/{id} — rename VBU
+                if (method === 'PUT' && path.startsWith('/vbus/')) {
+                    resolve({ success: true });
+                    return;
+                }
+                // POST /admin/reset-assessments
+                if (method === 'POST' && path === '/admin/reset-assessments') {
+                    mockAssessments = {};
+                    mockAuditLog = [];
+                    mockNotes = {};
+                    resolve({ success: true, deleted: 0 });
+                    return;
+                }
+                // POST /admin/reset-all
+                if (method === 'POST' && path === '/admin/reset-all') {
+                    mockParticipants = [];
+                    mockAssessments = {};
+                    mockAuditLog = [];
+                    mockNotes = {};
+                    resolve({ success: true, deleted: 0 });
+                    return;
+                }
                 resolve({ error: 'Not found' });
             }, 100);
         });
@@ -2128,7 +2238,7 @@
         // Load data per view
         if (name === 'dashboard') loadConsensus();
         if (name === 'assessment') renderAssessmentSelect();
-        if (name === 'journey') renderJourneyList();
+        if (name === 'journey') loadJourneyGrid();
         if (name === 'admin') renderAdminTable();
         if (name === 'auditLog') loadAuditLog();
     }
@@ -2151,18 +2261,19 @@
     // ===== DASHBOARD =====
     function renderDaySelector() {
         const el = document.getElementById('daySelector');
-        el.innerHTML = DAYS.map(d =>
-            `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="selectDay('${d}')">${d}</button>`
-        ).join('');
+        el.innerHTML = DAYS.map(d => {
+            const label = d === 'AI' ? 'AI' : `Day ${d.slice(1)}`;
+            return `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="selectDay('${d}')">${label}</button>`;
+        }).join('');
     }
 
     function renderTrackFilter() {
         const el = document.getElementById('trackFilter');
         const tracks = [
-            { key: 'all', label: 'All' },
+            { key: 'all', label: 'All Tracks' },
+            { key: 'leadership', label: 'Leadership' },
             { key: 'product', label: 'Product' },
             { key: 'rnd', label: 'R&D' },
-            { key: 'leadership', label: 'Leadership' },
         ];
         el.innerHTML = tracks.map(t =>
             `<button class="track-btn ${t.key === currentTrack ? 'active' : ''}" data-track="${t.key}" onclick="selectTrack('${t.key}')">${t.label}</button>`
@@ -2172,7 +2283,11 @@
     function selectDay(day) {
         currentDay = day;
         renderDaySelector();
-        loadConsensus();
+        if (currentDay === 'AI') {
+            loadAILevelView();
+        } else {
+            loadConsensus();
+        }
     }
 
     function selectTrack(track) {
@@ -2181,12 +2296,36 @@
         renderDashboard();
     }
 
+    function populateDashboardVbuDropdown() {
+        const sel = document.getElementById('dashboardVbuFilter');
+        if (!sel) return;
+        const allData = [...participants, ...consensusData];
+        const vbus = [...new Set(allData.map(p => p.vbu).filter(Boolean))].sort();
+        sel.innerHTML = '<option value="all">All VBUs</option>' +
+            vbus.map(v => `<option value="${escAttr(v)}" ${v === currentVbu ? 'selected' : ''}>${escHtml(v)}</option>`).join('');
+    }
+
+    function selectDashboardVbu(vbu) {
+        currentVbu = vbu;
+        renderDashboard();
+    }
+
+    function filterByLevel(level) {
+        currentLevelFilter = currentLevelFilter === level ? 'all' : level;
+        renderDashboard();
+    }
+
     async function loadConsensus() {
         renderDaySelector();
         renderTrackFilter();
+        if (currentDay === 'AI') {
+            loadAILevelView();
+            return;
+        }
         try {
             const data = await api('GET', `/consensus?day=${currentDay}`);
             consensusData = data.consensus || [];
+            populateDashboardVbuDropdown();
             renderDashboard();
         } catch (e) {
             console.error('Failed to load consensus:', e);
@@ -2195,9 +2334,12 @@
     }
 
     function renderDashboard() {
-        const filtered = currentTrack === 'all'
+        let filtered = currentTrack === 'all'
             ? consensusData
             : consensusData.filter(p => p.track === currentTrack);
+        if (currentVbu !== 'all') {
+            filtered = filtered.filter(p => p.vbu === currentVbu);
+        }
 
         // Stats
         const stats = { toxic: 0, talker: 0, action: 0, driver: 0, unrated: 0 };
@@ -2207,12 +2349,22 @@
         }
 
         document.getElementById('statsBar').innerHTML = `
-            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-toxic)"></div>${stats.toxic} Toxic</div>
-            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-talker)"></div>${stats.talker} Talker</div>
-            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-action)"></div>${stats.action} Action</div>
-            <div class="stat-chip"><div class="stat-dot" style="background:var(--level-driver)"></div>${stats.driver} Driver</div>
-            <div class="stat-chip"><div class="stat-dot" style="background:var(--cell-border)"></div>${stats.unrated} Unrated</div>
+            <div class="stat-chip ${currentLevelFilter === 'all' ? 'stat-chip-active' : ''}" onclick="filterByLevel('all')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--cell-border)"></div>All ${filtered.length}</div>
+            <div class="stat-chip ${currentLevelFilter === 'toxic' ? 'stat-chip-active' : ''}" onclick="filterByLevel('toxic')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-toxic)"></div>${stats.toxic} Toxic</div>
+            <div class="stat-chip ${currentLevelFilter === 'talker' ? 'stat-chip-active' : ''}" onclick="filterByLevel('talker')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-talker)"></div>${stats.talker} Talker</div>
+            <div class="stat-chip ${currentLevelFilter === 'action' ? 'stat-chip-active' : ''}" onclick="filterByLevel('action')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-action)"></div>${stats.action} Action</div>
+            <div class="stat-chip ${currentLevelFilter === 'driver' ? 'stat-chip-active' : ''}" onclick="filterByLevel('driver')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-driver)"></div>${stats.driver} Driver</div>
+            <div class="stat-chip ${currentLevelFilter === 'unrated' ? 'stat-chip-active' : ''}" onclick="filterByLevel('unrated')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--cell-border)"></div>${stats.unrated} Unrated</div>
         `;
+
+        // Apply level filter
+        if (currentLevelFilter !== 'all') {
+            if (currentLevelFilter === 'unrated') {
+                filtered = filtered.filter(p => !p.consensus);
+            } else {
+                filtered = filtered.filter(p => p.consensus && p.consensus.label === currentLevelFilter);
+            }
+        }
 
         // Group by VBU
         const groups = {};
@@ -2224,14 +2376,14 @@
 
         const content = document.getElementById('dashboardContent');
         if (filtered.length === 0) {
-            content.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No participants yet. Add some in the Admin tab.</p></div>`;
+            content.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No participants yet. Add some in the Admin tab.</p></div>`;
             return;
         }
 
         let html = '';
-        const sortedVBUs = Object.keys(groups).sort();
+        const sortedVBUs = sortVBUs(Object.keys(groups));
         for (const vbu of sortedVBUs) {
-            const group = groups[vbu];
+            const group = groups[vbu].sort((a, b) => a.name.localeCompare(b.name));
             html += `<div class="vbu-group"><div class="vbu-label">${escHtml(vbu)}</div><div class="participants-grid">`;
             for (const p of group) {
                 const level = p.consensus ? p.consensus.label : 'none';
@@ -2265,44 +2417,546 @@
         content.innerHTML = html;
     }
 
+    // ===== AI LEVEL VIEW =====
+    let aiConsensusMap = {}; // participantId -> { label, mean, count, day }
+
+    async function loadAILevelView() {
+        renderDaySelector();
+        renderTrackFilter();
+        try {
+            // Fetch participants and consensus for all days in parallel
+            const [pData, ...cResults] = await Promise.all([
+                api('GET', '/participants'),
+                ...ASSESSMENT_DAYS.map(d => api('GET', `/consensus?day=${d}`).then(r => ({ day: d, consensus: r.consensus || [] })))
+            ]);
+            aiParticipantsData = pData.participants || [];
+
+            // Build map of most recent consensus per participant
+            aiConsensusMap = {};
+            for (const r of cResults) {
+                for (const c of r.consensus) {
+                    if (c.consensus) {
+                        const existing = aiConsensusMap[c.userId];
+                        if (!existing || ASSESSMENT_DAYS.indexOf(r.day) > ASSESSMENT_DAYS.indexOf(existing.day)) {
+                            aiConsensusMap[c.userId] = { ...c.consensus, day: r.day };
+                        }
+                    }
+                }
+            }
+
+            populateDashboardVbuDropdown();
+            renderAILevelDashboard();
+        } catch (e) {
+            console.error('Failed to load AI level data:', e);
+            showToast('Failed to load data');
+        }
+    }
+
+    function filterByAILevel(level) {
+        aiLevelFilter = aiLevelFilter === level ? 'all' : level;
+        renderAILevelDashboard();
+    }
+
+    function renderAILevelDashboard() {
+        let filtered = currentTrack === 'all'
+            ? [...aiParticipantsData]
+            : aiParticipantsData.filter(p => p.track === currentTrack);
+        if (currentVbu !== 'all') {
+            filtered = filtered.filter(p => p.vbu === currentVbu);
+        }
+
+        // Stats
+        const stats = { 0: 0, 1: 0, 2: 0, 3: 0, notset: 0 };
+        for (const p of filtered) {
+            if (p.aiMaturityLevel !== undefined && p.aiMaturityLevel !== null) {
+                stats[p.aiMaturityLevel]++;
+            } else {
+                stats.notset++;
+            }
+        }
+
+        document.getElementById('statsBar').innerHTML = `
+            <div class="stat-chip ${aiLevelFilter === 'all' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('all')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--cell-border)"></div>All ${filtered.length}</div>
+            <div class="stat-chip ${aiLevelFilter === '0' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('0')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-toxic)"></div>L0: ${stats[0]}</div>
+            <div class="stat-chip ${aiLevelFilter === '1' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('1')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-talker)"></div>L1: ${stats[1]}</div>
+            <div class="stat-chip ${aiLevelFilter === '2' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('2')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-action)"></div>L2: ${stats[2]}</div>
+            <div class="stat-chip ${aiLevelFilter === '3' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('3')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--level-driver)"></div>L3: ${stats[3]}</div>
+            <div class="stat-chip ${aiLevelFilter === 'notset' ? 'stat-chip-active' : ''}" onclick="filterByAILevel('notset')" style="cursor:pointer;"><div class="stat-dot" style="background:var(--cell-border)"></div>Not Set: ${stats.notset}</div>
+        `;
+
+        // Apply AI level filter
+        if (aiLevelFilter !== 'all') {
+            if (aiLevelFilter === 'notset') {
+                filtered = filtered.filter(p => p.aiMaturityLevel === undefined || p.aiMaturityLevel === null);
+            } else {
+                const lvl = Number(aiLevelFilter);
+                filtered = filtered.filter(p => p.aiMaturityLevel === lvl);
+            }
+        }
+
+        // Group by VBU
+        const groups = {};
+        for (const p of filtered) {
+            const vbu = p.vbu || 'Ungrouped';
+            if (!groups[vbu]) groups[vbu] = [];
+            groups[vbu].push(p);
+        }
+
+        const content = document.getElementById('dashboardContent');
+        if (filtered.length === 0) {
+            content.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><p>No participants match your filters.</p></div>';
+            return;
+        }
+
+        let html = '';
+        const sortedVBUs = sortVBUs(Object.keys(groups));
+        for (const vbu of sortedVBUs) {
+            const group = groups[vbu].sort((a, b) => a.name.localeCompare(b.name));
+            html += `<div class="vbu-group"><div class="vbu-label">${escHtml(vbu)}</div><div class="participants-grid">`;
+            for (const p of group) {
+                const aiLevel = p.aiMaturityLevel;
+                const hasLevel = aiLevel !== undefined && aiLevel !== null;
+                const levelLabel = hasLevel ? AI_LEVEL_LABELS[aiLevel] : 'Not Set';
+                const pillClass = hasLevel ? `ai-level-${aiLevel}` : 'ai-level-none';
+                const borderClass = hasLevel ? `ai-card-border-${aiLevel}` : '';
+                const trackColor = TRACK_COLORS[p.track] || 'var(--track-general)';
+                const trackLabel = TRACK_LABELS[p.track] || p.track || '';
+                const trackTextColor = p.track === 'product' ? 'var(--white)' : 'var(--navy)';
+
+                // Most recent mindset consensus
+                const mc = aiConsensusMap[p.userId];
+                let mindsetHtml = '';
+                if (mc) {
+                    mindsetHtml = `<span class="level-pill ${mc.label}" style="font-size:0.6rem;padding:1px 6px;" title="${LEVEL_LABELS[mc.label]} (${mc.day})">${LEVEL_LABELS[mc.label]}</span>`;
+                }
+
+                html += `
+                    <div class="participant-card ${borderClass}" onclick="showAILevelPicker('${escAttr(p.userId)}', '${escAttr(p.name)}', ${hasLevel ? aiLevel : 'null'})">
+                        <div class="participant-info">
+                            <div class="participant-name">${escHtml(p.name)}</div>
+                            <div class="participant-meta">
+                                <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                                ${mc ? `<span style="font-size:0.58rem;opacity:0.5;">${mc.day}</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:4px;">
+                            ${mindsetHtml}
+                            <span class="level-pill ${pillClass}">${levelLabel}</span>
+                        </div>
+                    </div>`;
+            }
+            html += '</div></div>';
+        }
+        content.innerHTML = html;
+    }
+
+    function showAILevelPicker(participantId, name, currentLevel) {
+        const overlay = document.createElement('div');
+        overlay.className = 'ai-level-picker';
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+        const levels = [
+            { val: 0, label: 'Level 0', cls: 'ai-level-0' },
+            { val: 1, label: 'Level 1', cls: 'ai-level-1' },
+            { val: 2, label: 'Level 2', cls: 'ai-level-2' },
+            { val: 3, label: 'Level 3', cls: 'ai-level-3' },
+        ];
+
+        overlay.innerHTML = `<div class="ai-level-picker-inner">
+            <div style="font-weight:800;font-size:1rem;color:var(--heading);margin-bottom:4px;">${escHtml(name)}</div>
+            <div style="font-size:0.72rem;color:var(--text);opacity:0.6;margin-bottom:16px;">Set AI Maturity Level</div>
+            ${levels.map(l => `<button class="ai-picker-btn ${l.cls} ${currentLevel === l.val ? 'selected' : ''}" onclick="saveAILevel('${escAttr(participantId)}', ${l.val})">${l.label}</button>`).join('')}
+            <button style="width:100%;padding:10px;border:2px solid var(--cell-border);border-radius:10px;background:transparent;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:4px;" onclick="this.closest('.ai-level-picker').remove()">Cancel</button>
+        </div>`;
+        document.body.appendChild(overlay);
+    }
+
+    async function saveAILevel(participantId, level) {
+        // Remove picker overlay
+        const picker = document.querySelector('.ai-level-picker');
+        if (picker) picker.remove();
+
+        try {
+            await api('POST', '/participants/ai-level', { participantId, aiLevel: level });
+            showToast(`AI Level set to ${level}`);
+            // Update local data
+            const p = aiParticipantsData.find(x => x.userId === participantId);
+            if (p) p.aiMaturityLevel = level;
+            // Also update participants cache
+            const pc = participants.find(x => x.userId === participantId);
+            if (pc) pc.aiMaturityLevel = level;
+            renderAILevelDashboard();
+        } catch (e) {
+            showToast('Failed to save AI level');
+            console.error(e);
+        }
+    }
+
     // ===== ASSESSMENT VIEW =====
     function openAssessment(participantId) {
         selectedAssessmentParticipant = participantId;
-        showView('assessment');
-        loadAssessmentForParticipant(participantId);
+        // If not already on assessment view, switch to it (the showView will call renderAssessmentSelect which detects selectedAssessmentParticipant)
+        const assessView = document.getElementById('viewAssessment');
+        if (!assessView.classList.contains('active')) {
+            showView('assessment');
+        } else {
+            document.getElementById('assessBackBtn').style.display = '';
+            loadAssessmentForParticipant(participantId);
+        }
     }
 
-    function renderAssessmentSelect() {
+    function assessGoBack() {
+        selectedAssessmentParticipant = null;
+        document.getElementById('assessBackBtn').style.display = 'none';
+        renderAssessmentSelect();
+    }
+
+    async function renderAssessmentSelect() {
+        if (currentDay === 'AI') {
+            renderAssessAICards();
+            return;
+        }
         if (selectedAssessmentParticipant) {
+            document.getElementById('assessBackBtn').style.display = '';
             loadAssessmentForParticipant(selectedAssessmentParticipant);
             return;
         }
 
+        document.getElementById('assessBackBtn').style.display = 'none';
         const content = document.getElementById('assessmentContent');
-        let html = `
-            <div class="card">
-                <div class="card-header"><div class="card-title">Select Participant</div></div>
-                <div class="day-selector" style="justify-content:flex-start;margin-bottom:12px;">
-                    ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="currentDay='${d}';renderAssessmentSelect()">${d}</button>`).join('')}
-                </div>
-                <div class="search-wrapper">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" class="search-input" id="assessSearch" placeholder="Search..." oninput="filterAssessmentList()">
-                </div>
-                <div class="participant-select-list" id="assessParticipantList">
-        `;
-        for (const p of participants) {
-            html += `<div class="participant-select-item" data-name="${escAttr(p.name)}" onclick="openAssessment('${escAttr(p.userId)}')">${escHtml(p.name)} <span style="opacity:0.5;font-size:0.72rem;">${escHtml(p.vbu || '')}</span></div>`;
+        content.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;">Loading assessments...</div>';
+
+        // Load consensus data for assess view
+        try {
+            const data = await api('GET', `/consensus?day=${currentDay}`);
+            assessConsensusData = data.consensus || [];
+        } catch (e) {
+            console.error('Failed to load assess consensus:', e);
+            content.innerHTML = '<div class="empty-state"><p>Failed to load data.</p></div>';
+            return;
         }
-        html += '</div></div>';
+
+        // Load skips from sessionStorage
+        try {
+            skippedAssessments = JSON.parse(sessionStorage.getItem('mt_skipped_assess') || '{}');
+        } catch(e) { skippedAssessments = {}; }
+
+        renderAssessCards();
+    }
+
+    function renderAssessCards() {
+        const content = document.getElementById('assessmentContent');
+        const myEmail = currentUser ? currentUser.email : '';
+
+        // Classify each participant
+        let items = assessConsensusData.map(p => {
+            const myAssess = (p.assessments || []).find(a => a.assessorId === myEmail);
+            const skipKey = `${currentDay}:${p.userId}`;
+            const isSkipped = !!skippedAssessments[skipKey];
+            return {
+                ...p,
+                myAssessment: myAssess || null,
+                isAssessedByMe: !!myAssess,
+                isSkipped,
+                myLevel: myAssess ? myAssess.level : null,
+            };
+        });
+
+        // Apply track filter
+        if (assessTrack !== 'all') {
+            items = items.filter(p => p.track === assessTrack);
+        }
+        // Apply VBU filter
+        if (assessVbu !== 'all') {
+            items = items.filter(p => p.vbu === assessVbu);
+        }
+        // Apply search filter
+        if (assessSearchQuery) {
+            const q = assessSearchQuery.toLowerCase();
+            items = items.filter(p => (p.name || '').toLowerCase().includes(q) || (p.userId || '').toLowerCase().includes(q));
+        }
+
+        // Stats (before filter mode)
+        const totalForMe = items.length;
+        const assessedCount = items.filter(p => p.isAssessedByMe).length;
+        const skippedCount = items.filter(p => p.isSkipped && !p.isAssessedByMe).length;
+        const remainingCount = totalForMe - assessedCount - skippedCount;
+
+        // Apply filter mode
+        let visibleItems = items;
+        if (assessFilter === 'unassessed') {
+            visibleItems = items.filter(p => !p.isAssessedByMe && !p.isSkipped);
+        }
+
+        // VBU dropdown options
+        const allVbus = [...new Set(assessConsensusData.map(p => p.vbu).filter(Boolean))].sort();
+
+        // Track filter
+        const tracks = [
+            { key: 'all', label: 'All Tracks' },
+            { key: 'leadership', label: 'Leadership' },
+            { key: 'product', label: 'Product' },
+            { key: 'rnd', label: 'R&D' },
+        ];
+
+        let html = `<div class="assess-top-bar">
+            <div class="day-selector" style="margin-bottom:10px;">
+                ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="selectAssessDay('${d}')">${d === 'AI' ? 'AI' : 'Day ' + d.slice(1)}</button>`).join('')}
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;justify-content:center;">
+                <div class="search-wrapper" style="flex:1;min-width:160px;max-width:280px;margin-bottom:0;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="assessSearch" placeholder="Search participants..." value="${escAttr(assessSearchQuery)}" oninput="filterAssessSearch(this.value)">
+                </div>
+                <select class="form-select" id="assessVbuDropdown" onchange="selectAssessVbu(this.value)" style="width:auto;min-width:140px;font-size:0.75rem;padding:6px 10px;">
+                    <option value="all">All VBUs</option>
+                    ${allVbus.map(v => `<option value="${escAttr(v)}" ${v === assessVbu ? 'selected' : ''}>${escHtml(v)}</option>`).join('')}
+                </select>
+            </div>
+            <div class="assess-stats">
+                <span class="stat-done">${assessedCount} assessed</span>
+                <span class="stat-remaining">${remainingCount} remaining</span>
+                ${skippedCount > 0 ? `<span class="stat-skipped">${skippedCount} skipped</span>` : ''}
+            </div>
+            <div class="assess-toggle">
+                <button class="assess-toggle-btn ${assessFilter === 'unassessed' ? 'active' : ''}" onclick="toggleAssessFilter('unassessed')">Unassessed</button>
+                <button class="assess-toggle-btn ${assessFilter === 'all' ? 'active' : ''}" onclick="toggleAssessFilter('all')">All</button>
+            </div>
+            <div class="track-filter" style="margin-bottom:8px;">
+                ${tracks.map(t => `<button class="track-btn ${t.key === assessTrack ? 'active' : ''}" data-track="${t.key}" onclick="selectAssessTrack('${t.key}')">${t.label}</button>`).join('')}
+            </div>
+        </div>`;
+
+        if (visibleItems.length === 0) {
+            const msg = assessFilter === 'unassessed'
+                ? 'All caught up! No unassessed participants remaining.'
+                : 'No participants match your filters.';
+            html += `<div class="empty-state" style="grid-column:1/-1;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><p>${msg}</p></div>`;
+            content.innerHTML = html;
+            return;
+        }
+
+        // Group by VBU
+        const groups = {};
+        for (const p of visibleItems) {
+            const vbu = p.vbu || 'Ungrouped';
+            if (!groups[vbu]) groups[vbu] = [];
+            groups[vbu].push(p);
+        }
+
+        html += '<div class="assess-grid">';
+        const sortedVBUs = sortVBUs(Object.keys(groups));
+        for (const vbu of sortedVBUs) {
+            const group = groups[vbu].sort((a, b) => a.name.localeCompare(b.name));
+            html += `<div class="vbu-group"><div class="vbu-label">${escHtml(vbu)}</div><div class="participants-grid">`;
+            for (const p of group) {
+                const trackColor = TRACK_COLORS[p.track] || 'var(--track-general)';
+                const trackLabel = TRACK_LABELS[p.track] || p.track || '';
+                const trackTextColor = p.track === 'product' ? 'var(--white)' : 'var(--navy)';
+                const raterCount = p.consensus ? p.consensus.count : 0;
+
+                let cardClass = 'participant-card';
+                let cardContent = '';
+
+                if (p.isSkipped && !p.isAssessedByMe) {
+                    // Skipped card
+                    cardClass += ' assess-card-skipped';
+                    cardContent = `
+                        <div class="participant-info">
+                            <div class="participant-name">${escHtml(p.name)}</div>
+                            <div class="participant-meta">
+                                <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                            </div>
+                        </div>
+                        <div class="assess-card-actions">
+                            <button class="assess-undo-link" onclick="event.stopPropagation();undoSkip('${escAttr(p.userId)}')">Undo skip</button>
+                        </div>`;
+                } else if (p.isAssessedByMe) {
+                    // Assessed card
+                    const level = p.myLevel;
+                    cardClass += ` assess-card-assessed`;
+                    cardContent = `
+                        <div class="participant-info">
+                            <div class="participant-name">${escHtml(p.name)}</div>
+                            <div class="participant-meta">
+                                <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                                <span class="rater-count">${raterCount} rater${raterCount !== 1 ? 's' : ''}</span>
+                            </div>
+                        </div>
+                        <div class="assess-card-actions">
+                            <span class="level-pill ${level}">${LEVEL_LABELS[level]}</span>
+                        </div>`;
+                } else {
+                    // Unassessed card
+                    cardClass += ' assess-card-unassessed';
+                    cardContent = `
+                        <div class="participant-info">
+                            <div class="participant-name">${escHtml(p.name)}</div>
+                            <div class="participant-meta">
+                                <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                            </div>
+                            <div class="assess-prompt">Tap to assess</div>
+                        </div>
+                        <div class="assess-card-actions">
+                            <button class="assess-skip-btn" onclick="event.stopPropagation();skipAssessment('${escAttr(p.userId)}')">Skip</button>
+                        </div>`;
+                }
+
+                html += `<div class="${cardClass}" onclick="openAssessment('${escAttr(p.userId)}')">${cardContent}</div>`;
+            }
+            html += '</div></div>';
+        }
+        html += '</div>';
         content.innerHTML = html;
     }
 
-    function filterAssessmentList() {
-        const q = document.getElementById('assessSearch').value.toLowerCase();
-        document.querySelectorAll('#assessParticipantList .participant-select-item').forEach(el => {
-            el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
-        });
+    function selectAssessDay(day) {
+        currentDay = day;
+        if (currentDay === 'AI') {
+            // Show AI level assessment cards in assess view
+            renderAssessAICards();
+        } else {
+            renderAssessmentSelect();
+        }
+    }
+
+    async function renderAssessAICards() {
+        const content = document.getElementById('assessmentContent');
+        document.getElementById('assessBackBtn').style.display = 'none';
+
+        try {
+            const data = await api('GET', '/participants');
+            aiParticipantsData = data.participants || [];
+        } catch (e) {
+            content.innerHTML = '<div class="empty-state"><p>Failed to load data.</p></div>';
+            return;
+        }
+
+        const allVbus = [...new Set(aiParticipantsData.map(p => p.vbu).filter(Boolean))].sort();
+
+        let html = `<div class="assess-top-bar">
+            <div class="day-selector" style="margin-bottom:10px;">
+                ${DAYS.map(d => `<button class="day-pill ${d === currentDay ? 'active' : ''}" onclick="selectAssessDay('${d}')">${d === 'AI' ? 'AI' : 'Day ' + d.slice(1)}</button>`).join('')}
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;justify-content:center;">
+                <div class="search-wrapper" style="flex:1;min-width:160px;max-width:280px;margin-bottom:0;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="assessSearch" placeholder="Search participants..." value="${escAttr(assessSearchQuery)}" oninput="filterAssessSearch(this.value)">
+                </div>
+                <select class="form-select" onchange="selectAssessVbu(this.value)" style="width:auto;min-width:140px;font-size:0.75rem;padding:6px 10px;">
+                    <option value="all">All VBUs</option>
+                    ${allVbus.map(v => `<option value="${escAttr(v)}" ${v === assessVbu ? 'selected' : ''}>${escHtml(v)}</option>`).join('')}
+                </select>
+            </div>
+            <div style="text-align:center;font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:12px;">Tap a card to set AI Maturity Level</div>
+        </div>`;
+
+        // Filter participants
+        let filteredParticipants = aiParticipantsData;
+        if (assessVbu !== 'all') {
+            filteredParticipants = filteredParticipants.filter(p => p.vbu === assessVbu);
+        }
+        if (assessSearchQuery) {
+            const q = assessSearchQuery.toLowerCase();
+            filteredParticipants = filteredParticipants.filter(p => (p.name || '').toLowerCase().includes(q) || (p.userId || '').toLowerCase().includes(q));
+        }
+
+        // Group by VBU
+        const groups = {};
+        for (const p of filteredParticipants) {
+            const vbu = p.vbu || 'Ungrouped';
+            if (!groups[vbu]) groups[vbu] = [];
+            groups[vbu].push(p);
+        }
+
+        html += '<div class="assess-grid">';
+        const sortedVBUs = sortVBUs(Object.keys(groups));
+        for (const vbu of sortedVBUs) {
+            const group = groups[vbu].sort((a, b) => a.name.localeCompare(b.name));
+            html += `<div class="vbu-group"><div class="vbu-label">${escHtml(vbu)}</div><div class="participants-grid">`;
+            for (const p of group) {
+                const aiLevel = p.aiMaturityLevel;
+                const hasLevel = aiLevel !== undefined && aiLevel !== null;
+                const levelLabel = hasLevel ? AI_LEVEL_LABELS[aiLevel] : 'Not Set';
+                const pillClass = hasLevel ? `ai-level-${aiLevel}` : 'ai-level-none';
+                const borderClass = hasLevel ? `ai-card-border-${aiLevel}` : '';
+                const trackColor = TRACK_COLORS[p.track] || 'var(--track-general)';
+                const trackLabel = TRACK_LABELS[p.track] || p.track || '';
+                const trackTextColor = p.track === 'product' ? 'var(--white)' : 'var(--navy)';
+
+                html += `<div class="participant-card ${borderClass}" onclick="showAILevelPicker('${escAttr(p.userId)}', '${escAttr(p.name)}', ${hasLevel ? aiLevel : 'null'})">
+                    <div class="participant-info">
+                        <div class="participant-name">${escHtml(p.name)}</div>
+                        <div class="participant-meta">
+                            <span class="track-badge" style="background:${trackColor};color:${trackTextColor}">${escHtml(trackLabel)}</span>
+                        </div>
+                    </div>
+                    <span class="level-pill ${pillClass}">${levelLabel}</span>
+                </div>`;
+            }
+            html += '</div></div>';
+        }
+        html += '</div>';
+        content.innerHTML = html;
+    }
+
+    function toggleAssessFilter(mode) {
+        assessFilter = mode;
+        renderAssessCards();
+    }
+
+    function selectAssessTrack(track) {
+        assessTrack = track;
+        renderAssessCards();
+    }
+
+    function selectAssessVbu(vbu) {
+        assessVbu = vbu;
+        renderAssessCards();
+    }
+
+    function filterAssessSearch(val) {
+        assessSearchQuery = val;
+        if (currentDay === 'AI') {
+            renderAssessAICards();
+        } else {
+            renderAssessCards();
+        }
+    }
+
+    let skipConfirmPending = false;
+    function confirmSkip(participantId) {
+        const btn = document.getElementById('skipConfirmBtn');
+        if (!skipConfirmPending) {
+            skipConfirmPending = true;
+            btn.textContent = 'Are you sure?';
+            // Reset after 3 seconds if not clicked again
+            setTimeout(() => {
+                if (skipConfirmPending && btn) {
+                    skipConfirmPending = false;
+                    btn.textContent = 'Skip';
+                }
+            }, 3000);
+            return;
+        }
+        skipConfirmPending = false;
+        skipAssessment(participantId);
+        selectedAssessmentParticipant = null;
+        renderAssessCards();
+    }
+
+    function skipAssessment(participantId) {
+        const skipKey = `${currentDay}:${participantId}`;
+        skippedAssessments[skipKey] = true;
+        sessionStorage.setItem('mt_skipped_assess', JSON.stringify(skippedAssessments));
+        renderAssessCards();
+    }
+
+    function undoSkip(participantId) {
+        const skipKey = `${currentDay}:${participantId}`;
+        delete skippedAssessments[skipKey];
+        sessionStorage.setItem('mt_skipped_assess', JSON.stringify(skippedAssessments));
+        renderAssessCards();
     }
 
     async function loadAssessmentForParticipant(participantId) {
