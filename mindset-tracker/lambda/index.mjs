@@ -569,6 +569,87 @@ export const handler = async (event) => {
       return ok({ success: true });
     }
 
+    // ===== FACILITATORS =====
+
+    // GET /facilitators
+    if (method === "GET" && path === "/facilitators") {
+      const result = await cognito.send(
+        new ListUsersCommand({ UserPoolId: USER_POOL_ID, Limit: 60 })
+      );
+      const facilitators = (result.Users || []).map((u) => {
+        const attrs = {};
+        for (const a of u.Attributes || []) attrs[a.Name] = a.Value;
+        return {
+          username: u.Username,
+          email: attrs.email || u.Username,
+          name: attrs.name || attrs.email || u.Username,
+          status: u.UserStatus,
+          enabled: u.Enabled,
+          created: u.UserCreateDate?.toISOString(),
+          lastModified: u.UserLastModifiedDate?.toISOString(),
+        };
+      });
+      return ok({ facilitators });
+    }
+
+    // POST /facilitators/reset-password — sends reset email via Cognito
+    if (method === "POST" && path === "/facilitators/reset-password") {
+      const body = JSON.parse(event.body);
+      const { username } = body;
+      if (!username) return err(400, "username required");
+      await cognito.send(
+        new AdminResetUserPasswordCommand({ UserPoolId: USER_POOL_ID, Username: username })
+      );
+      return ok({ success: true });
+    }
+
+    // POST /facilitators/set-password — manually set a password
+    if (method === "POST" && path === "/facilitators/set-password") {
+      const body = JSON.parse(event.body);
+      const { username, password } = body;
+      if (!username || !password) return err(400, "username and password required");
+      await cognito.send(
+        new AdminSetUserPasswordCommand({
+          UserPoolId: USER_POOL_ID,
+          Username: username,
+          Password: password,
+          Permanent: true,
+        })
+      );
+      return ok({ success: true });
+    }
+
+    // POST /facilitators — create a new facilitator in Cognito
+    if (method === "POST" && path === "/facilitators") {
+      const body = JSON.parse(event.body);
+      const { email, name, tempPassword } = body;
+      if (!email || !name) return err(400, "email and name required");
+      const params = {
+        UserPoolId: USER_POOL_ID,
+        Username: email.toLowerCase(),
+        UserAttributes: [
+          { Name: "email", Value: email.toLowerCase() },
+          { Name: "name", Value: name },
+          { Name: "email_verified", Value: "true" },
+        ],
+        MessageAction: "SUPPRESS",
+      };
+      if (tempPassword) params.TemporaryPassword = tempPassword;
+      await cognito.send(new AdminCreateUserCommand(params));
+      return ok({ success: true });
+    }
+
+    // DELETE /facilitators/{username}
+    if (method === "DELETE" && path.startsWith("/facilitators/")) {
+      const username = decodeURIComponent(path.split("/facilitators/")[1]);
+      if (!username) return err(400, "username required");
+      await cognito.send(
+        new AdminDeleteUserCommand({ UserPoolId: USER_POOL_ID, Username: username })
+      );
+      return ok({ success: true });
+    }
+
+
     return err(404, "Not found");
   } catch (e) {
     console.error("Error:", e);
