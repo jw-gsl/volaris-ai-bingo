@@ -3332,83 +3332,253 @@
         if (!sel) return;
         const current = sel.value;
         sel.innerHTML = '<option value="">Select VBU...</option>' +
-            vbuList.map(v => `<option value="${escAttr(v)}" ${v === current ? 'selected' : ''}>${escHtml(v)}</option>`).join('');
+            vbuList.map(v => `<option value="${escAttr(v.name)}" ${v.name === current ? 'selected' : ''}>${escHtml(v.name)}</option>`).join('');
     }
 
-    function addVbuEntity() {
+    async function addVbuEntity() {
         const input = document.getElementById('newVbuInput');
         const name = input.value.trim();
         if (!name) return;
-        if (vbuList.some(v => v.toLowerCase() === name.toLowerCase())) {
+        if (vbuList.some(v => v.name.toLowerCase() === name.toLowerCase())) {
             showToast('VBU already exists');
             return;
         }
-        vbuList.push(name);
-        saveVbuList();
-        renderVbuChips();
-        populateVbuDropdown();
-        input.value = '';
-        showToast(`Added: ${name}`);
+        try {
+            await api('POST', '/vbus', { name });
+            input.value = '';
+            await loadVbus();
+            renderVbuTable();
+            populateVbuDropdown();
+            showToast(`Added: ${name}`);
+        } catch (e) {
+            showToast('Failed to add VBU');
+        }
     }
 
-    function removeVbu(name) {
+    async function editVbu(vbuId, oldName) {
+        const newName = prompt(`Rename VBU "${oldName}" to:`, oldName);
+        if (!newName || newName.trim() === oldName) return;
+        try {
+            await api('PUT', `/vbus/${encodeURIComponent(vbuId)}`, { name: newName.trim(), oldName });
+            await loadVbus();
+            renderVbuTable();
+            populateVbuDropdown();
+            await loadParticipants();
+            renderAdminTable();
+            showToast(`Renamed: ${oldName} → ${newName.trim()}`);
+        } catch (e) {
+            showToast('Failed to rename VBU');
+            console.error(e);
+        }
+    }
+
+    async function removeVbu(vbuId, name) {
         if (!confirm(`Remove VBU "${name}"?`)) return;
-        vbuList = vbuList.filter(v => v !== name);
-        saveVbuList();
-        renderVbuChips();
-        populateVbuDropdown();
-        showToast(`Removed: ${name}`);
+        try {
+            await api('DELETE', `/vbus/${encodeURIComponent(vbuId)}`);
+            await loadVbus();
+            renderVbuTable();
+            populateVbuDropdown();
+            showToast(`Removed: ${name}`);
+        } catch (e) {
+            showToast('Failed to remove VBU');
+        }
+    }
+
+    // ===== FACILITATOR MANAGEMENT =====
+    async function loadFacilitators() {
+        const tbody = document.getElementById('facilitatorTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading...</td></tr>';
+        try {
+            const data = await api('GET', '/facilitators');
+            const facilitators = data.facilitators || [];
+            document.getElementById('facilitatorCount').textContent = `(${facilitators.length})`;
+            if (facilitators.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No facilitators found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = facilitators.map(f => {
+                const statusColor = f.status === 'CONFIRMED' ? 'var(--level-driver)' : 'var(--level-talker)';
+                const statusLabel = f.status === 'CONFIRMED' ? 'Active' : f.status === 'FORCE_CHANGE_PASSWORD' ? 'Pending' : f.status;
+                return `<tr><td>${escHtml(f.name)}</td><td><span class="facilitator-email" title="${escAttr(f.email)}">${escHtml(f.email)}</span></td><td><span style="color:${statusColor};font-weight:600;font-size:0.7rem;">${statusLabel}</span></td><td style="white-space:nowrap;"><button class="btn btn-outline btn-sm" style="font-size:0.62rem;padding:2px 6px;" onclick="resetFacilitatorPassword('${escAttr(f.username)}','${escAttr(f.name)}')" title="Send reset email"><span class="reset-btn-text">Email </span>&#x1F4E7;</button> <button class="btn btn-outline btn-sm" style="font-size:0.62rem;padding:2px 6px;" onclick="setFacilitatorPassword('${escAttr(f.username)}','${escAttr(f.name)}')" title="Set password manually"><span class="reset-btn-text">Set </span>&#x1F511;</button> <button class="btn btn-danger btn-sm" style="font-size:0.62rem;padding:2px 6px;" onclick="deleteFacilitator('${escAttr(f.username)}','${escAttr(f.name)}')" title="Remove facilitator">Del</button></td></tr>`;
+            }).join('');
+        } catch (e) {
+            console.error('Failed to load facilitators:', e);
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">Failed to load</td></tr>';
+        }
+    }
+
+    async function resetFacilitatorPassword(username, name) {
+        if (!confirm(`Send password reset email to ${name}? They will receive an email to set a new password.`)) return;
+        try {
+            await api('POST', '/facilitators/reset-password', { username });
+            showToast(`Password reset email sent to ${name}`);
+        } catch (e) {
+            showToast('Failed to send reset email');
+            console.error(e);
+        }
+    }
+
+    async function addFacilitator() {
+        const name = document.getElementById('facName').value.trim();
+        const email = document.getElementById('facEmail').value.trim();
+        if (!name || !email) { showToast('Name and email required'); return; }
+        try {
+            await api('POST', '/facilitators', { email, name });
+            document.getElementById('facName').value = '';
+            document.getElementById('facEmail').value = '';
+            document.getElementById('addFacilitatorForm').style.display = 'none';
+            showToast(`Facilitator added: ${name}`);
+            loadFacilitators();
+        } catch (e) {
+            showToast('Failed to add facilitator');
+            console.error(e);
+        }
+    }
+
+    async function deleteFacilitator(username, name) {
+        if (!confirm(`Remove facilitator ${name}? This will delete their Cognito account.`)) return;
+        try {
+            await api('DELETE', `/facilitators/${encodeURIComponent(username)}`);
+            showToast(`Removed: ${name}`);
+            loadFacilitators();
+        } catch (e) {
+            showToast('Failed to remove facilitator');
+            console.error(e);
+        }
+    }
+
+    async function setFacilitatorPassword(username, name) {
+        const password = prompt(`Set new password for ${name}:\n(Min 8 chars, uppercase, lowercase, number)`);
+        if (!password) return;
+        if (password.length < 8) {
+            showToast('Password must be at least 8 characters');
+            return;
+        }
+        try {
+            await api('POST', '/facilitators/set-password', { username, password });
+            showToast(`Password updated for ${name}`);
+            loadFacilitators();
+        } catch (e) {
+            showToast('Failed to set password');
+            console.error(e);
+        }
+    }
+
+    // ===== DATA MANAGEMENT =====
+    async function resetAssessments() {
+        if (!confirm('This will permanently delete ALL assessments, audit log entries, and notes. Are you sure?')) return;
+        if (!confirm('This cannot be undone. Type "yes" would not work here, but are you really sure?')) return;
+        try {
+            const data = await api('POST', '/admin/reset-assessments');
+            showToast(`Cleared ${data.deleted} records`);
+            loadConsensus();
+        } catch (e) {
+            showToast('Failed to reset');
+        }
+    }
+
+    async function resetAllData() {
+        if (!confirm('This will permanently delete ALL data: participants, assessments, audit log, and notes. Are you sure?')) return;
+        if (!confirm('FINAL WARNING: This deletes everything and cannot be undone. Continue?')) return;
+        try {
+            const data = await api('POST', '/admin/reset-all');
+            showToast(`Cleared ${data.deleted} records`);
+            participants = [];
+            loadConsensus();
+            renderAdminTable();
+        } catch (e) {
+            showToast('Failed to reset');
+        }
     }
 
     // ===== ADMIN VIEW =====
-    function renderAdminTable() {
-        seedVbusFromParticipants();
-        renderVbuChips();
+    async function renderAdminTable() {
+        await loadVbus();
+        renderVbuTable();
         populateVbuDropdown();
+        loadFacilitators();
         const tbody = document.getElementById('adminTableBody');
-        tbody.innerHTML = participants.map(p => `
-            <tr>
+        tbody.innerHTML = participants.map(p => {
+            const aiLevel = p.aiMaturityLevel;
+            const hasAI = aiLevel !== undefined && aiLevel !== null;
+            const aiLabel = hasAI ? `L${aiLevel}` : '-';
+            const aiClass = hasAI ? `ai-level-${aiLevel}` : '';
+            return `<tr>
                 <td><strong>${escHtml(p.name)}</strong></td>
-                <td>${escHtml(p.email)}</td>
-                <td>${escHtml(p.vbu || '')}</td>
+                <td class="hide-mobile">${escHtml(p.email)}</td>
+                <td class="hide-mobile">${escHtml(p.vbu || '')}</td>
                 <td><span class="track-badge" style="background:${TRACK_COLORS[p.track] || 'var(--track-general)'};color:${p.track === 'product' ? 'var(--white)' : 'var(--navy)'}">${escHtml(TRACK_LABELS[p.track] || p.track || '')}</span></td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteParticipant('${escAttr(p.userId)}')">Del</button></td>
-            </tr>
-        `).join('');
+                <td>${hasAI ? `<span class="level-pill ${aiClass}" style="font-size:0.6rem;padding:1px 6px;">${aiLabel}</span>` : '<span style="opacity:0.3;">-</span>'}</td>
+                <td style="white-space:nowrap;"><button class="btn btn-outline btn-sm" style="padding:2px 8px;" onclick="editParticipant('${escAttr(p.userId)}')">Edit</button> <button class="btn btn-danger btn-sm" style="padding:2px 8px;" onclick="deleteParticipant('${escAttr(p.userId)}')">Del</button></td>
+            </tr>`;
+        }).join('');
     }
 
+    let editingParticipantId = null;
+
     function showAddParticipant() {
+        editingParticipantId = null;
         populateVbuDropdown();
+        document.getElementById('addEmail').disabled = false;
         document.getElementById('addParticipantForm').style.display = 'block';
+        document.getElementById('participantFormTitle').textContent = 'Add Participant';
         document.getElementById('addName').focus();
     }
 
+    function editParticipant(userId) {
+        const p = participants.find(x => x.userId === userId);
+        if (!p) return;
+        editingParticipantId = userId;
+        populateVbuDropdown();
+        document.getElementById('addParticipantForm').style.display = 'block';
+        document.getElementById('participantFormTitle').textContent = 'Edit Participant';
+        document.getElementById('addName').value = p.name || '';
+        document.getElementById('addEmail').value = p.email || p.userId;
+        document.getElementById('addEmail').disabled = true; // Can't change the key
+        document.getElementById('addVbu').value = p.vbu || '';
+        document.getElementById('addTrack').value = p.track || 'product';
+        const aiLvl = p.aiMaturityLevel;
+        document.getElementById('addAiLevel').value = (aiLvl !== undefined && aiLvl !== null) ? String(aiLvl) : '';
+        document.getElementById('addParticipantForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     function hideAddParticipant() {
+        editingParticipantId = null;
         document.getElementById('addParticipantForm').style.display = 'none';
         document.getElementById('addName').value = '';
         document.getElementById('addEmail').value = '';
+        document.getElementById('addEmail').disabled = false;
         document.getElementById('addVbu').selectedIndex = 0;
+        document.getElementById('addAiLevel').selectedIndex = 0;
+        document.getElementById('participantFormTitle').textContent = 'Add Participant';
     }
 
     async function saveParticipant() {
         const name = document.getElementById('addName').value.trim();
-        const email = document.getElementById('addEmail').value.trim();
+        const email = editingParticipantId || document.getElementById('addEmail').value.trim();
         const vbu = document.getElementById('addVbu').value.trim();
         const track = document.getElementById('addTrack').value;
+        const aiLevelVal = document.getElementById('addAiLevel').value;
 
         if (!name || !email) {
             showToast('Name and email required');
             return;
         }
 
+        const payload = { name, email, vbu, track };
+        if (aiLevelVal !== '') payload.aiMaturityLevel = Number(aiLevelVal);
+
         try {
-            await api('POST', '/participants', { name, email, vbu, track });
+            await api('POST', '/participants', payload);
+            const wasEditing = !!editingParticipantId;
             hideAddParticipant();
-            showToast('Participant added');
+            showToast(wasEditing ? 'Participant updated' : 'Participant added');
             await loadParticipants();
             renderAdminTable();
         } catch (e) {
-            showToast('Failed to add participant');
+            showToast('Failed to save participant');
             console.error(e);
         }
     }
@@ -3427,7 +3597,7 @@
     }
 
     function downloadTemplate() {
-        const csv = 'name,email,vbu,track\nJane Doe,jane@example.com,Acme Corp,product\n';
+        const csv = 'name,email,vbu,track,ai_level\nJane Doe,jane@example.com,Acme Corp,product,2\n';
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -3475,6 +3645,7 @@
         const emailIdx = headers.indexOf('email');
         const vbuIdx = headers.indexOf('vbu');
         const trackIdx = headers.indexOf('track');
+        const aiLevelIdx = headers.indexOf('ai_level');
 
         if (nameIdx === -1 || emailIdx === -1) {
             showToast('CSV must have name and email columns');
@@ -3485,12 +3656,16 @@
         for (let i = 1; i < lines.length; i++) {
             const cols = parseCSVLine(lines[i]);
             if (cols[nameIdx] && cols[emailIdx]) {
-                imported.push({
+                const row = {
                     name: cols[nameIdx],
                     email: cols[emailIdx],
                     vbu: vbuIdx >= 0 ? (cols[vbuIdx] || '') : '',
                     track: trackIdx >= 0 ? (cols[trackIdx] || 'product') : 'product',
-                });
+                };
+                if (aiLevelIdx >= 0 && cols[aiLevelIdx] !== undefined && cols[aiLevelIdx] !== '') {
+                    row.aiMaturityLevel = Number(cols[aiLevelIdx]);
+                }
+                imported.push(row);
             }
         }
 
@@ -3514,18 +3689,88 @@
     }
 
     async function exportAssessments() {
-        // Build a CSV of all assessment data
-        let csv = 'Participant,Email,VBU,Track,Day,Level,Assessor,Timestamp\n';
+        showToast('Preparing export...');
 
-        for (const p of participants) {
-            try {
-                const data = await api('GET', `/assessments?participantId=${encodeURIComponent(p.userId)}`);
-                for (const a of (data.assessments || [])) {
-                    csv += `"${p.name}","${p.email}","${p.vbu || ''}","${p.track || ''}","${a.day}","${a.level}","${a.assessorName}","${a.timestamp}"\n`;
+        // Fetch consensus for all days + notes in parallel
+        const [d1, d2, d3, d4] = await Promise.all([
+            api('GET', '/consensus?day=D1').catch(() => ({ consensus: [] })),
+            api('GET', '/consensus?day=D2').catch(() => ({ consensus: [] })),
+            api('GET', '/consensus?day=D3').catch(() => ({ consensus: [] })),
+            api('GET', '/consensus?day=D4').catch(() => ({ consensus: [] })),
+        ]);
+
+        const consensusByDay = {
+            D1: d1.consensus || [],
+            D2: d2.consensus || [],
+            D3: d3.consensus || [],
+            D4: d4.consensus || [],
+        };
+
+        // Fetch notes for all participants in parallel
+        const notesMap = {};
+        const notePromises = participants.map(p =>
+            api('GET', `/notes/${encodeURIComponent(p.userId)}`).then(data => {
+                const notes = data.notes || [];
+                if (notes.length > 0) {
+                    notesMap[p.userId] = notes.map(n => `[${n.timestamp ? new Date(n.timestamp).toLocaleDateString() : ''}] ${n.note || ''}`);
                 }
-            } catch (e) {
-                console.error('Export error for', p.userId, e);
+            }).catch(() => {})
+        );
+        await Promise.all(notePromises);
+
+        // Collect all unique assessor names across all days
+        const assessorSet = new Set();
+        for (const day of ASSESSMENT_DAYS) {
+            for (const p of consensusByDay[day]) {
+                for (const a of (p.assessments || [])) {
+                    assessorSet.add(a.assessorName || a.assessorId);
+                }
             }
+        }
+        const assessors = [...assessorSet].sort();
+
+        // Build header
+        let header = ['Participant', 'Email', 'VBU', 'Track', 'AI_Level'];
+        for (const day of ASSESSMENT_DAYS) {
+            header.push(`${day}_Consensus`);
+            header.push(`${day}_Count`);
+            for (const assessor of assessors) {
+                header.push(`${day}_${assessor}`);
+            }
+        }
+        header.push('Notes');
+
+        const csvEsc = (val) => `"${String(val || '').replace(/"/g, '""')}"`;
+        let csv = header.map(csvEsc).join(',') + '\n';
+
+        // Build consensus lookup per day: userId → consensus data
+        const lookups = {};
+        for (const day of ASSESSMENT_DAYS) {
+            lookups[day] = {};
+            for (const p of consensusByDay[day]) {
+                lookups[day][p.userId] = p;
+            }
+        }
+
+        // One row per participant
+        for (const p of participants) {
+            const aiLvl = p.aiMaturityLevel !== undefined && p.aiMaturityLevel !== null ? `Level ${p.aiMaturityLevel}` : '';
+            const row = [p.name, p.email || p.userId, p.vbu || '', p.track || '', aiLvl];
+
+            for (const day of ASSESSMENT_DAYS) {
+                const cd = lookups[day][p.userId];
+                const consensus = cd && cd.consensus ? cd.consensus.level : '';
+                const count = cd && cd.consensus ? cd.consensus.count : 0;
+                row.push(consensus ? LEVEL_LABELS[consensus] || consensus : '');
+                row.push(count);
+                for (const assessor of assessors) {
+                    const match = cd ? (cd.assessments || []).find(a => (a.assessorName || a.assessorId) === assessor) : null;
+                    row.push(match ? LEVEL_LABELS[match.level] || match.level : '');
+                }
+            }
+
+            row.push((notesMap[p.userId] || []).join(' | '));
+            csv += row.map(csvEsc).join(',') + '\n';
         }
 
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -3552,27 +3797,61 @@
 
     function renderAuditLog(entries) {
         const tbody = document.getElementById('auditTableBody');
+        const cardsContainer = document.getElementById('auditCardsContainer');
         if (entries.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;opacity:0.5;">No audit entries yet</td></tr>';
+            if (cardsContainer) cardsContainer.innerHTML = '<div style="text-align:center;padding:16px;opacity:0.5;font-size:0.8rem;">No audit entries yet</div>';
             return;
         }
 
+        function getLevelPill(level) {
+            if (!level) return '-';
+            // For AI levels (numeric strings)
+            if (/^\d$/.test(level)) {
+                return `<span class="level-pill ai-level-${level}" style="font-size:0.6rem;padding:1px 6px;">L${level}</span>`;
+            }
+            return `<span class="level-pill ${level}" style="font-size:0.6rem;padding:1px 6px;">${LEVEL_LABELS[level] || level}</span>`;
+        }
+
+        function getDayLabel(day) {
+            if (!day) return '';
+            if (day === 'AI') return 'AI';
+            return 'Day ' + day.slice(1);
+        }
+
+        // Table view
         tbody.innerHTML = entries.map(e => {
             const time = new Date(e.timestamp).toLocaleString();
             const participant = participants.find(p => p.userId === e.participantId);
             const pName = participant ? participant.name : e.participantId;
-            const prev = e.previousLevel ? `<span class="level-pill ${e.previousLevel}" style="font-size:0.6rem;padding:1px 6px;">${LEVEL_LABELS[e.previousLevel] || e.previousLevel}</span>` : '-';
-            const next = `<span class="level-pill ${e.newLevel}" style="font-size:0.6rem;padding:1px 6px;">${LEVEL_LABELS[e.newLevel] || e.newLevel}</span>`;
+            const prev = getLevelPill(e.previousLevel);
+            const next = getLevelPill(e.newLevel);
             return `<tr>
                 <td style="white-space:nowrap;font-size:0.68rem;">${time}</td>
                 <td><strong>${escHtml(pName)}</strong></td>
-                <td>${e.day || ''}</td>
+                <td>${getDayLabel(e.day)}</td>
                 <td>${escHtml(e.assessorName || '')}</td>
                 <td>${e.action || ''}</td>
                 <td>${prev}</td>
                 <td>${next}</td>
             </tr>`;
         }).join('');
+
+        // Card view (for mobile)
+        if (cardsContainer) {
+            cardsContainer.innerHTML = entries.map(e => {
+                const time = new Date(e.timestamp).toLocaleString();
+                const participant = participants.find(p => p.userId === e.participantId);
+                const pName = participant ? participant.name : e.participantId;
+                const prev = getLevelPill(e.previousLevel);
+                const next = getLevelPill(e.newLevel);
+                return `<div class="audit-card">
+                    <div class="audit-card-header">${escHtml(pName)} — ${getDayLabel(e.day)}</div>
+                    <div class="audit-card-body">${prev} &rarr; ${next}</div>
+                    <div class="audit-card-footer">${escHtml(e.assessorName || '')} at ${time}</div>
+                </div>`;
+            }).join('');
+        }
     }
 
     function filterAuditLog() {
