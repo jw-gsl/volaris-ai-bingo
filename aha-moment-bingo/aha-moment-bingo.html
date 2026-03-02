@@ -2014,7 +2014,7 @@
             .day-dot { padding: 4px 10px; font-size: 0.65rem; }
             .day-journal-btn { padding: 4px 10px !important; font-size: 0.65rem !important; }
             /* Landing page — fit in one viewport */
-            .landing-overlay { padding: 8px; align-items: center; overflow-y: hidden; }
+            .landing-overlay { padding: 8px; align-items: center; overflow-y: auto; }
             .landing-card { padding: 22px 18px 18px; border-radius: 18px; }
             .landing-card .welcome-logo { margin-bottom: 10px; }
             .landing-card .welcome-logo img { height: 26px; }
@@ -2932,7 +2932,7 @@
 
     // Step 0: check DynamoDB for existing record by email
     async function submitEmail() {
-        const email = document.getElementById('welcomeEmail').value.trim();
+        const email = document.getElementById('welcomeEmail').value.trim().toLowerCase();
         if (!email || !email.includes('@')) {
             document.getElementById('lookupStatus').textContent = 'Please enter a valid email.';
             return;
