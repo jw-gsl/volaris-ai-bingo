@@ -2063,9 +2063,8 @@
                     <span class="step-dot" id="sdot1"></span>
                     <span class="step-dot" id="sdot2"></span>
                     <span class="step-dot" id="sdot3"></span>
-                    <span class="step-dot" id="sdot4"></span>
                 </div>
-                <span class="wizard-step-label" id="wizardStepLabel">Step 1 of 5</span>
+                <span class="wizard-step-label" id="wizardStepLabel">Step 1 of 4</span>
             </div>
 
             <!-- Step 0: Email lookup -->
@@ -3007,8 +3006,8 @@
             progress.style.display = 'none';
         } else {
             progress.style.display = 'block';
-            document.getElementById('wizardStepLabel').textContent = `Step ${n} of 5`;
-            for (let i = 0; i <= 4; i++) {
+            document.getElementById('wizardStepLabel').textContent = `Step ${n} of 4`;
+            for (let i = 0; i <= 3; i++) {
                 const dot = document.getElementById(`sdot${i}`);
                 dot.classList.toggle('active', i === n - 1);
                 dot.classList.toggle('done', i < n - 1);
