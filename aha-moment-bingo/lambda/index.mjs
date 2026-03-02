@@ -1,9 +1,10 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, GetCommand, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({ region: "us-east-1" });
 const ddb = DynamoDBDocumentClient.from(client);
 const TABLE = "csi-bingo-journal";
+const DIAG_TABLE = "csi-bingo-diagnostics";
 
 const headers = {
   "Content-Type": "application/json",
@@ -71,6 +72,51 @@ export const handler = async (event) => {
       await ddb.send(new DeleteCommand({
         TableName: TABLE,
         Key: { userId, ahaText }
+      }));
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // GET /diagnostic?userId=email — look up existing diagnostic record
+    if (method === "GET" && path.startsWith("/diagnostic")) {
+      const userId = event.queryStringParameters?.userId;
+      if (!userId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "userId required" }) };
+      }
+
+      const result = await ddb.send(new GetCommand({
+        TableName: DIAG_TABLE,
+        Key: { userId }
+      }));
+
+      if (!result.Item) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify(result.Item) };
+    }
+
+    // POST /diagnostic — create/update a diagnostic record
+    if (method === "POST" && path.startsWith("/diagnostic")) {
+      const body = JSON.parse(event.body);
+      const { userId, name, vbu, role, level, q3, q4, completedAt } = body;
+
+      if (!userId || !name || !role) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "userId, name, and role required" }) };
+      }
+
+      await ddb.send(new PutCommand({
+        TableName: DIAG_TABLE,
+        Item: {
+          userId,
+          name: name || "",
+          vbu: vbu || "",
+          role: role || "",
+          level: level !== undefined ? String(level) : "",
+          q3: q3 || "",
+          q4: q4 || "",
+          completedAt: completedAt || new Date().toISOString()
+        }
       }));
 
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
